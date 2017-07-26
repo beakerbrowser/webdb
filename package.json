@@ -1,0 +1,35 @@
+{
+  "name": "injestdb",
+  "version": "1.0.0",
+  "description": "A DB which abstracts over the DatArchive API to provide a Tables & Records interface.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "ava": "^0.21.0",
+    "fake-indexeddb": "^2.0.3"
+  },
+  "scripts": {
+    "lint": "standard --fix",
+    "test": "ava -s test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beakerbrowser/injestdb.git"
+  },
+  "keywords": [
+    "beaker",
+    "dat",
+    "p2p"
+  ],
+  "author": "Paul Frazee <pfrazee@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/beakerbrowser/injestdb/issues"
+  },
+  "homepage": "https://github.com/beakerbrowser/injestdb#readme"
+}

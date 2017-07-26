@@ -2,7 +2,7 @@
 
 Abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. Put another way, it hides the filesystem to provide a Tables and Records metaphor. Forked from [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using IndexedDB.
 
-Injest works by scanning a set of source archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. Injest also provides a simple interface for adding, editing, and removing records on the archives that the local user owns.
+Injest works by scanning a set of origin archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. Injest also provides a simple interface for adding, editing, and removing records on the archives that the local user owns.
 
 #### Goals
 
@@ -15,7 +15,7 @@ Injest works by scanning a set of source archives for files that match a path pa
  - **Record**: an entry in a Table which is derived from a single file in an Archive.
  - **Table**: a namespace of Records which are aggregated across many Archives.
  - **Recordset**: a set of Records which have been returned by a Table query.
- - **Source Archive**: an Archive that has been added to the database as a source of Records.
+ - **Origin Archive**: an Archive that has been added to the database as a origin of Records.
  - **Ingest**: to process a file and index it as a Record in a Table.
 
 
@@ -86,9 +86,9 @@ Next we add source archives to be ingested (added ot the dataset). The source ar
 
 ```js
 await Promise.all([
-  db.sources.add(bobsUrl),
-  db.sources.add(alicesUrl),
-  db.sources.add(carlasDatArchive)
+  db.addOrigin(bobsUrl),
+  db.addOrigin(alicesUrl),
+  db.addOrigin(carlasDatArchive)
 ])
 ```
 
@@ -159,18 +159,22 @@ await db.likes
 #### API quick reference
 
 ```js
+var db = new InjestDB(name)
+db.close() => Promise<Void>
 db.schema(Object) => Promise<Void>
-db.sources.add(url|DatArchive) => Promise<Void>
-db.sources.remove(url|DatArchive) => Promise<Void>
-db.sources.list() => Promise<url>
+db.addOrigin(url|DatArchive) => Promise<Void>
+db.removeOrigin(url|DatArchive) => Promise<Void>
+db.listOrigins() => Promise<url>
+InjestDB.list() => Promise<Void>
+InjestDB.delete(name) => Promise<Void>
 
 db.{table} => InjestTable
-InjestTable#add(url|DatArchive, record) => Promise<url>
+InjestTable#add(url, record) => Promise<url>
 InjestTable#count() => Promise<Number>
-InjestTable#delete(url|DatArchive, record) => Promise<url>
+InjestTable#delete(url) => Promise<url>
 InjestTable#each(Function) => Promise<Void>
 InjestTable#filter(Function) => InjestRecordset
-InjestTable#get(path | query) => Promise<InjestArchive>
+InjestTable#get(url | query) => Promise<InjestArchive>
 InjestTable#limit(Number) => InjestRecordset
 InjestTable#name => String
 InjestTable#offset(Number) => InjestRecordset
@@ -179,7 +183,7 @@ InjestTable#reverse() => InjestRecordset
 InjestTable#schema => Object
 InjestTable#toArray() => Promise<Array>
 InjestTable#toCollection() => InjestRecordset
-InjestTable#update(url|DatArchive, record) => Promise<url>
+InjestTable#update(url, record) => Promise<url>
 InjestTable#where(index|query) => InjestWhereClause|InjestRecordset
 
 InjestWhereClause#above(lowerBound) => InjestRecordset
