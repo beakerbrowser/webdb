@@ -224,3 +224,37 @@ InjestRecordset#uniqueKeys() => Promise<Array<String>>
 InjestRecordset#until(Function) => InjestRecordset
 InjestRecordset#update(Object|Function) => Promise<Number>
 ```
+
+## API
+
+### db.schema(definition)
+
+```js
+{
+  version: Number, // the version # of the schema, should increment by 1 on each change
+
+  [tableName]: {
+    // the path inside archives to read record data from
+    // can include globs (see https://www.npmjs.com/package/anymatch)
+    path: String,
+
+    // function to build paths for newly-created records
+    // eg (record) => `/tweets/${record.createdAt}.json`
+    buildPath: Function(Object) => String, 
+
+    // specify which fields are indexed for querying
+    // each is a keypath, see https://www.w3.org/TR/IndexedDB/#dfn-key-path
+    // can specify compound indexes with a + separator in the keypath
+    // eg one index            - index: 'firstName' 
+    // eg two indexes          - index: ['firstName', 'lastName']
+    // eg add a compound index - index: ['firstName', 'lastName', 'firstName+lastName']
+    index: String|Array<String>,
+
+    // validator & sanitizer
+    // takes the ingested file (must be valid json)
+    // returns the record to be stored
+    // returns falsy or throws to not store the record
+    validator: Function(Object) => Object
+  }
+}
+```
