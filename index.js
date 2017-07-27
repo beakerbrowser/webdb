@@ -46,7 +46,7 @@ class InjestDB extends EventEmitter {
       if (!e.newVersion || e.newVersion < e.oldVersion) {
         console.warn(`InjestDB.delete('${this.name}') was blocked`)
       } else {
-        console.warn(`Upgrade '${this.name}' blocked by other connection holding version ${e.oldVersion / 10}`)
+        console.warn(`Upgrade '${this.name}' blocked by other connection holding version ${e.oldVersion}`)
       }
     })
   }
@@ -56,6 +56,9 @@ class InjestDB extends EventEmitter {
     if (this.isBeingOpened || this.idx) {
       veryDebug('duplicate open, returning ready promise')
       return this.dbReadyPromise
+    }
+    if (this.isOpen) {
+      console.error('\n\nOH NO IS OPEN\n\n')
     }
     // if (this.isClosed) {
     //   veryDebug('open after close')
@@ -113,6 +116,9 @@ class InjestDB extends EventEmitter {
       Schemas.removeTables(this)
       this.idx.close()
       this.idx = null
+      veryDebug('db .idx closed')
+    } else {
+      veryDebug('db .idx didnt yet exist')
     }
     this.isOpen = false
     this.isClosed = true
@@ -165,23 +171,28 @@ module.exports = InjestDB
 async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
   // get the ones that haven't been run
   var upgrades = db.schemas.filter(s => s.version > oldVersion)
-  var lastSchema = db.schemas.find(s => s.version === oldVersion)
-  if (oldVersion > 0 && !lastSchema) {
+  var currentSchema = db.schemas.filter(s => s.version <= oldVersion).reduce(Schemas.merge, {})
+  if (oldVersion > 0 && !currentSchema) {
     throw new SchemaError(`Missing schema for previous version (${oldVersion}), unable to run upgrade.`)
   }
   debug(`running upgrade from ${oldVersion}, ${upgrades.length} upgrade(s) found`)
 
   // diff and apply changes
   var tablesToRebuild = []
-  await Promise.all(upgrades.map(async schema => {
+  for (let schema of upgrades) {
+    // compute diff
     debug(`applying upgrade for version ${schema.version}`)
-    var diff = Schemas.diff(lastSchema, schema)
+    var diff = Schemas.diff(currentSchema, schema)
     veryDebug('diff', diff)
+
+    // apply diff
     await Schemas.applyDiff(db, upgradeTransaction, diff)
     tablesToRebuild.push(diff.tablesToRebuild)
-    lastSchema = schema
+
+    // update current schema
+    currentSchema = Schemas.merge(currentSchema, schema)
     debug(`version ${schema.version} applied`)
-  }))
+  }
 
   // rebuild as needed
   tablesToRebuild = new Set(...tablesToRebuild)
@@ -190,6 +201,7 @@ async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
     veryDebug('tablesToRebuild', tablesToRebuild)
     // TODO
   }
+  debug('finished running upgrades')
 }
 
 function lowestVersionFirst (a, b) {
