@@ -183,7 +183,6 @@ async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
     // compute diff
     debug(`applying upgrade for version ${schema.version}`)
     var diff = Schemas.diff(currentSchema, schema)
-    veryDebug('diff', diff)
 
     // apply diff
     await Schemas.applyDiff(db, upgradeTransaction, diff)

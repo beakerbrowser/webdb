@@ -279,3 +279,28 @@ test('simple v6: add / change / remove all at once', async t => {
 
   await testDB.close()
 })
+
+
+test('complex index test', async t => {
+  const testDB = newDB()
+
+  // setup the schema
+  testDB.schema({
+    version: 1,
+    firstTable: {
+      path: '/table1/*.json',
+      buildPath: record => `/table1/${record.id}.json`,
+      index: ['a+b', 'c+d', 'e']
+    }
+  })
+  await testDB.open()
+
+  // check that the table was created correctly
+  t.truthy(testDB.firstTable)
+  var tx = testDB.idx.transaction('firstTable')
+  var store = tx.objectStore('firstTable')
+  t.truthy(store)
+  t.deepEqual(store.indexNames, ['a+b', 'c+d', 'e'])
+
+  await testDB.close()
+})
