@@ -1,9 +1,12 @@
-/* globals window */
+/* globals window DatArchive */
 
 const EventEmitter = require('events')
+const tempy = require('tempy')
 const {debug, veryDebug, assert, eventHandler, errorHandler, eventRebroadcaster} = require('./lib/util')
 const {DatabaseClosedError, SchemaError} = require('./lib/errors')
 const Schemas = require('./lib/schemas')
+const Indexer = require('./lib/indexer')
+const InjestTable = require('./lib/table')
 const indexedDB = typeof window === 'undefined' ? require('fake-indexeddb') : window.indexedDB
 
 class InjestDB extends EventEmitter {
@@ -13,6 +16,10 @@ class InjestDB extends EventEmitter {
     this.name = name
     this.version = 0
     this.schemas = []
+    this.archives = []
+    this.activeTableNames = []
+    this._activeSchema = null
+    this._tablePathPatterns = []
     this.dbReadyPromise = new Promise((resolve, reject) => {
       this.once('open', () => resolve(this))
       this.once('open-failed', reject)
@@ -65,6 +72,7 @@ class InjestDB extends EventEmitter {
     //   throw new DatabaseClosedError()
     // }
     this.isBeingOpened = true
+    Schemas.addBuiltinTableSchemas(this)
 
     debug('opening')
 
@@ -135,20 +143,31 @@ class InjestDB extends EventEmitter {
   }
 
   get tables () {
-    // TODO
-    // return keys(allTables).map(function (name) { return allTables[name]; });
+    return this.activeTableNames.map(name => this[name])
   }
 
-  addOrigin (origin) {
-    // TODO
+  async addArchive (archive) {
+    // create our own new DatArchive instance
+    archive = typeof archive === 'string' ? new DatArchive(archive) : archive
+    if (!(archive.url in this.archives)) {
+      // store and process
+      this.archives[archive.url] = archive
+      await Indexer.processArchive(this, archive)
+      Indexer.watchArchive(this, archive)
+    }
   }
 
-  removeOrigin (origin) {
-    // TODO
+  async removeArchive (archive) {
+    const url = typeof archive === 'string' ? archive.url : archive
+    if (!(archive.url in this.archives)) {
+      delete this.archives[url]
+      Indexer.unwatchArchive(this, archive)
+      await Indexer.disposeArchive(this, archive)
+    }
   }
 
-  listOrigins (origin) {
-    // TODO
+  listArchives (archive) {
+    return Object.keys(this.archives).map(url => this.archives[url])
   }
 
   static list () {
@@ -171,8 +190,8 @@ module.exports = InjestDB
 async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
   // get the ones that haven't been run
   var upgrades = db.schemas.filter(s => s.version > oldVersion)
-  var currentSchema = db.schemas.filter(s => s.version <= oldVersion).reduce(Schemas.merge, {})
-  if (oldVersion > 0 && !currentSchema) {
+  db._activeSchema = db.schemas.filter(s => s.version <= oldVersion).reduce(Schemas.merge, {})
+  if (oldVersion > 0 && !db._activeSchema) {
     throw new SchemaError(`Missing schema for previous version (${oldVersion}), unable to run upgrade.`)
   }
   debug(`running upgrade from ${oldVersion}, ${upgrades.length} upgrade(s) found`)
@@ -182,14 +201,14 @@ async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
   for (let schema of upgrades) {
     // compute diff
     debug(`applying upgrade for version ${schema.version}`)
-    var diff = Schemas.diff(currentSchema, schema)
+    var diff = Schemas.diff(db._activeSchema, schema)
 
     // apply diff
     await Schemas.applyDiff(db, upgradeTransaction, diff)
     tablesToRebuild.push(diff.tablesToRebuild)
 
     // update current schema
-    currentSchema = Schemas.merge(currentSchema, schema)
+    db._activeSchema = Schemas.merge(db._activeSchema, schema)
     debug(`version ${schema.version} applied`)
   }
 
@@ -206,3 +225,4 @@ async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
 function lowestVersionFirst (a, b) {
   return a.version - b.version
 }
+

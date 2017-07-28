@@ -1,13 +1,5 @@
-const InjestDB = require('../')
 const test = require('ava')
-const {debug} = require('../lib/util')
-
-var __counter = 0
-function newDB () {
-  var name = 'test' + (++__counter)
-  debug('\n##', name, '\n')
-  return new InjestDB(name)
-}
+const {newDB} = require('./lib/util')
 
 test('simple v1: add table', async t => {
   const testDB = newDB()
