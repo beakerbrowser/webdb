@@ -122,6 +122,7 @@ class InjestDB extends EventEmitter {
     debug('closing')
     if (this.idx) {
       Schemas.removeTables(this)
+      this.listArchives().forEach(archive => Indexer.unwatchArchive(this, archive))
       this.idx.close()
       this.idx = null
       veryDebug('db .idx closed')
