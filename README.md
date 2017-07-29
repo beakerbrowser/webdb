@@ -120,7 +120,17 @@ await db.likes
   .delete()
 ```
 
-#### API quick reference
+## TODOs
+
+Injest is still in development.
+
+ - [x] Indexer
+ - [x] Core query engine
+ - [ ] Mutation methods (add/update/delete)
+ - [ ] Support for .or() queries
+ -
+
+## API quick reference
 
 ```js
 var db = new InjestDB(name)
