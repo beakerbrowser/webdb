@@ -19,7 +19,8 @@ class InjestDB extends EventEmitter {
     this.isOpen = false
     this.isClosed = false
     this._schemas = []
-    this._archives = []
+    this._archives = {}
+    this._tablesToRebuild = []
     this._activeTableNames = []
     this._activeSchema = null
     this._tablePathPatterns = []
@@ -65,7 +66,7 @@ class InjestDB extends EventEmitter {
       return this._dbReadyPromise
     }
     if (this.isOpen) {
-      console.error('\n\nOH NO IS OPEN\n\n')
+      return
     }
     // if (this.isClosed) {
     //   veryDebug('open after close')
@@ -93,7 +94,7 @@ class InjestDB extends EventEmitter {
         }, reject)
 
         // open suceeded
-        req.onsuccess = eventHandler(() => {
+        req.onsuccess = eventHandler(async () => {
           debug('opened')
 
           // construct the final injestdb object
@@ -101,6 +102,8 @@ class InjestDB extends EventEmitter {
           this.isOpen = true
           this.idx = req.result
           Schemas.addTables(this)
+          var needsRebuild = await Indexer.resetOutdatedIndexes(this)
+          await Indexer.loadArchives(this, needsRebuild)
 
           // events
           this.idx.onversionchange = eventRebroadcaster(this, 'versionchange')
@@ -110,6 +113,7 @@ class InjestDB extends EventEmitter {
       })
     } catch (e) {
       // Did we fail within onupgradeneeded? Make sure to abort the upgrade transaction so it doesnt commit.
+      console.error('Upgrade has failed', e)
       if (upgradeTransaction) {
         upgradeTransaction.abort()
       }
@@ -153,8 +157,7 @@ class InjestDB extends EventEmitter {
     if (!(archive.url in this._archives)) {
       // store and process
       this._archives[archive.url] = archive
-      await Indexer.processArchive(this, archive)
-      Indexer.watchArchive(this, archive)
+      await Indexer.addArchive(this, archive)
     }
   }
 
@@ -167,8 +170,7 @@ class InjestDB extends EventEmitter {
     const url = typeof archive === 'string' ? archive.url : archive
     if (!(archive.url in this._archives)) {
       delete this._archives[url]
-      Indexer.unwatchArchive(this, archive)
-      await Indexer.disposeArchive(this, archive)
+      await Indexer.removeArchive(this, archive)
     }
   }
 
@@ -218,13 +220,8 @@ async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
     debug(`version ${schema.version} applied`)
   }
 
-  // rebuild as needed
-  tablesToRebuild = new Set(...tablesToRebuild)
-  if (tablesToRebuild.size > 0) {
-    debug(`need to rebuid ${tablesToRebuild.size} tables`)
-    veryDebug('tablesToRebuild', tablesToRebuild)
-    // TODO
-  }
+  // track the tables that need rebuilding
+  this._tablesToRebuild = Array.from(new Set(...tablesToRebuild))
   debug('finished running upgrades')
 }
 

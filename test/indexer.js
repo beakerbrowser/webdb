@@ -132,6 +132,11 @@ test('index two archives, then make changes', async t => {
   await testDB.close()
 })
 
+test('make schema changes that require a full rebuild', async t => {
+  // TODO
+  t.pass()
+})
+
 async function testAliceIndex (t, testDB) {
   var profile = await IDB.get(testDB.profile, aliceArchive.url + '/profile.json')
   t.truthy(profile)

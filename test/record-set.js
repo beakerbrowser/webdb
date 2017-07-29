@@ -217,23 +217,23 @@ test('count()', async t => {
 test('orderBy()', async t => {
   var result
   const testDB = await setupNewDB()
-  result = await testDB.single.orderBy('first').first()
+  result = await testDB.single.getRecordSet().orderBy('first').first()
   t.is(result.first, 'first0')
-  result = await testDB.single.orderBy('second').first()
+  result = await testDB.single.getRecordSet().orderBy('second').first()
   t.is(result.second, 0)
-  result = await testDB.single.orderBy('first+second').first()
+  result = await testDB.single.getRecordSet().orderBy('first+second').first()
   t.is(result.first, 'first0')
   t.is(result.second, 0)
-  result = await testDB.single.orderBy('third').first()
+  result = await testDB.single.getRecordSet().orderBy('third').first()
   t.is(result.third, 'third0single')
-  result = await testDB.multi.orderBy('first').first()
+  result = await testDB.multi.getRecordSet().orderBy('first').first()
   t.is(result.first, 'first0')
-  result = await testDB.multi.orderBy('second').first()
+  result = await testDB.multi.getRecordSet().orderBy('second').first()
   t.is(result.second, 0)
-  result = await testDB.multi.orderBy('first+second').first()
+  result = await testDB.multi.getRecordSet().orderBy('first+second').first()
   t.is(result.first, 'first0')
   t.is(result.second, 0)
-  result = await testDB.multi.orderBy('third').first()
+  result = await testDB.multi.getRecordSet().orderBy('third').first()
   t.is(result.third, 'third0multi1')
   await testDB.close()
 })
@@ -243,11 +243,11 @@ test('reverse()', async t => {
   const testDB = await setupNewDB()
   result = await testDB.single.getRecordSet().reverse().toArray()
   t.truthy(result[0].first, 'first9')
-  result = await testDB.single.orderBy('second').reverse().toArray()
+  result = await testDB.single.getRecordSet().orderBy('second').reverse().toArray()
   t.truthy(result[0].first, 'first9')
   result = await testDB.multi.getRecordSet().reverse().toArray()
   t.truthy(result[0].first, 'first9')
-  result = await testDB.multi.orderBy('second').reverse().toArray()
+  result = await testDB.multi.getRecordSet().orderBy('second').reverse().toArray()
   t.truthy(result[0].first, 'first9')
   await testDB.close()
 })
@@ -276,28 +276,33 @@ test('uniqueKeys()', async t => {
 
 test('offset() and limit()', async t => {
   const testDB = await setupNewDB()
-  var results = await testDB.single.orderBy('first').offset(1).toArray()
+  var results = await testDB.single.getRecordSet().orderBy('first').offset(1).toArray()
   t.is(results[0].first, 'first1')
   t.is(results.length, 9)
-  var results = await testDB.single.orderBy('first').limit(2).toArray()
+  var results = await testDB.single.getRecordSet().orderBy('first').limit(2).toArray()
   t.is(results[0].first, 'first0')
   t.is(results[1].first, 'first1')
   t.is(results.length, 2)
-  var results = await testDB.single.orderBy('first').offset(1).limit(2).toArray()
+  var results = await testDB.single.getRecordSet().orderBy('first').offset(1).limit(2).toArray()
   t.is(results[0].first, 'first1')
   t.is(results[1].first, 'first2')
   t.is(results.length, 2)
-  var results = await testDB.single.orderBy('first').offset(1).limit(2).reverse().toArray()
+  var results = await testDB.single.getRecordSet().orderBy('first').offset(1).limit(2).reverse().toArray()
   t.is(results[0].first, 'first8')
   t.is(results[1].first, 'first7')
   t.is(results.length, 2)
   await testDB.close()
 })
 
-
 test('filter()', async t => {
   const testDB = await setupNewDB()
-  var results = await testDB.single.filter(r => r.first === 'first5').toArray()
+  var results = await testDB.single.getRecordSet().filter(r => r.first === 'first5').toArray()
+  t.is(results[0].first, 'first5')
+  t.is(results.length, 1)
+  var results = await testDB.single.getRecordSet()
+    .filter(r => r.first.startsWith('first'))
+    .filter(r => r.second === 5)
+    .toArray()
   t.is(results[0].first, 'first5')
   t.is(results.length, 1)
   await testDB.close()
@@ -313,16 +318,6 @@ test('until()', async t => {
 })
 
 test('or()', async t => {
-  // TODO
-  t.pass()
-})
-
-test('update()', async t => {
-  // TODO
-  t.pass()
-})
-
-test('delete()', async t => {
   // TODO
   t.pass()
 })

@@ -127,7 +127,7 @@ Injest is still in development.
  - [x] Indexer
  - [x] Core query engine
  - [ ] Persisted tables and table reindex on schema change
- - [ ] Mutation methods (add/update/delete)
+ - [x] Mutation methods (add/update/delete)
  - [ ] Support for .or() queries
 
 ## API quick reference
@@ -145,7 +145,7 @@ InjestDB.list() => Promise<Void>
 InjestDB.delete(name) => Promise<Void>
 
 db.{table} => InjestTable
-InjestTable#add(url, record) => Promise<url>
+InjestTable#add(archive, record) => Promise<url>
 InjestTable#count() => Promise<Number>
 InjestTable#delete(url) => Promise<url>
 InjestTable#each(Function) => Promise<Void>
@@ -162,7 +162,10 @@ InjestTable#reverse() => InjestRecordset
 InjestTable#schema => Object
 InjestTable#toArray() => Promise<Array>
 InjestTable#toCollection() => InjestRecordset
-InjestTable#update(url, record) => Promise<url>
+InjestTable#update(record) => Promise<Number>
+InjestTable#update(url, updates) => Promise<Number>
+InjestTable#update(archive, updates) => Promise<Number>
+InjestTable#update(archive, key, updates) => Promise<Number>
 InjestTable#where(index) => InjestWhereClause
 
 InjestWhereClause#above(lowerBound) => InjestRecordset
