@@ -15,18 +15,18 @@ class InjestDB extends EventEmitter {
     this.idx = false
     this.name = name
     this.version = 0
-    this.schemas = []
-    this.archives = []
-    this.activeTableNames = []
-    this._activeSchema = null
-    this._tablePathPatterns = []
-    this.dbReadyPromise = new Promise((resolve, reject) => {
-      this.once('open', () => resolve(this))
-      this.once('open-failed', reject)
-    })
     this.isBeingOpened = false
     this.isOpen = false
     this.isClosed = false
+    this._schemas = []
+    this._archives = []
+    this._activeTableNames = []
+    this._activeSchema = null
+    this._tablePathPatterns = []
+    this._dbReadyPromise = new Promise((resolve, reject) => {
+      this.once('open', () => resolve(this))
+      this.once('open-failed', reject)
+    })
 
     // Default subscribers to 'versionchange' and 'blocked'.
     // Can be overridden by custom handlers. If custom handlers return false, these default
@@ -62,7 +62,7 @@ class InjestDB extends EventEmitter {
     // guard against duplicate opens
     if (this.isBeingOpened || this.idx) {
       veryDebug('duplicate open, returning ready promise')
-      return this.dbReadyPromise
+      return this._dbReadyPromise
     }
     if (this.isOpen) {
       console.error('\n\nOH NO IS OPEN\n\n')
@@ -139,36 +139,41 @@ class InjestDB extends EventEmitter {
 
     // update current version
     this.version = Math.max(this.version, desc.version)
-    this.schemas.push(desc)
-    this.schemas.sort(lowestVersionFirst)
+    this._schemas.push(desc)
+    this._schemas.sort(lowestVersionFirst)
   }
 
   get tables () {
-    return this.activeTableNames.map(name => this[name])
+    return this._activeTableNames.map(name => this[name])
   }
 
   async addArchive (archive) {
     // create our own new DatArchive instance
     archive = typeof archive === 'string' ? new DatArchive(archive) : archive
-    if (!(archive.url in this.archives)) {
+    if (!(archive.url in this._archives)) {
       // store and process
-      this.archives[archive.url] = archive
+      this._archives[archive.url] = archive
       await Indexer.processArchive(this, archive)
       Indexer.watchArchive(this, archive)
     }
   }
 
+  async addArchives (archives) {
+    archives = Array.isArray(archives) ? archives : [archives]
+    return Promise.all(archives.map(a => this.addArchive(a)))
+  }
+
   async removeArchive (archive) {
     const url = typeof archive === 'string' ? archive.url : archive
-    if (!(archive.url in this.archives)) {
-      delete this.archives[url]
+    if (!(archive.url in this._archives)) {
+      delete this._archives[url]
       Indexer.unwatchArchive(this, archive)
       await Indexer.disposeArchive(this, archive)
     }
   }
 
   listArchives (archive) {
-    return Object.keys(this.archives).map(url => this.archives[url])
+    return Object.keys(this._archives).map(url => this._archives[url])
   }
 
   static list () {
@@ -190,8 +195,8 @@ module.exports = InjestDB
 // run the database's queued upgrades
 async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
   // get the ones that haven't been run
-  var upgrades = db.schemas.filter(s => s.version > oldVersion)
-  db._activeSchema = db.schemas.filter(s => s.version <= oldVersion).reduce(Schemas.merge, {})
+  var upgrades = db._schemas.filter(s => s.version > oldVersion)
+  db._activeSchema = db._schemas.filter(s => s.version <= oldVersion).reduce(Schemas.merge, {})
   if (oldVersion > 0 && !db._activeSchema) {
     throw new SchemaError(`Missing schema for previous version (${oldVersion}), unable to run upgrade.`)
   }

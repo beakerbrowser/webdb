@@ -164,6 +164,7 @@ db.open() => Promise<Void>
 db.close() => Promise<Void>
 db.schema(Object) => Promise<Void>
 db.addArchive(url|DatArchive) => Promise<Void>
+db.addArchives(Array<url|DatArchive>) => Promise<Void>
 db.removeArchive(url|DatArchive) => Promise<Void>
 db.listArchives() => Promise<url>
 InjestDB.list() => Promise<Void>
@@ -196,10 +197,9 @@ InjestWhereClause#anyOf(Array|...args) => InjestRecordset
 InjestWhereClause#anyOfIgnoreCase(Array|...args) => InjestRecordset
 InjestWhereClause#below(upperBound) => InjestRecordset
 InjestWhereClause#belowOrEqual(upperBound) => InjestRecordset
-InjestWhereClause#between(lowerBound, upperBound, opts) => InjestRecordset
+InjestWhereClause#between(lowerBound, upperBound, {includeUpper, includeLower}) => InjestRecordset
 InjestWhereClause#equals(value) => InjestRecordset
 InjestWhereClause#equalsIgnoreCase(value) => InjestRecordset
-InjestWhereClause#inAnyRange(ranges, opts) => InjestRecordset
 InjestWhereClause#noneOf(Array|...args) => InjestRecordset
 InjestWhereClause#notEqual(value) => InjestRecordset
 InjestWhereClause#startsWith(value) => InjestRecordset
@@ -228,6 +228,7 @@ InjestRecordset#toArray() => Promise<Array<Object>>
 InjestRecordset#uniqueKeys() => Promise<Array<String>>
 InjestRecordset#until(Function) => InjestRecordset
 InjestRecordset#update(Object|Function) => Promise<Number>
+InjestRecordset#where(index|query) => InjestWhereClause|InjestRecordset
 ```
 
 ## API
