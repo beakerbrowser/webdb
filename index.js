@@ -95,7 +95,6 @@ class InjestDB extends EventEmitter {
 
         // open suceeded
         req.onsuccess = eventHandler(async () => {
-          debug('opened')
 
           // construct the final injestdb object
           this.isBeingOpened = false
@@ -106,6 +105,7 @@ class InjestDB extends EventEmitter {
           await Indexer.loadArchives(this, needsRebuild)
 
           // events
+          debug('opened')
           this.idx.onversionchange = eventRebroadcaster(this, 'versionchange')
           this.emit('open')
           resolve()
@@ -148,7 +148,9 @@ class InjestDB extends EventEmitter {
   }
 
   get tables () {
-    return this._activeTableNames.map(name => this[name])
+    return this._activeTableNames
+      .filter(name => !name.startsWith('_'))
+      .map(name => this[name])
   }
 
   async addArchive (archive) {
@@ -221,8 +223,8 @@ async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
   }
 
   // track the tables that need rebuilding
-  this._tablesToRebuild = Array.from(new Set(...tablesToRebuild))
-  debug('finished running upgrades')
+  db._tablesToRebuild = Array.from(new Set(...tablesToRebuild))
+  debug('Injest.runUpgrades complete', (db._tablesToRebuild.length === 0) ? '- no rebuilds needed' : 'REBUILD REQUIRED')
 }
 
 function lowestVersionFirst (a, b) {

@@ -126,7 +126,7 @@ Injest is still in development.
 
  - [x] Indexer
  - [x] Core query engine
- - [ ] Persisted tables and table reindex on schema change
+ - [x] Persisted tables and table reindex on schema change
  - [x] Mutation methods (add/update/delete)
  - [ ] Support for .or() queries
 

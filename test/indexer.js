@@ -87,6 +87,47 @@ test('index two archives', async t => {
   await testDB.close()
 })
 
+test('make schema changes that require a full rebuild', async t => {
+  // index the archive
+  var testDB = await setupNewDB()
+  await Promise.all([
+    testDB.addArchive(aliceArchive),
+    testDB.addArchive(bobArchive)
+  ])
+
+  // test the indexed values
+  await testAliceIndex(t, testDB)
+  await testBobIndex(t, testDB)
+
+  // grab counts
+  var profileCount = await testDB.profile.count()
+  var broadcastsCount = await testDB.broadcasts.count()
+  t.is(profileCount, 2)
+  t.truthy(broadcastsCount > 0)
+
+  // close, make destructive change, and reopen
+  await testDB.close()
+  testDB.schema({
+    version: 2,
+    profile: {
+      index: ['name', 'bio']
+    },
+    broadcasts: {
+      index: ['createdAt', 'type', 'type+createdAt']
+    }
+  })
+  await testDB.open()
+
+    // test the indexed values
+  // await testAliceIndex(t, testDB)
+  // await testBobIndex(t, testDB)
+
+  // check counts
+  t.is(profileCount, await testDB.profile.count())
+  t.is(broadcastsCount, await testDB.broadcasts.count())
+  await testDB.close()
+})
+
 test('index two archives, then make changes', async t => {
   // index the archive
   var testDB = await setupNewDB()
@@ -130,11 +171,6 @@ test('index two archives, then make changes', async t => {
   t.falsy(broadcast4)
 
   await testDB.close()
-})
-
-test('make schema changes that require a full rebuild', async t => {
-  // TODO
-  t.pass()
 })
 
 async function testAliceIndex (t, testDB) {
