@@ -128,7 +128,11 @@ Injest is still in development.
  - [x] Core query engine
  - [x] Persisted tables and table reindex on schema change
  - [x] Mutation methods (add/update/delete)
+ - [ ] Events
+ - [x] Multikey indexes
+ - [ ] Validation: filename must match primaryKey on non-singular tables
  - [ ] Support for .or() queries
+ - [ ] Complete documentation
 
 ## API quick reference
 
@@ -230,9 +234,10 @@ InjestRecordset#where(index) => InjestWhereClause
     // specify which fields are indexed for querying
     // each is a keypath, see https://www.w3.org/TR/IndexedDB/#dfn-key-path
     // can specify compound indexes with a + separator in the keypath
-    // eg one index            - index: 'firstName' 
-    // eg two indexes          - index: ['firstName', 'lastName']
-    // eg add a compound index - index: ['firstName', 'lastName', 'firstName+lastName']
+    // eg one index               - index: 'firstName' 
+    // eg two indexes             - index: ['firstName', 'lastName']
+    // eg add a compound index    - index: ['firstName', 'lastName', 'firstName+lastName']
+    // eg index an array's values - index: ['firstName', '*favoriteFruits']
     index: String|Array<String>,
 
     // validator & sanitizer

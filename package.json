@@ -11,7 +11,7 @@
     "anymatch": "^1.3.2",
     "await-lock": "^1.1.2",
     "lodash.flatten": "^4.4.0",
-    "node-dat-archive": "^1.0.0",
+    "node-dat-archive": "^1.0.1",
     "tempy": "^0.1.0"
   },
   "devDependencies": {
