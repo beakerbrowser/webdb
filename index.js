@@ -1,7 +1,6 @@
 /* globals window DatArchive */
 
 const EventEmitter = require('events')
-const tempy = require('tempy')
 const {debug, veryDebug, assert, eventHandler, errorHandler, eventRebroadcaster} = require('./lib/util')
 const {DatabaseClosedError, SchemaError} = require('./lib/errors')
 const Schemas = require('./lib/schemas')
@@ -95,8 +94,8 @@ class InjestDB extends EventEmitter {
 
         // open suceeded
         req.onsuccess = eventHandler(async () => {
-
           // construct the final injestdb object
+          this._activeSchema = this._schemas.reduce(Schemas.merge, {})
           this.isBeingOpened = false
           this.isOpen = true
           this.idx = req.result
