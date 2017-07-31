@@ -152,20 +152,30 @@ class InjestDB extends EventEmitter {
       .map(name => this[name])
   }
 
-  async addArchive (archive) {
+  async prepareArchive (archive) {
+    archive = typeof archive === 'string' ? new DatArchive(archive) : archive
+    await Promise.all(this.tables.map(table => {
+      if (!table.schema.singular) {
+        return archive.mkdir(`/${table.name}`).catch(() => {})
+      }
+    }))
+  }
+
+  async addArchive (archive, {prepare} = {}) {
     // create our own new DatArchive instance
     archive = typeof archive === 'string' ? new DatArchive(archive) : archive
     if (!(archive.url in this._archives)) {
       // store and process
       debug('Injest.addArchive', archive.url)
       this._archives[archive.url] = archive
+      if (prepare) await this.prepareArchive(archive)
       await Indexer.addArchive(this, archive)
     }
   }
 
-  async addArchives (archives) {
+  async addArchives (archives, opts) {
     archives = Array.isArray(archives) ? archives : [archives]
-    return Promise.all(archives.map(a => this.addArchive(a)))
+    return Promise.all(archives.map(a => this.addArchive(a, opts)))
   }
 
   async removeArchive (archive) {

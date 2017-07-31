@@ -49,11 +49,7 @@ db.schema({
 Next we add source archives to be ingested (added ot the dataset). The source archives are persisted in IndexedDB, so this doesn't have to be done every run.
 
 ```js
-await Promise.all([
-  db.addArchive(bobsUrl),
-  db.addArchive(alicesUrl),
-  db.addArchive(carlasDatArchive)
-])
+await db.addArchives([alicesUrl, bobsUrl, carlasDatArchive], {prepare: true})
 ```
 
 Now we can begin querying the database for records.
@@ -141,9 +137,10 @@ var db = new InjestDB(name)
 db.open() => Promise<Void>
 db.close() => Promise<Void>
 db.schema(Object) => Promise<Void>
-db.addArchive(url|DatArchive) => Promise<Void>
-db.addArchives(Array<url|DatArchive>) => Promise<Void>
+db.addArchive(url|DatArchive, {prepare: Boolean}) => Promise<Void>
+db.addArchives(Array<url|DatArchive>, {prepare: Boolean}) => Promise<Void>
 db.removeArchive(url|DatArchive) => Promise<Void>
+db.prepareArchive(url|DatArchive)
 db.listArchives() => Promise<url>
 InjestDB.list() => Promise<Void>
 InjestDB.delete(name) => Promise<Void>
