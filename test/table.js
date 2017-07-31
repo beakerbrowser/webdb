@@ -90,6 +90,10 @@ test('get()', async t => {
 
   var result = await testDB.single.get(archives[0].url + '/single.json')
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
+  var result = await testDB.single.get(archives[0])
+  t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
+  var result = await testDB.single.get(archives[0].url)
+  t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   var result = await testDB.single.get('first', 'first0')
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   var result = await testDB.single.get('second', 0)
@@ -100,6 +104,8 @@ test('get()', async t => {
   t.falsy(result)
 
   var result = await testDB.multi.get(archives[0].url + '/multi/1.json')
+  t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
+  var result = await testDB.multi.get(archives[0], 1)
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   var result = await testDB.multi.get('first', 'first0')
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
