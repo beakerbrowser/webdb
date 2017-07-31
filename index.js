@@ -170,10 +170,10 @@ class InjestDB extends EventEmitter {
   }
 
   async removeArchive (archive) {
-    const url = typeof archive === 'string' ? archive.url : archive
+    archive = typeof archive === 'string' ? new DatArchive(archive) : archive
     if (!(archive.url in this._archives)) {
       debug('Injest.removeArchive', archive.url)
-      delete this._archives[url]
+      delete this._archives[archive.url]
       await Indexer.removeArchive(this, archive)
     }
   }
