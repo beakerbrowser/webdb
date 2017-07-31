@@ -170,6 +170,8 @@ InjestTable#update(record) => Promise<Number>
 InjestTable#update(url, updates) => Promise<Number>
 InjestTable#update(archive, updates) => Promise<Number>
 InjestTable#update(archive, key, updates) => Promise<Number>
+InjestTable#upsert(url, record) => Promise<Void | url>
+InjestTable#upsert(archive, record) => Promise<Void | url>
 InjestTable#where(index) => InjestWhereClause
 
 InjestWhereClause#above(lowerBound) => InjestRecordset

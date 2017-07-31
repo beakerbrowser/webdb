@@ -129,3 +129,21 @@ test('Table.update()', async t => {
 
   await testDB.close()
 })
+
+test('Table.upsert()', async t => {
+  const testDB = await setupNewDB()
+
+  // upsert a multi record
+  const url = await testDB.multi.upsert(archives[0], {first: 'upFirst', second: 'upSecond', third: 'upThird'})
+  t.is(typeof url, 'string')
+  t.is(await testDB.multi.upsert(archives[0], {first: 'upFirst', second: 'UPSECOND', third: 'UPTHIRD'}), 1)
+  t.is((await testDB.multi.get('first', 'upFirst')).third, 'UPTHIRD')
+
+  // upsert a single record
+  const url2 = await testDB.single.upsert(archives[0], {first: 'upFirst', second: 'upSecond', third: 'upThird'})
+  t.is(url2, archives[0].url + '/single.json')
+  t.is(await testDB.single.upsert(archives[0], {first: 'upFirst', second: 'UPSECOND', third: 'UPTHIRD'}), 1)
+  t.is((await testDB.single.get('first', 'upFirst')).third, 'UPTHIRD')
+
+  await testDB.close()
+})
