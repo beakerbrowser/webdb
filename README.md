@@ -1,6 +1,6 @@
 # InjestDB
 
-A peer-to-peer database for dat:// applications.
+A peer-to-peer database for dat:// applications. [How it works](#how-it-works)
 
 #### Example
 
@@ -253,20 +253,12 @@ InjestRecordset#where(index) => InjestWhereClause
 
 ## How it works
 
-InjestDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. Put another way, it uses the filesystem to provide a Tables and Records interface. Injest is based heavily on [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using IndexedDB.
+InjestDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is based heavily on [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using IndexedDB.
 
-Injest works by scanning a set of origin archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. Injest also provides a simple interface for adding, editing, and removing records on the archives that the local user owns.
+Injest works by scanning a set of source archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. Injest also provides a simple interface for adding, editing, and removing records on the archives that the local user owns.
 
-#### Goals
+Injest sits on top of Dat archives. It duplicates the data it's handling into IndexedDB, and that duplicated data acts as a throwaway cache -- it can be reconstructed at any time from the Dat archives.
 
- - Simplify data storage and aggregate querying over multiple dat archives
- - Provide complex queries with ranges, partial matches, and logical combinations (AND, OR)
+Injest treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of .json files. For instance, if you had a 'tweets' table, it would map to the `/tweets/*.json` files. Injest's mutators, such as put or add or update, simply write those json files. Injest's readers & query-ers, such as get() or where(), read from the IndexedDB cache.
 
-#### Glossary
-
- - **Archive**: a Dat archive. Has its own security origin. Contains many records.
- - **Record**: an entry in a Table which is derived from a single file in an Archive.
- - **Table**: a namespace of Records which are aggregated across many Archives.
- - **Recordset**: a set of Records which have been returned by a Table query.
- - **Origin Archive**: an Archive that has been added to the database as a origin of Records.
- - **Ingest**: to process a file and index it as a Record in a Table.
+Injest watches its source archives for changes to the json files. When they change, it reads them and updates IndexedDB, thus the query results stay up-to-date. The flow is, roughly: `put() -> archive/tweets/12345.json -> indexer -> indexeddb -> get()`.
