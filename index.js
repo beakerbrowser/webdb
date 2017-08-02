@@ -6,7 +6,7 @@ const {DatabaseClosedError, SchemaError} = require('./lib/errors')
 const Schemas = require('./lib/schemas')
 const Indexer = require('./lib/indexer')
 const InjestTable = require('./lib/table')
-const indexedDB = typeof window === 'undefined' ? require('fake-indexeddb') : window.indexedDB
+const indexedDB = window.indexedDB
 
 class InjestDB extends EventEmitter {
   constructor (name) {

@@ -134,6 +134,8 @@ Injest is still in development.
 
 ```js
 var db = new InjestDB(name)
+InjestDB.list() => Promise<Void>
+InjestDB.delete(name) => Promise<Void>
 db.open() => Promise<Void>
 db.close() => Promise<Void>
 db.schema(Object) => Promise<Void>
@@ -142,8 +144,10 @@ db.addArchives(Array<url|DatArchive>, {prepare: Boolean}) => Promise<Void>
 db.removeArchive(url|DatArchive) => Promise<Void>
 db.prepareArchive(url|DatArchive)
 db.listArchives() => Promise<url>
-InjestDB.list() => Promise<Void>
-InjestDB.delete(name) => Promise<Void>
+db 'open' ()
+db 'open-failed' (error)
+db 'versionchange' ()
+db 'indexes-updated' (archive, archiveVersion)
 
 db.{table} => InjestTable
 InjestTable#add(archive, record) => Promise<url>
@@ -173,6 +177,7 @@ InjestTable#update(archive, key, updates) => Promise<Number>
 InjestTable#upsert(url, record) => Promise<Void | url>
 InjestTable#upsert(archive, record) => Promise<Void | url>
 InjestTable#where(index) => InjestWhereClause
+InjestTable 'index-updated' (archive, archiveVersion)
 
 InjestWhereClause#above(lowerBound) => InjestRecordset
 InjestWhereClause#aboveOrEqual(lowerBound) => InjestRecordset

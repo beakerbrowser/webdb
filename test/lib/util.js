@@ -1,4 +1,4 @@
-const InjestDB = require('../../')
+const InjestDB = require('../../node')
 const {debug} = require('../../lib/util')
 
 var __counter = 0
