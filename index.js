@@ -122,7 +122,7 @@ class InjestDB extends EventEmitter {
       // store and process
       debug('Injest.addArchive', archive.url)
       this._archives[archive.url] = archive
-      if (prepare) await this.prepareArchive(archive)
+      if (prepare !== false) await this.prepareArchive(archive)
       await Indexer.addArchive(this, archive)
     }
   }
