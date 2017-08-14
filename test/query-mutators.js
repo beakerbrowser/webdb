@@ -1,6 +1,5 @@
 const test = require('ava')
 const {newDB, ts} = require('./lib/util')
-const IDB = require('../lib/idb-wrapper')
 const {debug} = require('../lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
@@ -43,7 +42,7 @@ test.before('setup archives', async () => {
   }
 })
 
-test('RecordSet.delete()', async t => {
+test('Query.delete()', async t => {
   var result
   const testDB = await setupNewDB()
 
@@ -58,7 +57,7 @@ test('RecordSet.delete()', async t => {
   await testDB.close()
 })
 
-test('RecordSet.update()', async t => {
+test('Query.update()', async t => {
   const incrementSecond = record => { record.second++ }
   const testDB = await setupNewDB()
 

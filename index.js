@@ -1,22 +1,22 @@
-/* globals window DatArchive */
+/* globals DatArchive */
 
 const EventEmitter = require('events')
-const {debug, veryDebug, assert, eventHandler, errorHandler, eventRebroadcaster} = require('./lib/util')
-const {DatabaseClosedError, SchemaError} = require('./lib/errors')
+const level = require('level-browserify')
+const sublevel = require('level-sublevel')
+const levelPromisify = require('level-promise')
+const {debug, veryDebug, assert} = require('./lib/util')
+const {SchemaError} = require('./lib/errors')
 const Schemas = require('./lib/schemas')
 const Indexer = require('./lib/indexer')
-const InjestTable = require('./lib/table')
-const indexedDB = window.indexedDB
 
 class InjestDB extends EventEmitter {
   constructor (name) {
     super()
-    this.idx = false
+    this.level = false
     this.name = name
     this.version = 0
     this.isBeingOpened = false
     this.isOpen = false
-    this.isClosed = false
     this._schemas = []
     this._archives = {}
     this._tablesToRebuild = []
@@ -27,117 +27,71 @@ class InjestDB extends EventEmitter {
       this.once('open', () => resolve(this))
       this.once('open-failed', reject)
     })
-
-    // Default subscribers to 'versionchange' and 'blocked'.
-    // Can be overridden by custom handlers. If custom handlers return false, these default
-    // behaviours will be prevented.
-    this.on('versionchange', e => {
-      // Default behavior for versionchange event is to close database connection.
-      // Caller can override this behavior by doing this.on('versionchange', function(){ return false; });
-      // Let's not block the other window from making it's delete() or open() call.
-      // NOTE! This event is never fired in IE,Edge or Safari.
-      if (e.newVersion > 0) {
-        console.warn(`Another connection wants to upgrade database '${this.name}'. Closing db now to resume the upgrade.`)
-      } else {
-        console.warn(`Another connection wants to delete database '${this.name}'. Closing db now to resume the delete request.`)
-      }
-      this.close()
-      // In many web applications, it would be recommended to force window.reload()
-      // when this event occurs. To do that, subscribe to the versionchange event
-      // and call window.location.reload(true) if e.newVersion > 0 (not a deletion)
-      // The reason for this is that your current web app obviously has old schema code that needs
-      // to be updated. Another window got a newer version of the app and needs to upgrade DB but
-      // your window is blocking it unless we close it here.
-    })
-    this.on('blocked', e => {
-      if (!e.newVersion || e.newVersion < e.oldVersion) {
-        console.warn(`InjestDB.delete('${this.name}') was blocked`)
-      } else {
-        console.warn(`Upgrade '${this.name}' blocked by other connection holding version ${e.oldVersion}`)
-      }
-    })
   }
 
   async open () {
     // guard against duplicate opens
-    if (this.isBeingOpened || this.idx) {
+    if (this.isBeingOpened || this.level) {
       veryDebug('duplicate open, returning ready promise')
       return this._dbReadyPromise
     }
     if (this.isOpen) {
       return
     }
-    // if (this.isClosed) {
-    //   veryDebug('open after close')
-    //   throw new DatabaseClosedError()
-    // }
     this.isBeingOpened = true
     Schemas.addBuiltinTableSchemas(this)
 
+    // open the db
     debug('opening')
-
-    var upgradeTransaction
     try {
-      // start the opendb request
-      await new Promise((resolve, reject) => {
-        var req = indexedDB.open(this.name, this.version)
-        req.onerror = errorHandler(reject)
-        req.onblocked = eventRebroadcaster(this, 'blocked')
+      this.level = sublevel(level(this.name, {valueEncoding: 'json'}))
+      levelPromisify(this.level)
 
-        // run the upgrades
-        req.onupgradeneeded = eventHandler(async e => {
-          debug('upgrade needed', {oldVersion: e.oldVersion, newVersion: e.newVersion})
-          upgradeTransaction = req.transaction
-          upgradeTransaction.onerror = errorHandler(reject) // if upgrade fails, open() fails
-          await runUpgrades({db: this, oldVersion: e.oldVersion, upgradeTransaction})
-        }, reject)
-
-        // open suceeded
-        req.onsuccess = eventHandler(async () => {
-          // construct the final injestdb object
-          this._activeSchema = this._schemas.reduce(Schemas.merge, {})
-          this.isBeingOpened = false
-          this.isOpen = true
-          this.idx = req.result
-          Schemas.addTables(this)
-          var needsRebuild = await Indexer.resetOutdatedIndexes(this)
-          await Indexer.loadArchives(this, needsRebuild)
-
-          // events
-          debug('opened')
-          this.idx.onversionchange = eventRebroadcaster(this, 'versionchange')
-          this.emit('open')
-          resolve()
-        }, reject)
-      })
-    } catch (e) {
-      // Did we fail within onupgradeneeded? Make sure to abort the upgrade transaction so it doesnt commit.
-      console.error('Upgrade has failed', e)
-      if (upgradeTransaction) {
-        upgradeTransaction.abort()
+      // run upgrades
+      try {
+        var oldVersion = (await this.level.get('version')) || 0
+      } catch (e) {
+        oldVersion = 0
       }
+      if (oldVersion < this.version) {
+        await runUpgrades({db: this, oldVersion})
+        await this.level.put('version', this.version)
+      }
+
+      // construct the final injestdb object
+      this._activeSchema = this._schemas.reduce(Schemas.merge, {})
+      this.isBeingOpened = false
+      this.isOpen = true
+      Schemas.addTables(this)
+      let needsRebuild = await Indexer.resetOutdatedIndexes(this)
+      await Indexer.loadArchives(this, needsRebuild)
+
+      // events
+      debug('opened')
+      this.emit('open')
+    } catch (e) {
+      console.error('Upgrade has failed', e)
       this.isBeingOpened = false
       this.emit('open-failed', e)
     }
   }
 
-  close () {
+  async close () {
     debug('closing')
-    if (this.idx) {
+    this.isOpen = false
+    if (this.level) {
       Schemas.removeTables(this)
       this.listArchives().forEach(archive => Indexer.unwatchArchive(this, archive))
-      this.idx.close()
-      this.idx = null
-      veryDebug('db .idx closed')
+      await new Promise(resolve => this.level.close(resolve))
+      this.level = null
+      veryDebug('db .level closed')
     } else {
-      veryDebug('db .idx didnt yet exist')
+      veryDebug('db .level didnt yet exist')
     }
-    this.isOpen = false
-    this.isClosed = true
   }
 
   schema (desc) {
-    assert(!this.idx && !this.isBeingOpened, SchemaError, 'Cannot add version when database is open')
+    assert(!this.level && !this.isBeingOpened, SchemaError, 'Cannot add version when database is open')
     Schemas.validateAndSanitize(desc)
 
     // update current version
@@ -168,7 +122,7 @@ class InjestDB extends EventEmitter {
       // store and process
       debug('Injest.addArchive', archive.url)
       this._archives[archive.url] = archive
-      if (prepare) await this.prepareArchive(archive)
+      if (prepare !== false) await this.prepareArchive(archive)
       await Indexer.addArchive(this, archive)
     }
   }
@@ -196,19 +150,23 @@ class InjestDB extends EventEmitter {
   }
 
   static delete (name) {
+    if (typeof level.destroy !== 'function') {
+      throw new Error('Cannot .delete() databases outside of the browser environment. You should just delete the files manually.')
+    }
+
     // delete the database from indexeddb
     return new Promise((resolve, reject) => {
-      var req = indexedDB.deleteDatabase(name)
-      req.onsuccess = resolve
-      req.onerror = errorHandler(reject)
-      req.onblocked = eventRebroadcaster(this, 'blocked')
+      level.destroy(name, err => {
+        if (err) reject(err)
+        else resolve()
+      })
     })
   }
 }
 module.exports = InjestDB
 
 // run the database's queued upgrades
-async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
+async function runUpgrades ({db, oldVersion}) {
   // get the ones that haven't been run
   var upgrades = db._schemas.filter(s => s.version > oldVersion)
   db._activeSchema = db._schemas.filter(s => s.version <= oldVersion).reduce(Schemas.merge, {})
@@ -225,7 +183,7 @@ async function runUpgrades ({db, oldVersion, upgradeTransaction}) {
     var diff = Schemas.diff(db._activeSchema, schema)
 
     // apply diff
-    await Schemas.applyDiff(db, upgradeTransaction, diff)
+    await Schemas.applyDiff(db, diff)
     tablesToRebuild.push(diff.tablesToRebuild)
 
     // update current schema
