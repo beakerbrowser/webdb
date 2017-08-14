@@ -1,6 +1,5 @@
 const test = require('ava')
 const {newDB, ts} = require('./lib/util')
-const IDB = require('../lib/idb-wrapper')
 const {debug} = require('../lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
@@ -116,7 +115,7 @@ test('Table.update()', async t => {
   t.is(await testDB.multi.update(archives[9], 'first0', {foo: 'bar'}), 2)
 
   // update a single record
-  var record = await testDB.single.getRecordSet().first()
+  var record = await testDB.single.query().first()
   record.n = 0
   debug('== update by record')
   t.is(await testDB.single.update(record), 1)

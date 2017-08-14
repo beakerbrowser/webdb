@@ -17,10 +17,8 @@ test('simple v1: add table', async t => {
 
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
-  var tx = testDB.idx.transaction('firstTable')
-  var store = tx.objectStore('firstTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'a', 'b', 'c'])
+  t.truthy(testDB.firstTable.level)
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', '_origin'])
 
   await testDB.close()
 })
@@ -49,15 +47,11 @@ test('simple v2: add another table', async t => {
 
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
+  t.truthy(testDB.firstTable.level)
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', '_origin'])
   t.truthy(testDB.secondTable)
-  var tx = testDB.idx.transaction('firstTable')
-  var store = tx.objectStore('firstTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'a', 'b', 'c'])
-  var tx = testDB.idx.transaction('secondTable')
-  var store = tx.objectStore('secondTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'd', 'e', 'f'])
+  t.truthy(testDB.secondTable.level)
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', '_origin'])
 
   await testDB.close()
 })
@@ -91,10 +85,8 @@ test('simple v3: delete the first table', async t => {
   // check that the table was created correctly
   t.falsy(testDB.firstTable)
   t.truthy(testDB.secondTable)
-  var tx = testDB.idx.transaction('secondTable')
-  var store = tx.objectStore('secondTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'd', 'e', 'f'])
+  t.truthy(testDB.secondTable.level)
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', '_origin'])
   
   await testDB.close()
 })
@@ -136,10 +128,8 @@ test('simple v4: modify the index', async t => {
   // check that the table was created correctly
   t.falsy(testDB.firstTable)
   t.truthy(testDB.secondTable)
-  var tx = testDB.idx.transaction('secondTable')
-  var store = tx.objectStore('secondTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'd', 'f', 'g'])
+  t.truthy(testDB.secondTable.level)
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'f', 'g', '_origin'])
 
   await testDB.close()
 })
@@ -188,15 +178,11 @@ test('simple v5: add another table', async t => {
   // check that the table was created correctly
   t.falsy(testDB.firstTable)
   t.truthy(testDB.secondTable)
+  t.truthy(testDB.secondTable.level)
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'f', 'g', '_origin'])
   t.truthy(testDB.thirdTable)
-  var tx = testDB.idx.transaction('secondTable')
-  var store = tx.objectStore('secondTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'd', 'f', 'g'])
-  var tx = testDB.idx.transaction('thirdTable')
-  var store = tx.objectStore('thirdTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin'])
+  t.truthy(testDB.thirdTable.level)
+  t.deepEqual(Object.keys(testDB.thirdTable.level.indexes), ['_origin'])
 
   await testDB.close()
 })
@@ -260,14 +246,11 @@ test('simple v6: add / change / remove all at once', async t => {
   t.truthy(testDB.secondTable)
   t.falsy(testDB.thirdTable)
   t.truthy(testDB.fourthTable)
-  var tx = testDB.idx.transaction('secondTable')
-  var store = tx.objectStore('secondTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'z'])
-  var tx = testDB.idx.transaction('fourthTable')
-  var store = tx.objectStore('fourthTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin'])
+
+  t.truthy(testDB.secondTable.level)
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['z', '_origin'])
+  t.truthy(testDB.fourthTable.level)
+  t.deepEqual(Object.keys(testDB.fourthTable.level.indexes), ['_origin'])
 
   await testDB.close()
 })
@@ -289,10 +272,8 @@ test('complex index test', async t => {
 
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
-  var tx = testDB.idx.transaction('firstTable')
-  var store = tx.objectStore('firstTable')
-  t.truthy(store)
-  t.deepEqual(store.indexNames, ['_origin', 'a+b', 'c+d', 'e'])
+  t.truthy(testDB.firstTable.level)
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a+b', 'c+d', 'e', '_origin'])
 
   await testDB.close()
 })

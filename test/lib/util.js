@@ -1,11 +1,14 @@
+const tempy = require('tempy')
 const InjestDB = require('../../node')
-const {debug} = require('../../lib/util')
+const {debug, veryDebug} = require('../../lib/util')
 
 var __counter = 0
 exports.newDB = function () {
   const name = 'test' + (++__counter)
   debug('\n##', name, '\n')
-  return new InjestDB(name)
+  var dir = tempy.directory()
+  veryDebug('DB dir:', dir)
+  return new InjestDB(dir)
 }
 
 var lastTs = 0

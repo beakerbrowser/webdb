@@ -1,6 +1,5 @@
 const test = require('ava')
 const {newDB, ts} = require('./lib/util')
-const IDB = require('../lib/idb-wrapper')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 

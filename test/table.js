@@ -1,6 +1,5 @@
 const test = require('ava')
 const {newDB, ts} = require('./lib/util')
-const IDB = require('../lib/idb-wrapper')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
@@ -102,6 +101,7 @@ test('get()', async t => {
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   var result = await testDB.single.get('first', 'notfound')
   t.falsy(result)
+
 
   var result = await testDB.multi.get(archives[0].url + '/multi/1.json')
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)

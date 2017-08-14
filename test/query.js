@@ -1,6 +1,5 @@
 const test = require('ava')
 const {newDB, ts} = require('./lib/util')
-const IDB = require('../lib/idb-wrapper')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
@@ -47,13 +46,13 @@ test('each()', async t => {
   var result
   const testDB = await setupNewDB()
   n = 0
-  await testDB.single.getRecordSet().each(result => {
+  await testDB.single.query().each(result => {
     n++
     t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   })
   t.is(n, 10)
   n = 0
-  await testDB.multi.getRecordSet().each(result => {
+  await testDB.multi.query().each(result => {
     n++
     t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   })
@@ -66,14 +65,14 @@ test('toArray()', async t => {
   var result
   const testDB = await setupNewDB()
   n = 0
-  var results = await testDB.single.getRecordSet().toArray()
+  var results = await testDB.single.query().toArray()
   results.forEach(result => {
     n++
     t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   })
   t.is(n, 10)
   n = 0
-  results = await testDB.multi.getRecordSet().toArray()
+  results = await testDB.multi.query().toArray()
   results.forEach(result => {
     n++
     t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
@@ -87,7 +86,7 @@ test('eachKey()', async t => {
   var result
   const testDB = await setupNewDB()
   n = 0
-  await testDB.single.getRecordSet().eachKey(result => {
+  await testDB.single.query().eachKey(result => {
     n++
     t.truthy(typeof result === 'string')
     // is ._url
@@ -96,7 +95,7 @@ test('eachKey()', async t => {
   })
   t.is(n, 10)
   n = 0
-  await testDB.multi.getRecordSet().eachKey(result => {
+  await testDB.multi.query().eachKey(result => {
     n++
     t.truthy(typeof result === 'string')
     // is .first
@@ -111,7 +110,7 @@ test('keys()', async t => {
   var result
   const testDB = await setupNewDB()
   n = 0
-  var keys = await testDB.single.getRecordSet().keys()
+  var keys = await testDB.single.query().keys()
   keys.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
@@ -121,7 +120,7 @@ test('keys()', async t => {
   })
   t.is(n, 10)
   n = 0
-  var keys = await testDB.multi.getRecordSet().keys()
+  var keys = await testDB.multi.query().keys()
   keys.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
@@ -137,7 +136,7 @@ test('eachUrl()', async t => {
   var result
   const testDB = await setupNewDB()
   n = 0
-  await testDB.single.getRecordSet().eachUrl(result => {
+  await testDB.single.query().eachUrl(result => {
     n++
     t.truthy(typeof result === 'string')
     // is ._url
@@ -146,7 +145,7 @@ test('eachUrl()', async t => {
   })
   t.is(n, 10)
   n = 0
-  await testDB.multi.getRecordSet().eachUrl(result => {
+  await testDB.multi.query().eachUrl(result => {
     n++
     t.truthy(typeof result === 'string')
     // is ._url
@@ -162,7 +161,7 @@ test('urls()', async t => {
   var result
   const testDB = await setupNewDB()
   n = 0
-  var urls = await testDB.single.getRecordSet().urls()
+  var urls = await testDB.single.query().urls()
   urls.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
@@ -172,7 +171,7 @@ test('urls()', async t => {
   })
   t.is(n, 10)
   n = 0
-  urls = await testDB.multi.getRecordSet().urls()
+  urls = await testDB.multi.query().urls()
   urls.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
@@ -187,9 +186,9 @@ test('urls()', async t => {
 test('first()', async t => {
   var result
   const testDB = await setupNewDB()
-  result = await testDB.single.getRecordSet().first()
+  result = await testDB.single.query().first()
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
-  result = await testDB.multi.getRecordSet().first()
+  result = await testDB.multi.query().first()
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   await testDB.close()
 })
@@ -197,9 +196,9 @@ test('first()', async t => {
 test('last()', async t => {
   var result
   const testDB = await setupNewDB()
-  result = await testDB.single.getRecordSet().last()
+  result = await testDB.single.query().last()
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
-  result = await testDB.multi.getRecordSet().last()
+  result = await testDB.multi.query().last()
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   await testDB.close()
 })
@@ -207,9 +206,9 @@ test('last()', async t => {
 test('count()', async t => {
   var result
   const testDB = await setupNewDB()
-  result = await testDB.single.getRecordSet().count()
+  result = await testDB.single.query().count()
   t.is(result, 10)
-  result = await testDB.multi.getRecordSet().count()
+  result = await testDB.multi.query().count()
   t.is(result, 30)
   await testDB.close()
 })
@@ -217,23 +216,23 @@ test('count()', async t => {
 test('orderBy()', async t => {
   var result
   const testDB = await setupNewDB()
-  result = await testDB.single.getRecordSet().orderBy('first').first()
+  result = await testDB.single.query().orderBy('first').first()
   t.is(result.first, 'first0')
-  result = await testDB.single.getRecordSet().orderBy('second').first()
+  result = await testDB.single.query().orderBy('second').first()
   t.is(result.second, 0)
-  result = await testDB.single.getRecordSet().orderBy('first+second').first()
+  result = await testDB.single.query().orderBy('first+second').first()
   t.is(result.first, 'first0')
   t.is(result.second, 0)
-  result = await testDB.single.getRecordSet().orderBy('third').first()
+  result = await testDB.single.query().orderBy('third').first()
   t.is(result.third, 'third0single')
-  result = await testDB.multi.getRecordSet().orderBy('first').first()
+  result = await testDB.multi.query().orderBy('first').first()
   t.is(result.first, 'first0')
-  result = await testDB.multi.getRecordSet().orderBy('second').first()
+  result = await testDB.multi.query().orderBy('second').first()
   t.is(result.second, 0)
-  result = await testDB.multi.getRecordSet().orderBy('first+second').first()
+  result = await testDB.multi.query().orderBy('first+second').first()
   t.is(result.first, 'first0')
   t.is(result.second, 0)
-  result = await testDB.multi.getRecordSet().orderBy('third').first()
+  result = await testDB.multi.query().orderBy('third').first()
   t.is(result.third, 'third0multi1')
   await testDB.close()
 })
@@ -241,53 +240,41 @@ test('orderBy()', async t => {
 test('reverse()', async t => {
   var result
   const testDB = await setupNewDB()
-  result = await testDB.single.getRecordSet().reverse().toArray()
+  result = await testDB.single.query().reverse().toArray()
   t.truthy(result[0].first, 'first9')
-  result = await testDB.single.getRecordSet().orderBy('second').reverse().toArray()
+  result = await testDB.single.query().orderBy('second').reverse().toArray()
   t.truthy(result[0].first, 'first9')
-  result = await testDB.multi.getRecordSet().reverse().toArray()
+  result = await testDB.multi.query().reverse().toArray()
   t.truthy(result[0].first, 'first9')
-  result = await testDB.multi.getRecordSet().orderBy('second').reverse().toArray()
+  result = await testDB.multi.query().orderBy('second').reverse().toArray()
   t.truthy(result[0].first, 'first9')
-  await testDB.close()
-})
-
-test('distinct()', async t => {
-  var result
-  const testDB = await setupNewDB()
-  result = await testDB.single.getRecordSet().distinct().count()
-  t.is(result, 10)
-  result = await testDB.multi.getRecordSet().distinct().count()
-  t.is(result, 30)
-  result = await testDB.multi.orderBy('second').distinct().count()
-  t.is(result, 20)
   await testDB.close()
 })
 
 test('uniqueKeys()', async t => {
   var result
   const testDB = await setupNewDB()
-  result = await testDB.single.getRecordSet().uniqueKeys()
+  result = await testDB.single.query().uniqueKeys()
   t.is(result.length, 10)
-  result = await testDB.multi.getRecordSet().uniqueKeys()
+  result = await testDB.multi.query().uniqueKeys()
   t.is(result.length, 20)
   await testDB.close()
 })
 
 test('offset() and limit()', async t => {
   const testDB = await setupNewDB()
-  var results = await testDB.single.getRecordSet().orderBy('first').offset(1).toArray()
+  var results = await testDB.single.query().orderBy('first').offset(1).toArray()
   t.is(results[0].first, 'first1')
   t.is(results.length, 9)
-  var results = await testDB.single.getRecordSet().orderBy('first').limit(2).toArray()
+  var results = await testDB.single.query().orderBy('first').limit(2).toArray()
   t.is(results[0].first, 'first0')
   t.is(results[1].first, 'first1')
   t.is(results.length, 2)
-  var results = await testDB.single.getRecordSet().orderBy('first').offset(1).limit(2).toArray()
+  var results = await testDB.single.query().orderBy('first').offset(1).limit(2).toArray()
   t.is(results[0].first, 'first1')
   t.is(results[1].first, 'first2')
   t.is(results.length, 2)
-  var results = await testDB.single.getRecordSet().orderBy('first').offset(1).limit(2).reverse().toArray()
+  var results = await testDB.single.query().orderBy('first').offset(1).limit(2).reverse().toArray()
   t.is(results[0].first, 'first8')
   t.is(results[1].first, 'first7')
   t.is(results.length, 2)
@@ -296,10 +283,10 @@ test('offset() and limit()', async t => {
 
 test('filter()', async t => {
   const testDB = await setupNewDB()
-  var results = await testDB.single.getRecordSet().filter(r => r.first === 'first5').toArray()
+  var results = await testDB.single.query().filter(r => r.first === 'first5').toArray()
   t.is(results[0].first, 'first5')
   t.is(results.length, 1)
-  var results = await testDB.single.getRecordSet()
+  var results = await testDB.single.query()
     .filter(r => r.first.startsWith('first'))
     .filter(r => r.second === 5)
     .toArray()

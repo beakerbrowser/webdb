@@ -1,6 +1,5 @@
 const test = require('ava')
 const {newDB, ts} = require('./lib/util')
-const IDB = require('../lib/idb-wrapper')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
@@ -145,7 +144,7 @@ test('index two archives, then make changes', async t => {
   await new Promise(resolve => testDB.profile.once('index-updated', resolve))
 
   // test updated values
-  var profile = await IDB.get(testDB.profile, aliceArchive.url + '/profile.json')
+  var profile = await testDB.profile.level.get(aliceArchive.url + '/profile.json')
   t.truthy(profile)
   t.is(profile.name, 'alice')
   t.is(profile.bio, '_Very_ cool computer girl')
@@ -156,7 +155,7 @@ test('index two archives, then make changes', async t => {
   await new Promise(resolve => testDB.broadcasts.once('index-updated', resolve))
 
   // test updated values
-  var broadcast4 = await IDB.get(testDB.broadcasts, aliceArchive.url + `/broadcasts/${aliceArchive.broadcast4TS}.json`)
+  var broadcast4 = await testDB.broadcasts.level.get(aliceArchive.url + `/broadcasts/${aliceArchive.broadcast4TS}.json`)
   t.truthy(broadcast4)
   t.is(broadcast4.type, 'comment')
   t.is(broadcast4.text, 'Index me!')
@@ -167,29 +166,33 @@ test('index two archives, then make changes', async t => {
   await new Promise(resolve => testDB.broadcasts.once('index-updated', resolve))
 
   // test updated values
-  var broadcast4 = await IDB.get(testDB.broadcasts, aliceArchive.url + `/broadcasts/${aliceArchive.broadcast1TS}.json`)
-  t.falsy(broadcast4)
+  try {
+    var broadcast4 = await testDB.broadcasts.level.get(aliceArchive.url + `/broadcasts/${aliceArchive.broadcast1TS}.json`)
+    t.fail('should not hit')
+  } catch (e) {
+    t.truthy(e)
+  }
 
   await testDB.close()
 })
 
 async function testAliceIndex (t, testDB) {
-  var profile = await IDB.get(testDB.profile, aliceArchive.url + '/profile.json')
+  var profile = await testDB.profile.level.get(aliceArchive.url + '/profile.json')
   t.truthy(profile)
   t.is(profile.name, 'alice')
   t.is(profile.bio, 'Cool computer girl')
   t.falsy(profile.avatarUrl) // not included by the validator
-  var broadcast1 = await IDB.get(testDB.broadcasts, aliceArchive.url + '/broadcasts/' + aliceArchive.broadcast1TS + '.json')
+  var broadcast1 = await testDB.broadcasts.level.get(aliceArchive.url + '/broadcasts/' + aliceArchive.broadcast1TS + '.json')
   t.truthy(broadcast1)
   t.is(broadcast1.type, 'comment')
   t.is(broadcast1.text, 'Hello, world!')
   t.is(broadcast1.createdAt, aliceArchive.broadcast1TS)
-  var broadcast2 = await IDB.get(testDB.broadcasts, aliceArchive.url + '/broadcasts/' + aliceArchive.broadcast2TS + '.json')
+  var broadcast2 = await testDB.broadcasts.level.get(aliceArchive.url + '/broadcasts/' + aliceArchive.broadcast2TS + '.json')
   t.truthy(broadcast2)
   t.is(broadcast2.type, 'comment')
   t.is(broadcast2.text, 'Whoop')
   t.is(broadcast2.createdAt, aliceArchive.broadcast2TS)
-  var broadcast3 = await IDB.get(testDB.broadcasts, aliceArchive.url + '/broadcasts/' + aliceArchive.broadcast3TS + '.json')
+  var broadcast3 = await testDB.broadcasts.level.get(aliceArchive.url + '/broadcasts/' + aliceArchive.broadcast3TS + '.json')
   t.truthy(broadcast3)
   t.is(broadcast3.type, 'image')
   t.is(broadcast3.imageUrl, 'foo.png')
@@ -197,17 +200,17 @@ async function testAliceIndex (t, testDB) {
 }
 
 async function testBobIndex (t, testDB) {
-  var profile = await IDB.get(testDB.profile, bobArchive.url + '/profile.json')
+  var profile = await testDB.profile.level.get(bobArchive.url + '/profile.json')
   t.truthy(profile)
   t.is(profile.name, 'bob')
   t.is(profile.bio, 'Cool computer guy')
   t.falsy(profile.avatarUrl) // not included by the validator
-  var broadcast1 = await IDB.get(testDB.broadcasts, bobArchive.url + '/broadcasts/' + bobArchive.broadcast1TS + '.json')
+  var broadcast1 = await testDB.broadcasts.level.get(bobArchive.url + '/broadcasts/' + bobArchive.broadcast1TS + '.json')
   t.truthy(broadcast1)
   t.is(broadcast1.type, 'comment')
   t.is(broadcast1.text, 'Hello, world!')
   t.is(broadcast1.createdAt, bobArchive.broadcast1TS)
-  var broadcast2 = await IDB.get(testDB.broadcasts, bobArchive.url + '/broadcasts/' + bobArchive.broadcast2TS + '.json')
+  var broadcast2 = await testDB.broadcasts.level.get(bobArchive.url + '/broadcasts/' + bobArchive.broadcast2TS + '.json')
   t.truthy(broadcast2)
   t.is(broadcast2.type, 'image')
   t.is(broadcast2.imageUrl, 'baz.png')

@@ -8,8 +8,6 @@ class NodeDatArchive extends DatArchive {
 }
 
 global.window = {
-  indexedDB: require('fake-indexeddb'),
-  IDBKeyRange: require('fake-indexeddb/lib/FDBKeyRange'),
   localStorage: {
     LOG_LEVEL: process.env.LOG_LEVEL
   },
