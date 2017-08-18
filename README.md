@@ -44,12 +44,13 @@ db.schema({
     }
   }
 })
+await db.open()
 ```
 
 Next we add source archives to be ingested (added ot the dataset). The source archives are persisted in IndexedDB, so this doesn't have to be done every run.
 
 ```js
-await db.addArchives([alicesUrl, bobsUrl, carlasDatArchive], {prepare: true})
+await db.addArchives([alicesUrl, bobsUrl, carlasDatArchive])
 ```
 
 Now we can begin querying the database for records.
