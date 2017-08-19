@@ -4,11 +4,24 @@ A peer-to-peer database for dat:// applications. [How it works](#how-it-works)
 
 #### Example
 
-Setup a database for social profiles, which can publish status updates and like other users' posts.
+Setup in the browser:
 
 ```js
 const Injest = require('injestdb')
 var db = new Injest('social-profiles')
+```
+
+Setup in node:
+
+```js
+const DatArchive = require('node-dat-archive')
+const Injest = require('injestdb')
+var db = new Injest('social-profiles', {DatArchive})
+```
+
+Define your schema:
+
+```js
 db.schema({
   version: 1,
   broadcasts: {
@@ -44,6 +57,11 @@ db.schema({
     }
   }
 })
+```
+
+Then open the DB:
+
+```js
 await db.open()
 ```
 

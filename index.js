@@ -1,4 +1,4 @@
-/* globals DatArchive */
+/* globals window */
 
 const EventEmitter = require('events')
 const level = require('level-browserify')
@@ -10,13 +10,17 @@ const Schemas = require('./lib/schemas')
 const Indexer = require('./lib/indexer')
 
 class InjestDB extends EventEmitter {
-  constructor (name) {
+  constructor (name, opts = {}) {
     super()
+    if (typeof window === 'undefined' && !opts.DatArchive) {
+      throw new Error('Must provide {DatArchive} opt when using InjestDB outside the browser.')
+    }
     this.level = false
     this.name = name
     this.version = 0
     this.isBeingOpened = false
     this.isOpen = false
+    this.DatArchive = opts.DatArchive || window.DatArchive
     this._schemas = []
     this._archives = {}
     this._tablesToRebuild = []
@@ -107,7 +111,7 @@ class InjestDB extends EventEmitter {
   }
 
   async prepareArchive (archive) {
-    archive = typeof archive === 'string' ? new DatArchive(archive) : archive
+    archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     await Promise.all(this.tables.map(table => {
       if (!table.schema.singular) {
         return archive.mkdir(`/${table.name}`).catch(() => {})
@@ -117,7 +121,7 @@ class InjestDB extends EventEmitter {
 
   async addArchive (archive, {prepare} = {}) {
     // create our own new DatArchive instance
-    archive = typeof archive === 'string' ? new DatArchive(archive) : archive
+    archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (!(archive.url in this._archives)) {
       // store and process
       debug('Injest.addArchive', archive.url)
@@ -133,7 +137,7 @@ class InjestDB extends EventEmitter {
   }
 
   async removeArchive (archive) {
-    archive = typeof archive === 'string' ? new DatArchive(archive) : archive
+    archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (archive.url in this._archives) {
       debug('Injest.removeArchive', archive.url)
       delete this._archives[archive.url]
