@@ -257,7 +257,7 @@ InjestQuery#where(index) => InjestWhereClause
     // only required if !singular
     primaryKey: String, 
 
-    // specify which fields are indexed for querying
+    // specify which fields are indexed for querying (optional)
     // each is a keypath, see https://www.w3.org/TR/IndexedDB/#dfn-key-path
     // can specify compound indexes with a + separator in the keypath
     // eg one index               - index: 'firstName' 
@@ -266,14 +266,26 @@ InjestQuery#where(index) => InjestWhereClause
     // eg index an array's values - index: ['firstName', '*favoriteFruits']
     index: String|Array<String>,
 
-    // validator & sanitizer
+    // validator & sanitizer (optional)
     // takes the ingested file (must be valid json)
     // returns the record to be stored
     // returns falsy or throws to not store the record
     validator: Function(Object) => Object
+
+    // file-creator (optional)
+    // takes the record
+    // returns the object to be stored to the file
+    // returns falsy or throws to not write the file
+    toFile: Function(Object) => Object
   }
 }
 ```
+
+#### About `validator` and `toFile`
+
+The `validator` method is called any time Injest is given a record, either due to reading it from an archive, or because the application called `add()` or `update()` with new record data.
+
+The `toFile` method is only called when the application calls `add()` or `update()` with new record data. It is called after `validator`. Its main purpose is to reduce the data saved to the file.
 
 ## How it works
 
