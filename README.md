@@ -228,6 +228,7 @@ InjestQuery#last() => Promise<Object>
 InjestQuery#limit(Number) => InjestQuery
 InjestQuery#offset(Number) => InjestQuery
 InjestQuery#or(index) => InjestWhereClause
+InjestQuery#orderBy(index) => InjestQuery
 InjestQuery#put(Object) => Promise<Number>
 InjestQuery#urls() => Promise<Array<String>>
 InjestQuery#reverse() => InjestQuery
