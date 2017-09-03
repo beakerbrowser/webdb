@@ -102,6 +102,13 @@ test('eachKey()', async t => {
     t.truthy(result.startsWith('first'))
   })
   t.is(n, 30)
+  n = 0
+  await testDB.multi.orderBy('second').eachKey(result => {
+    n++
+    // is .second
+    t.truthy(typeof result === 'number')
+  })
+  t.is(n, 30)
   await testDB.close()
 })
 

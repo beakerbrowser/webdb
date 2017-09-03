@@ -145,6 +145,7 @@ Injest is still in development.
  - [x] Mutation methods (add/update/delete)
  - [ ] Events
  - [x] Multikey indexes
+ - [ ] More efficient key queries (currently loads full record from disk - could just load the keys)
  - [ ] Validation: filename must match primaryKey on non-singular tables
  - [ ] Support for .or() queries
  - [ ] Complete documentation
