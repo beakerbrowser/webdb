@@ -36,7 +36,8 @@ test.before('setup archives', async () => {
   // setup alice
   const a = aliceArchive = await DatArchive.create({
     localPath: tempy.directory(),
-    title: 'Alice Archive'
+    title: 'Alice Archive',
+    author: {url: 'dat://ffffffffffffffffffffffffffffffff'}
   })
   await a.writeFile('/profile.json', JSON.stringify({name: 'alice', bio: 'Cool computer girl', avatarUrl: 'notincluded.png'}))
   await a.mkdir('/broadcasts')

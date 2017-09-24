@@ -24,15 +24,15 @@ async function setupNewDB () {
 }
 
 test.before('setup archives', async () => {
-  async function def (fn) {
-    const a = await DatArchive.create({localPath: tempy.directory()})
+  async function def (i, fn) {
+    const a = await DatArchive.create({localPath: tempy.directory(), author: {url: 'dat://' + (i.toString().repeat(32))}})
     await a.mkdir('/multi')
     const write = (path, record) => a.writeFile(path, JSON.stringify(record))
     await fn(write, a)
     return a
   }
   for (let i = 0; i < 10; i++) {
-    archives.push(await def(async write => {
+    archives.push(await def(i, async write => {
       await write('/single.json', {first: 'first' + i, second: i, third: 'third' + i + 'single'})
       await write('/multi/1.json', {first: 'first' + i, second: (i+1)*100, third: 'third' + i + 'multi1'})
       await write('/multi/2.json', {first: 'first' + i, second: i, third: 'third' + i + 'multi2'})
@@ -197,6 +197,10 @@ test('equals()', async t => {
   t.is(result.second, 4)
   var result = await testDB.single.where('first').equals('no match').first()
   t.falsy(result)
+  var result = await testDB.single.where('_origin').equals(archives[0].url).first()
+  t.is(result.first, 'first0')
+  var result = await testDB.single.where('_author').equals('dat://99999999999999999999999999999999').first()
+  t.is(result.first, 'first9')
   await testDB.close()
 })
 
