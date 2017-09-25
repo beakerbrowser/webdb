@@ -11,11 +11,11 @@ async function setupNewDB () {
     version: 1,
     single: {
       singular: true,
-      index: ['first', 'second', 'first+second', 'third']
+      index: ['first', 'second', 'first+second', 'third', '_author']
     },
     multi: {
       primaryKey: 'first',
-      index: ['first', 'second', 'first+second', 'third']
+      index: ['first', 'second', 'first+second', 'third', '_author']
     }
   })
   await testDB.open()
