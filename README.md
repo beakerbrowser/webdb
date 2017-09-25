@@ -192,11 +192,10 @@ InjestTable#schema => Object
 InjestTable#toArray() => Promise<Array>
 InjestTable#toCollection() => InjestQuery
 InjestTable#update(record) => Promise<Number>
-InjestTable#update(url, updates) => Promise<Number>
-InjestTable#update(archive, updates) => Promise<Number>
-InjestTable#update(archive, key, updates) => Promise<Number>
-InjestTable#upsert(url, record) => Promise<Void | url>
-InjestTable#upsert(archive, record) => Promise<Void | url>
+InjestTable#update(url, updates|function) => Promise<Number>
+InjestTable#update(archive, updates|function) => Promise<Number>
+InjestTable#update(archive, key, updates|function) => Promise<Number>
+InjestTable#upsert(url|archive, record|function) => Promise<Void | url>
 InjestTable#where(index) => InjestWhereClause
 InjestTable 'index-updated' (archive, archiveVersion)
 
