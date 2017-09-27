@@ -9,11 +9,11 @@ const {SchemaError} = require('./lib/errors')
 const Schemas = require('./lib/schemas')
 const Indexer = require('./lib/indexer')
 
-class InjestDB extends EventEmitter {
+class IngestDB extends EventEmitter {
   constructor (name, opts = {}) {
     super()
     if (typeof window === 'undefined' && !opts.DatArchive) {
-      throw new Error('Must provide {DatArchive} opt when using InjestDB outside the browser.')
+      throw new Error('Must provide {DatArchive} opt when using IngestDB outside the browser.')
     }
     this.level = false
     this.name = name
@@ -62,7 +62,7 @@ class InjestDB extends EventEmitter {
         await this.level.put('version', this.version)
       }
 
-      // construct the final injestdb object
+      // construct the final ingestdb object
       this._activeSchema = this._schemas.reduce(Schemas.merge, {})
       this.isBeingOpened = false
       this.isOpen = true
@@ -124,7 +124,7 @@ class InjestDB extends EventEmitter {
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (!(archive.url in this._archives)) {
       // store and process
-      debug('Injest.addArchive', archive.url)
+      debug('Ingest.addArchive', archive.url)
       this._archives[archive.url] = archive
       if (prepare !== false) await this.prepareArchive(archive)
       await Indexer.addArchive(this, archive)
@@ -139,7 +139,7 @@ class InjestDB extends EventEmitter {
   async removeArchive (archive) {
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (archive.url in this._archives) {
-      debug('Injest.removeArchive', archive.url)
+      debug('Ingest.removeArchive', archive.url)
       delete this._archives[archive.url]
       await Indexer.removeArchive(this, archive)
     }
@@ -167,7 +167,7 @@ class InjestDB extends EventEmitter {
     })
   }
 }
-module.exports = InjestDB
+module.exports = IngestDB
 
 // run the database's queued upgrades
 async function runUpgrades ({db, oldVersion}) {
@@ -197,7 +197,7 @@ async function runUpgrades ({db, oldVersion}) {
 
   // track the tables that need rebuilding
   db._tablesToRebuild = Array.from(new Set(...tablesToRebuild))
-  debug('Injest.runUpgrades complete', (db._tablesToRebuild.length === 0) ? '- no rebuilds needed' : 'REBUILD REQUIRED')
+  debug('Ingest.runUpgrades complete', (db._tablesToRebuild.length === 0) ? '- no rebuilds needed' : 'REBUILD REQUIRED')
 }
 
 function lowestVersionFirst (a, b) {

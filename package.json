@@ -1,5 +1,5 @@
 {
-  "name": "injestdb",
+  "name": "ingestdb",
   "version": "2.4.5",
   "description": "A peer-to-peer database for dat:// applications.",
   "main": "index.js",
@@ -10,7 +10,7 @@
   "dependencies": {
     "anymatch": "^1.3.2",
     "await-lock": "^1.1.2",
-    "injestdb-level": "^1.0.4",
+    "ingestdb-level": "^1.0.4",
     "level-browserify": "^1.1.1",
     "level-promise": "^2.1.1",
     "level-sublevel": "^6.6.1",
@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/beakerbrowser/injestdb.git"
+    "url": "git+https://github.com/beakerbrowser/ingestdb.git"
   },
   "keywords": [
     "beaker",
@@ -38,7 +38,7 @@
   "author": "Paul Frazee <pfrazee@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/beakerbrowser/injestdb/issues"
+    "url": "https://github.com/beakerbrowser/ingestdb/issues"
   },
-  "homepage": "https://github.com/beakerbrowser/injestdb#readme"
+  "homepage": "https://github.com/beakerbrowser/ingestdb#readme"
 }

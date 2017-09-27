@@ -1,6 +1,6 @@
 const tempy = require('tempy')
 const DatArchive = require('node-dat-archive')
-const InjestDB = require('../../index')
+const IngestDB = require('../../index')
 const {debug, veryDebug} = require('../../lib/util')
 
 var __counter = 0
@@ -9,7 +9,7 @@ exports.newDB = function () {
   debug('\n##', name, '\n')
   var dir = tempy.directory()
   veryDebug('DB dir:', dir)
-  return new InjestDB(dir, {DatArchive})
+  return new IngestDB(dir, {DatArchive})
 }
 
 var lastTs = 0

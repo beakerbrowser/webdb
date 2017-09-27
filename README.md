@@ -1,6 +1,4 @@
-# InjestDB
-
-**Renamed to [IngestDB](https://npm.im/ingestdb)**
+# IngestDB
 
 A peer-to-peer database for dat:// applications. [How it works](#how-it-works)
 
@@ -9,16 +7,16 @@ A peer-to-peer database for dat:// applications. [How it works](#how-it-works)
 Setup in the browser:
 
 ```js
-const Injest = require('injestdb')
-var db = new Injest('social-profiles')
+const Ingest = require('ingestdb')
+var db = new Ingest('social-profiles')
 ```
 
 Setup in node:
 
 ```js
 const DatArchive = require('node-dat-archive')
-const Injest = require('injestdb')
-var db = new Injest('social-profiles', {DatArchive})
+const Ingest = require('ingestdb')
+var db = new Ingest('social-profiles', {DatArchive})
 ```
 
 Define your schema:
@@ -107,7 +105,7 @@ var numLikes = await db.likes
   .count()
 ```
 
-We can also use Injest to create, modify, and delete records (and their matching files).
+We can also use Ingest to create, modify, and delete records (and their matching files).
 
 ```js
 // update bob's name
@@ -139,7 +137,7 @@ await db.likes
 
 ## TODOs
 
-Injest is still in development.
+Ingest is still in development.
 
  - [x] Indexer
  - [x] Core query engine
@@ -155,9 +153,9 @@ Injest is still in development.
 ## API quick reference
 
 ```js
-var db = new InjestDB(name)
-InjestDB.list() => Promise<Void>
-InjestDB.delete(name) => Promise<Void>
+var db = new IngestDB(name)
+IngestDB.list() => Promise<Void>
+IngestDB.delete(name) => Promise<Void>
 db.open() => Promise<Void>
 db.close() => Promise<Void>
 db.schema(Object) => Promise<Void>
@@ -171,74 +169,74 @@ db 'open-failed' (error)
 db 'versionchange' ()
 db 'indexes-updated' (archive, archiveVersion)
 
-db.{table} => InjestTable
-InjestTable#add(archive, record) => Promise<url>
-InjestTable#count() => Promise<Number>
-InjestTable#delete(url) => Promise<url>
-InjestTable#each(Function) => Promise<Void>
-InjestTable#filter(Function) => InjestQuery
-InjestTable#get(url) => Promise<Object>
-InjestTable#get(archive) => Promise<Object>
-InjestTable#get(archive, key) => Promise<Object>
-InjestTable#get(index, value) => Promise<Object>
-InjestTable#isRecordFile(String) => Boolean
-InjestTable#limit(Number) => InjestQuery
-InjestTable#listRecordFiles(Archive) => Promise<Object>
-InjestTable#name => String
-InjestTable#offset(Number) => InjestQuery
-InjestTable#orderBy(index) => InjestQuery
-InjestTable#put(url, record) => Promise<url>
-InjestTable#query() => InjestQuery
-InjestTable#reverse() => InjestQuery
-InjestTable#schema => Object
-InjestTable#toArray() => Promise<Array>
-InjestTable#toCollection() => InjestQuery
-InjestTable#update(record) => Promise<Number>
-InjestTable#update(url, updates|function) => Promise<Number>
-InjestTable#update(archive, updates|function) => Promise<Number>
-InjestTable#update(archive, key, updates|function) => Promise<Number>
-InjestTable#upsert(url|archive, record|function) => Promise<Void | url>
-InjestTable#where(index) => InjestWhereClause
-InjestTable 'index-updated' (archive, archiveVersion)
+db.{table} => IngestTable
+IngestTable#add(archive, record) => Promise<url>
+IngestTable#count() => Promise<Number>
+IngestTable#delete(url) => Promise<url>
+IngestTable#each(Function) => Promise<Void>
+IngestTable#filter(Function) => IngestQuery
+IngestTable#get(url) => Promise<Object>
+IngestTable#get(archive) => Promise<Object>
+IngestTable#get(archive, key) => Promise<Object>
+IngestTable#get(index, value) => Promise<Object>
+IngestTable#isRecordFile(String) => Boolean
+IngestTable#limit(Number) => IngestQuery
+IngestTable#listRecordFiles(Archive) => Promise<Object>
+IngestTable#name => String
+IngestTable#offset(Number) => IngestQuery
+IngestTable#orderBy(index) => IngestQuery
+IngestTable#put(url, record) => Promise<url>
+IngestTable#query() => IngestQuery
+IngestTable#reverse() => IngestQuery
+IngestTable#schema => Object
+IngestTable#toArray() => Promise<Array>
+IngestTable#toCollection() => IngestQuery
+IngestTable#update(record) => Promise<Number>
+IngestTable#update(url, updates|function) => Promise<Number>
+IngestTable#update(archive, updates|function) => Promise<Number>
+IngestTable#update(archive, key, updates|function) => Promise<Number>
+IngestTable#upsert(url|archive, record|function) => Promise<Void | url>
+IngestTable#where(index) => IngestWhereClause
+IngestTable 'index-updated' (archive, archiveVersion)
 
-InjestWhereClause#above(lowerBound) => InjestQuery
-InjestWhereClause#aboveOrEqual(lowerBound) => InjestQuery
-InjestWhereClause#anyOf(Array|...args) => InjestQuery
-InjestWhereClause#anyOfIgnoreCase(Array|...args) => InjestQuery
-InjestWhereClause#below(upperBound) => InjestQuery
-InjestWhereClause#belowOrEqual(upperBound) => InjestQuery
-InjestWhereClause#between(lowerBound, upperBound, {includeUpper, includeLower}) => InjestQuery
-InjestWhereClause#equals(value) => InjestQuery
-InjestWhereClause#equalsIgnoreCase(value) => InjestQuery
-InjestWhereClause#noneOf(Array|...args) => InjestQuery
-InjestWhereClause#notEqual(value) => InjestQuery
-InjestWhereClause#startsWith(value) => InjestQuery
-InjestWhereClause#startsWithAnyOf(Array|...args) => InjestQuery
-InjestWhereClause#startsWithAnyOfIgnoreCase(Array|...args) => InjestQuery
-InjestWhereClause#startsWithIgnoreCase(value) => InjestQuery
+IngestWhereClause#above(lowerBound) => IngestQuery
+IngestWhereClause#aboveOrEqual(lowerBound) => IngestQuery
+IngestWhereClause#anyOf(Array|...args) => IngestQuery
+IngestWhereClause#anyOfIgnoreCase(Array|...args) => IngestQuery
+IngestWhereClause#below(upperBound) => IngestQuery
+IngestWhereClause#belowOrEqual(upperBound) => IngestQuery
+IngestWhereClause#between(lowerBound, upperBound, {includeUpper, includeLower}) => IngestQuery
+IngestWhereClause#equals(value) => IngestQuery
+IngestWhereClause#equalsIgnoreCase(value) => IngestQuery
+IngestWhereClause#noneOf(Array|...args) => IngestQuery
+IngestWhereClause#notEqual(value) => IngestQuery
+IngestWhereClause#startsWith(value) => IngestQuery
+IngestWhereClause#startsWithAnyOf(Array|...args) => IngestQuery
+IngestWhereClause#startsWithAnyOfIgnoreCase(Array|...args) => IngestQuery
+IngestWhereClause#startsWithIgnoreCase(value) => IngestQuery
 
-InjestQuery#clone() => InjestQuery
-InjestQuery#count() => Promise<Number>
-InjestQuery#delete() => Promise<Number>
-InjestQuery#each(Function) => Promise<Void>
-InjestQuery#eachKey(Function) => Promise<Void>
-InjestQuery#eachUrl(Function) => Promise<Void>
-InjestQuery#filter(Function) => InjestQuery
-InjestQuery#first() => Promise<Object>
-InjestQuery#keys() => Promise<Array<String>>
-InjestQuery#last() => Promise<Object>
-InjestQuery#limit(Number) => InjestQuery
-InjestQuery#offset(Number) => InjestQuery
-InjestQuery#or(index) => InjestWhereClause
-InjestQuery#orderBy(index) => InjestQuery
-InjestQuery#put(Object) => Promise<Number>
-InjestQuery#urls() => Promise<Array<String>>
-InjestQuery#reverse() => InjestQuery
-InjestQuery#toArray() => Promise<Array<Object>>
-InjestQuery#uniqueKeys() => Promise<Array<String>>
-InjestQuery#until(Function) => InjestQuery
-InjestQuery#update(Object|Function) => Promise<Number>
-InjestQuery#where(index) => InjestWhereClause
+IngestQuery#clone() => IngestQuery
+IngestQuery#count() => Promise<Number>
+IngestQuery#delete() => Promise<Number>
+IngestQuery#each(Function) => Promise<Void>
+IngestQuery#eachKey(Function) => Promise<Void>
+IngestQuery#eachUrl(Function) => Promise<Void>
+IngestQuery#filter(Function) => IngestQuery
+IngestQuery#first() => Promise<Object>
+IngestQuery#keys() => Promise<Array<String>>
+IngestQuery#last() => Promise<Object>
+IngestQuery#limit(Number) => IngestQuery
+IngestQuery#offset(Number) => IngestQuery
+IngestQuery#or(index) => IngestWhereClause
+IngestQuery#orderBy(index) => IngestQuery
+IngestQuery#put(Object) => Promise<Number>
+IngestQuery#urls() => Promise<Array<String>>
+IngestQuery#reverse() => IngestQuery
+IngestQuery#toArray() => Promise<Array<Object>>
+IngestQuery#uniqueKeys() => Promise<Array<String>>
+IngestQuery#until(Function) => IngestQuery
+IngestQuery#update(Object|Function) => Promise<Number>
+IngestQuery#where(index) => IngestWhereClause
 ```
 
 ## API
@@ -286,18 +284,18 @@ InjestQuery#where(index) => InjestWhereClause
 
 #### About `validator` and `toFile`
 
-The `validator` method is called any time Injest is given a record, either due to reading it from an archive, or because the application called `add()` or `update()` with new record data.
+The `validator` method is called any time Ingest is given a record, either due to reading it from an archive, or because the application called `add()` or `update()` with new record data.
 
 The `toFile` method is only called when the application calls `add()` or `update()` with new record data. It is called after `validator`. Its main purpose is to reduce the data saved to the file.
 
 ## How it works
 
-InjestDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using LevelDB. (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
+IngestDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using LevelDB. (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
 
-Injest works by scanning a set of source archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. Injest also provides a simple interface for adding, editing, and removing records on the archives that the local user owns.
+Ingest works by scanning a set of source archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. Ingest also provides a simple interface for adding, editing, and removing records on the archives that the local user owns.
 
-Injest sits on top of Dat archives. It duplicates the data it's handling into IndexedDB, and that duplicated data acts as a throwaway cache -- it can be reconstructed at any time from the Dat archives.
+Ingest sits on top of Dat archives. It duplicates the data it's handling into IndexedDB, and that duplicated data acts as a throwaway cache -- it can be reconstructed at any time from the Dat archives.
 
-Injest treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of .json files. For instance, if you had a 'tweets' table, it would map to the `/tweets/*.json` files. Injest's mutators, such as put or add or update, simply write those json files. Injest's readers & query-ers, such as get() or where(), read from the IndexedDB cache.
+Ingest treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of .json files. For instance, if you had a 'tweets' table, it would map to the `/tweets/*.json` files. Ingest's mutators, such as put or add or update, simply write those json files. Ingest's readers & query-ers, such as get() or where(), read from the IndexedDB cache.
 
-Injest watches its source archives for changes to the json files. When they change, it reads them and updates IndexedDB, thus the query results stay up-to-date. The flow is, roughly: `put() -> archive/tweets/12345.json -> indexer -> indexeddb -> get()`.
+Ingest watches its source archives for changes to the json files. When they change, it reads them and updates IndexedDB, thus the query results stay up-to-date. The flow is, roughly: `put() -> archive/tweets/12345.json -> indexer -> indexeddb -> get()`.
