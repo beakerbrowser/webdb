@@ -1,5 +1,7 @@
 # InjestDB
 
+**Renamed to [IngestDB](https://npm.im/ingestdb)**
+
 A peer-to-peer database for dat:// applications. [How it works](#how-it-works)
 
 #### Example
