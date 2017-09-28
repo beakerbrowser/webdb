@@ -1,6 +1,6 @@
 {
   "name": "ingestdb",
-  "version": "2.4.5",
+  "version": "2.4.6",
   "description": "A peer-to-peer database for dat:// applications.",
   "main": "index.js",
   "directories": {
@@ -15,7 +15,7 @@
     "level-promise": "^2.1.1",
     "level-sublevel": "^6.6.1",
     "lodash.flatten": "^4.4.0",
-    "url-parse": "^1.1.9",    
+    "url-parse": "^1.1.9",
     "tempy": "^0.1.0",
     "through2": "^2.0.3"
   },
