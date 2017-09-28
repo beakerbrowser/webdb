@@ -15,6 +15,7 @@
     "level-promise": "^2.1.1",
     "level-sublevel": "^6.6.1",
     "lodash.flatten": "^4.4.0",
+    "url-parse": "^1.1.9",    
     "tempy": "^0.1.0",
     "through2": "^2.0.3"
   },
