@@ -1,6 +1,6 @@
 # IngestDB
 
-A peer-to-peer database for dat:// applications. [How it works](#how-it-works)
+An indexer and database for dat:// applications. [How it works](#how-it-works)
 
 #### Example
 
