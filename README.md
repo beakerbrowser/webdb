@@ -289,13 +289,37 @@ var urls = await webdb.mytable.listSources()
 
 ### Event: 'open'
 
+```js
+webdb.on('open', () => {
+  console.log('WebDB is ready for use')
+})
+```
+
 ### Event: 'open-failed'
+
+```js
+webdb.on('open-failed', (err) => {
+  console.log('WebDB failed to open', err)
+})
+```
 
  - `error` Error.
 
 ### Event: 'versionchange'
 
+```js
+webdb.on('versionchange', () => {
+  console.log('WebDB detected a change in schemas and rebuilt all data')
+})
+```
+
 ### Event: 'indexes-updated'
+
+```js
+webdb.on('indexes-updated', (url, version) => {
+  console.log('Tables were updated for', url, 'at version', version)
+})
+```
 
  - `url` String. The site that was updated.
  - `version` Number. The version which was updated to.
@@ -305,7 +329,7 @@ var urls = await webdb.mytable.listSources()
 ### count()
 
 ```js
-var n = await webdb.mytable.count()
+var numRecords = await webdb.mytable.count()
 ```
 
  - Returns Promise&lt;Number&gt;.
