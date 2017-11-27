@@ -158,17 +158,21 @@ var oldestPeople = await webdb.people
   .delete()
 ```
 
-## TODOs
-
-WebDB is still in development.
-
- - [ ] More efficient key queries (currently loads full record from disk - could just load the keys)
- - [ ] Support for .or() queries
+## Table of Contents
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
+- [How to use WebDB](#how-to-use-webdb)
+  - [Schema definitions](#schema-definitions)
+  - [Creating queries](#creating-queries)
+  - [Applying linear-scan filters](#applying-linear-scan-filters)
+  - [Applying query modifiers](#applying-query-modifiers)
+  - [Executing 'read' queries](#executing-read-queries)
+  - [Executing 'write' queries](#executing-write-queries)
+  - [Quick-query methods](#quick-query-methods)
+  - [Default attributes](#default-attributes)
 - [Class: WebDB](#class-webdb)
   - [new WebDB([name])](#new-webdbname)
   - [WebDB.delete([name])](#webdbdeletename)
@@ -248,6 +252,105 @@ WebDB is still in development.
 - [How it works](#how-it-works)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+## How to use WebDB
+
+### Schema definitions
+
+Schemas are defined using [JSON Schema v6](http://json-schema.org/).
+
+### Creating queries
+
+Queries are created with a chained function API.
+You can create a query from the table object using [`.query()`](#query), [`.where()`](#wherekey), or [`.orderBy()`](#orderbykey).
+The `where()` method returns an object with [multiple filter functions that you can use](#instance-webdbwhereclause).
+
+```js
+var myQuery = webdb.query().where('foo').equals('bar')
+var myQuery = webdb.where('foo').equals('bar') // equivalent
+var myQuery = webdb.where('foo').startsWith('ba')
+var myQuery = webdb.where('foo').between('bar', 'baz', {includeLower: true, includeUpper: false})
+```
+
+Each query has a primary key.
+By default, this is the `url` attribute, but it can be changed using [`.where()`](#wherekey) or [`.orderBy()`](#orderbykey).
+In this example, the primary key becomes 'foo':
+
+```js
+var myQuery = webdb.orderBy('foo')
+```
+
+At this time, the primary key must be one of the indexed attributes.
+There are 2 indexes created automatically for every record: `url` and `origin`.
+The other indexes are specified in your table's [`define()`](#webdbdefinename-definition) call using the `index` option.
+
+### Applying linear-scan filters
+
+After the primary key index is applied, you can apply additional filters using [filter(fn)](#filterfn-1) and [until(fn)](#untilfn).
+These methods are called "linear scan" filters because they require each record to be loaded and then filtered out.
+(Until stops when it hits the first `false` response.)
+
+```js
+var myQuery = webdb.query()
+  .where('foo').equals('bar')
+  .filter(record => record.beep == 'boop') // additional filter
+```
+
+### Applying query modifiers
+
+You can apply the following modifiers to your query to alter the output:
+
+  - [limit(n)](#limitn-1)
+  - [offset(n)](#offsetn-1)
+  - [reverse()](#reverse-1)
+
+### Executing 'read' queries
+
+Once your query has been defined, you can execute and read the results using one of these methods:
+
+  - [count()](#count-1)
+  - [each(fn)](#eachfn-1)
+  - [eachKey(fn)](#eachkeyfn)
+  - [eachUrl(fn)](#eachurlfn)
+  - [first()](#first)
+  - [keys()](#keys)
+  - [last()](#last)
+  - [urls()](#urls)
+  - [toArray()](#toarray-1)
+  - [uniqueKeys()](#uniquekeys)
+
+### Executing 'write' queries
+
+Once your query has been defined, you can execute and *modify* the results using one of these methods:
+
+  - [delete()](#delete)
+  - [put(record)](#putrecord)
+  - [update(updates)](#updateupdates)
+  - [update(fn)](#updatefn)
+
+### Quick-query methods
+
+The following methods exist on the table object for query reads and writes:
+
+  - [delete(url)](#deleteurl)
+  - [each(fn)](#eachfn)
+  - [get(url)](#geturl)
+  - [get(key, value)](#getkey-value)
+  - [put(url, record)](#puturl-record)
+  - [toArray()](#toarray)
+  - [update(url, updates)](#updateurl-updates)
+  - [update(url, fn)](#updateurl-fn)
+  - [upsert(url, updates)](#upserturl-updates)
+
+### Default attributes
+
+Every record has the following attributes overridden by WebDB:
+
+ - `url` String. The URL of the record.
+ - `origin` String. The URL of the site the record was found on.
+ - `indexedAt` String. The timestamp of when the record was indexed.
+
+These attributes should not be used in schemas, as they will always be overriden.
 
 ## Class: WebDB
 
@@ -1035,6 +1138,6 @@ WebDB works by scanning a set of source archives for files that match a path pat
 
 WebDB sits on top of Dat archives. It duplicates the data it's handling into IndexedDB, and that duplicated data acts as a throwaway cache -- it can be reconstructed at any time from the Dat archives.
 
-WebDB treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of .json files. For instance, if you had a 'tweets' table, it would map to the `/tweets/*.json` files. WebDB's mutators, such as put or add or update, simply write those json files. WebDB's readers & query-ers, such as get() or where(), read from the IndexedDB cache.
+WebDB treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of .json files. For instance, if you had a 'tweets' table, it might map to the `/tweets/*.json` files. WebDB's mutators, such as put or add or update, simply write those json files. WebDB's readers & query-ers, such as get() or where(), read from the IndexedDB cache.
 
 WebDB watches its source archives for changes to the json files. When they change, it reads them and updates IndexedDB, thus the query results stay up-to-date. The flow is, roughly: `put() -&gt; archive/tweets/12345.json -&gt; indexer -&gt; indexeddb -&gt; get()`.
