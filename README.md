@@ -182,7 +182,7 @@ var webdb = new WebDB('mydb')
 #### WebDB.delete([name])
 
  - `name` String. Defaults to `'webdb'`. If run in the browser, this will be the name of the IndexedDB instance. If run in NodeJS, this will be the path of the LevelDB folder.
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Example:
 
@@ -194,7 +194,7 @@ await WebDB.delete('mydb')
 
 #### webdb.open()
 
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Example:
 
@@ -204,7 +204,7 @@ await webdb.open()
 
 #### webdb.close()
 
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Example:
 
@@ -217,7 +217,7 @@ await webdb.close()
  - `name` String. The name of the table.
  - `definition` Object.
    - `schema` Object. A [JSON Schema v6](http://json-schema.org/) definition.
-   - `index` Array<String>. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path).
+   - `index` Array&lt;String&gt;. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path).
  - Returns Void.
 
 Create a new table on the `webdb` object.
@@ -267,10 +267,10 @@ await webdb.open()
 
 #### webdb.addSource(url[, options])
 
- - `url` String or DatArchive or Array<String or DatArchive>. The sites to index.
+ - `url` String or DatArchive or Array&lt;String or DatArchive&gt;. The sites to index.
  - `options` Object.
-   - `filePattern` String or Array<String>. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
- - Returns Promise<Void>.
+   - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
+ - Returns Promise&lt;Void&gt;.
 
 Example:
 
@@ -286,7 +286,7 @@ await webdb.people.addSource('dat://foo.com', {
 #### webdb.removeSource(url)
 
  - `url` String or DatArchive. The site to deindex.
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Example:
 
@@ -296,7 +296,7 @@ await webdb.mytable.removeSource('dat://foo.com')
 
 #### webdb.listSources()
 
- - Returns Promise<String>.
+ - Returns Promise&lt;String&gt;.
 
 Example:
 
@@ -321,7 +321,7 @@ var urls = await webdb.mytable.listSources()
 
 #### count()
 
- - Returns Promise<Number>.
+ - Returns Promise&lt;Number&gt;.
 
 Count the number of records in the table.
 
@@ -333,7 +333,7 @@ var n = await webdb.mytable.count()
 
 #### delete(url)
 
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Delete the record at the given URL.
 
@@ -348,7 +348,7 @@ await webdb.mytable.delete('dat://foo.com/bar.json')
  - `fn` Function.
    - `record` Object.
    - Returns Void.
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Iterate over all records in the table with the given function.
 
@@ -380,7 +380,7 @@ var records = await webdb.mytable.filter(record => {
 #### get(url)
 
  - `url` String. The URL of the record to fetch.
- - Returns Promise<Object>.
+ - Returns Promise&lt;Object&gt;.
 
 Get the record at the given URL.
 
@@ -394,7 +394,7 @@ var record = await webdb.mytable.get('dat://foo.com/myrecord.json')
 
  - `key` String. The keyname to search against.
  - `value` Any. The value to match against.
- - Promise<Object>.
+ - Promise&lt;Object&gt;.
 
 Example:
 
@@ -427,7 +427,7 @@ var query = webdb.mytable.limit(10)
 #### listRecordFiles(url)
 
  - `url` String.
- - Returns Promise<Array<Object>>. On each object:
+ - Returns Promise&lt;Array&lt;Object&gt;&gt;. On each object:
    - `recordUrl` String.
    - `table` WebDBTable.
 
@@ -469,7 +469,7 @@ var query = webdb.mytable.orderBy('foo')
 
  - `url` String.
  - `record` Object.
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Example:
 
@@ -505,7 +505,7 @@ The schema definition for the table.
 
 #### toArray()
 
- - Returns Promise<Array>.
+ - Returns Promise&lt;Array&gt;.
 
 Example:
 
@@ -517,7 +517,7 @@ var records = await webdb.mytable.toArray()
 
  - `url` String. The record to update.
  - `updates` Object. The new values to set on the record.
- - Returns Promise<Boolean>.
+ - Returns Promise&lt;Boolean&gt;.
 
 Example:
 
@@ -531,7 +531,7 @@ var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', {foo:
  - `fn` Function. A method to modify the record.
    - `record` Object. The record to modify.
    - Returns Object.
- - Returns Promise<Boolean>.
+ - Returns Promise&lt;Boolean&gt;.
 
 Example:
 
@@ -546,7 +546,7 @@ var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', recor
 
  - `url` String. The record to update.
  - `updates` Object. The new values to set on the record.
- - Returns Promise<Boolean>.
+ - Returns Promise&lt;Boolean&gt;.
 
 Example:
 
@@ -592,7 +592,7 @@ var query = webdb.mytable.query().clone()
 
 #### count()
 
- - Returns Promise<Number>. The number of found records.
+ - Returns Promise&lt;Number&gt;. The number of found records.
 
 Example:
 
@@ -602,7 +602,7 @@ var numRecords = await webdb.mytable.query().count()
 
 #### delete()
 
- - Returns Promise<Number>. The number of deleted records.
+ - Returns Promise&lt;Number&gt;. The number of deleted records.
 
 Example:
 
@@ -615,7 +615,7 @@ var numDeleted = await query.delete()
  - `fn` Function.
    - `record` Object.
    - Returns Void.
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Example:
 
@@ -630,7 +630,7 @@ await webdb.mytable.query().each(record => {
  - `fn` Function.
    - `key` String.
    - Returns Void.
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Gives the value of the query's primary key for each matching record.
 
@@ -658,7 +658,7 @@ await webdb.mytable.orderBy('age').eachKey(age => {
  - `fn` Function.
    - `url` String.
    - Returns Void.
- - Returns Promise<Void>.
+ - Returns Promise&lt;Void&gt;.
 
 Gives the URL of each matching record.
 
@@ -687,7 +687,7 @@ var query = webdb.mytable.query().filter(record => {
 
 #### first()
 
- - Returns Promise<Object>.
+ - Returns Promise&lt;Object&gt;.
 
 Example:
 
@@ -697,7 +697,7 @@ var record = await webdb.mytable.query().first()
 
 #### keys()
 
- - Returns Promise<Array<String>>.
+ - Returns Promise&lt;Array&lt;String&gt;&gt;.
 
 Example:
 
@@ -716,7 +716,7 @@ var ages = await webdb.mytable.orderBy('age').keys()
 
 #### last()
 
- - Returns Promise<Object>.
+ - Returns Promise&lt;Object&gt;.
 
 Example:
 
@@ -760,7 +760,7 @@ var query = webdb.mytable.query().orderBy('foo')
 #### put(record)
 
  - `record` Object.
- - Returns Promise<Number>. The number of written records.
+ - Returns Promise&lt;Number&gt;. The number of written records.
 
 Example:
 
@@ -770,7 +770,7 @@ var numWritten = await webdb.mytable.query().put({foo: 'bar'})
 
 #### urls()
 
- - Returns Promise<Array<String>>.
+ - Returns Promise&lt;Array&lt;String&gt;&gt;.
 
 Example:
 
@@ -790,7 +790,7 @@ var query = webdb.mytable.query().reverse()
 
 #### toArray()
 
- - Returns Promise<Array<Object>>.
+ - Returns Promise&lt;Array&lt;Object&gt;&gt;.
 
 Example:
 
@@ -800,7 +800,7 @@ var records = await webdb.mytable.query().toArray()
 
 #### uniqueKeys()
 
- - Returns Promise<Array<String>>.
+ - Returns Promise&lt;Array&lt;String&gt;&gt;.
 
 Example:
 
@@ -827,7 +827,7 @@ var ages = await webdb.mytable.orderBy('age').uniqueKeys()
 #### update(updates)
 
  - `updates` Object. The new values to set on the record.
- - Returns Promise<Number>. The number of updated records.
+ - Returns Promise&lt;Number&gt;. The number of updated records.
 
 Example:
 
@@ -840,7 +840,7 @@ var numUpdated = await webdb.mytable.query().update({foo: 'bar'})
  - `fn` Function. A method to modify the record.
    - `record` Object. The record to modify.
    - Returns Object.
- - Returns Promise<Number>. The number of updated records.
+ - Returns Promise&lt;Number&gt;. The number of updated records.
 
 Example:
 
@@ -890,7 +890,7 @@ var query = webdb.mytable.query().where('age').aboveOrEqual(18)
 
 #### anyOf(values)
 
- - `values` Array<Any>.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
 Example:
@@ -901,7 +901,7 @@ var query = webdb.mytable.query().where('foo').anyOf(['bar', 'baz'])
 
 #### anyOfIgnoreCase(values)
 
- - `values` Array<Any>.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
 Example:
@@ -974,7 +974,7 @@ var query = webdb.mytable.query().where('foo').equalsIgnoreCase('bar')
 
 #### noneOf(values)
 
- - `values` Array<Any>.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
 Example:
@@ -1007,7 +1007,7 @@ var query = webdb.mytable.query().where('foo').startsWith('ba')
 
 #### startsWithAnyOf(values)
 
- - `values` Array<Any>.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
 Example:
@@ -1018,7 +1018,7 @@ var query = webdb.mytable.query().where('foo').startsWithAnyOf(['ba', 'bu'])
 
 #### startsWithAnyOfIgnoreCase(values)
 
- - `values` Array<Any>.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
 Example:
@@ -1049,4 +1049,4 @@ WebDB sits on top of Dat archives. It duplicates the data it's handling into Ind
 
 WebDB treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of .json files. For instance, if you had a 'tweets' table, it would map to the `/tweets/*.json` files. WebDB's mutators, such as put or add or update, simply write those json files. WebDB's readers & query-ers, such as get() or where(), read from the IndexedDB cache.
 
-WebDB watches its source archives for changes to the json files. When they change, it reads them and updates IndexedDB, thus the query results stay up-to-date. The flow is, roughly: `put() -> archive/tweets/12345.json -> indexer -> indexeddb -> get()`.
+WebDB watches its source archives for changes to the json files. When they change, it reads them and updates IndexedDB, thus the query results stay up-to-date. The flow is, roughly: `put() -&gt; archive/tweets/12345.json -&gt; indexer -&gt; indexeddb -&gt; get()`.
