@@ -170,46 +170,38 @@ WebDB is still in development.
 
 ### new WebDB([name])
 
- - `name` String. Defaults to `'webdb'`. If run in the browser, this will be the name of the IndexedDB instance. If run in NodeJS, this will be the path of the LevelDB folder.
-
-Example:
-
 ```js
 var webdb = new WebDB('mydb')
 ```
 
-### WebDB.delete([name])
-
  - `name` String. Defaults to `'webdb'`. If run in the browser, this will be the name of the IndexedDB instance. If run in NodeJS, this will be the path of the LevelDB folder.
- - Returns Promise&lt;Void&gt;.
 
-Example:
+### WebDB.delete([name])
 
 ```js
 await WebDB.delete('mydb')
 ```
 
+ - `name` String. Defaults to `'webdb'`. If run in the browser, this will be the name of the IndexedDB instance. If run in NodeJS, this will be the path of the LevelDB folder.
+ - Returns Promise&lt;Void&gt;.
+
 ## Instance: WebDB
 
 ### webdb.open()
-
- - Returns Promise&lt;Void&gt;.
-
-Example:
 
 ```js
 await webdb.open()
 ```
 
-### webdb.close()
-
  - Returns Promise&lt;Void&gt;.
 
-Example:
+### webdb.close()
 
 ```js
 await webdb.close()
 ```
+
+ - Returns Promise&lt;Void&gt;.
 
 ### webdb.define(name, definition)
 
@@ -237,7 +229,6 @@ Example:
 
 ```js
 webdb.define('people', {
-  // the schema that objects must match
   // (uses JSONSchema v6)
   schema: {
     type: 'object',
@@ -256,22 +247,14 @@ webdb.define('people', {
     },
     required: ['firstName', 'lastName']
   },
-
-  // secondary indexes for fast queries (optional)
   index: ['lastName', 'lastName+firstName', 'age']
 })
+
 await webdb.open()
-// the new table will be defined at webdb.people
+// the new table will now be defined at webdb.people
 ```
 
 ### webdb.addSource(url[, options])
-
- - `url` String or DatArchive or Array&lt;String or DatArchive&gt;. The sites to index.
- - `options` Object.
-   - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
- - Returns Promise&lt;Void&gt;.
-
-Example:
 
 ```js
 await webdb.people.addSource('dat://foo.com', {
@@ -282,26 +265,27 @@ await webdb.people.addSource('dat://foo.com', {
 })
 ```
 
-### webdb.removeSource(url)
-
- - `url` String or DatArchive. The site to deindex.
+ - `url` String or DatArchive or Array&lt;String or DatArchive&gt;. The sites to index.
+ - `options` Object.
+   - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
  - Returns Promise&lt;Void&gt;.
 
-Example:
+### webdb.removeSource(url)
 
 ```js
 await webdb.mytable.removeSource('dat://foo.com')
 ```
 
+ - `url` String or DatArchive. The site to deindex.
+ - Returns Promise&lt;Void&gt;.
+
 ### webdb.listSources()
-
- - Returns Promise&lt;String&gt;.
-
-Example:
 
 ```js
 var urls = await webdb.mytable.listSources()
 ```
+
+ - Returns Promise&lt;String&gt;.
 
 ### Event: 'open'
 
@@ -320,29 +304,31 @@ var urls = await webdb.mytable.listSources()
 
 ### count()
 
- - Returns Promise&lt;Number&gt;.
-
-Count the number of records in the table.
-
-Example:
-
 ```js
 var n = await webdb.mytable.count()
 ```
 
+ - Returns Promise&lt;Number&gt;.
+
+Count the number of records in the table.
+
 ### delete(url)
-
- - Returns Promise&lt;Void&gt;.
-
-Delete the record at the given URL.
-
-Example:
 
 ```js
 await webdb.mytable.delete('dat://foo.com/bar.json')
 ```
 
+ - Returns Promise&lt;Void&gt;.
+
+Delete the record at the given URL.
+
 ### each(fn)
+
+```js
+await webdb.mytable.each(record => {
+  console.log(record)
+})
+```
 
  - `fn` Function.
    - `record` Object.
@@ -351,15 +337,13 @@ await webdb.mytable.delete('dat://foo.com/bar.json')
 
 Iterate over all records in the table with the given function.
 
-Example:
+### filter(fn)
 
 ```js
-await webdb.mytable.each(record => {
-  console.log(record)
+var records = await webdb.mytable.filter(record => {
+  return (record.foo == 'bar')
 })
 ```
-
-### filter(fn)
 
  - `fn` Function.
    - `record` Object.
@@ -368,73 +352,57 @@ await webdb.mytable.each(record => {
 
 Start a new query and apply the given filter function to the resultset.
 
-Example:
+### get(url)
 
 ```js
-var records = await webdb.mytable.filter(record => {
-  return (record.foo == 'bar')
-})
+var record = await webdb.mytable.get('dat://foo.com/myrecord.json')
 ```
-
-### get(url)
 
  - `url` String. The URL of the record to fetch.
  - Returns Promise&lt;Object&gt;.
 
 Get the record at the given URL.
 
-Example:
-
-```js
-var record = await webdb.mytable.get('dat://foo.com/myrecord.json')
-```
-
 ### get(key, value)
-
- - `key` String. The keyname to search against.
- - `value` Any. The value to match against.
- - Promise&lt;Object&gt;.
-
-Example:
 
 ```js
 var record = await webdb.mytable.get('foo', 'bar')
 ```
 
+ - `key` String. The keyname to search against.
+ - `value` Any. The value to match against.
+ - Promise&lt;Object&gt;.
+ 
+Get the record first record to match the given key/value query.
+
 ### isRecordFile(url)
-
- - `url` String.
- - Returns Boolean.
-
-Example:
 
 ```js
 var isRecord = webdb.mytable.isRecordFile('dat://foo.com/myrecord.json')
 ```
 
+ - `url` String.
+ - Returns Boolean.
+
 ### limit(n)
-
- - `n` Number.
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.limit(10)
 ```
 
+ - `n` Number.
+ - Returns WebDBQuery.
+
 ### listRecordFiles(url)
+
+```js
+var recordFiles = await webdb.mytable.listRecordFiles('dat://foo.com')
+```
 
  - `url` String.
  - Returns Promise&lt;Array&lt;Object&gt;&gt;. On each object:
    - `recordUrl` String.
    - `table` WebDBTable.
-
-Example:
-
-```js
-var recordFiles = await webdb.mytable.listRecordFiles('dat://foo.com')
-```
 
 ### name
 
@@ -444,57 +412,47 @@ The name of the table.
 
 ### offset(n)
 
- - `n` Number.
- - Returns WebDBQuery.
-
-Example:
-
 ```js
 var query = webdb.mytable.offset(5)
 ```
 
-### orderBy(key)
-
- - `key` String.
+ - `n` Number.
  - Returns WebDBQuery.
 
-Example:
+### orderBy(key)
 
 ```js
 var query = webdb.mytable.orderBy('foo')
 ```
 
+ - `key` String.
+ - Returns WebDBQuery.
+
 ### put(url, record)
-
- - `url` String.
- - `record` Object.
- - Returns Promise&lt;Void&gt;.
-
-Example:
 
 ```js
 await webdb.mytable.put('dat://foo.com/myrecord.json', {foo: 'bar'})
 ```
 
+ - `url` String.
+ - `record` Object.
+ - Returns Promise&lt;Void&gt;.
+
 ### query()
-
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.query()
 ```
 
-### reverse()
-
  - Returns WebDBQuery.
 
-Example:
+### reverse()
 
 ```js
 var query = webdb.mytable.reverse()
 ```
+
+ - Returns WebDBQuery.
 
 ### schema
 
@@ -504,35 +462,23 @@ The schema definition for the table.
 
 ### toArray()
 
- - Returns Promise&lt;Array&gt;.
-
-Example:
-
 ```js
 var records = await webdb.mytable.toArray()
 ```
 
+ - Returns Promise&lt;Array&gt;.
+
 ### update(url, updates)
-
- - `url` String. The record to update.
- - `updates` Object. The new values to set on the record.
- - Returns Promise&lt;Boolean&gt;.
-
-Example:
 
 ```js
 var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', {foo: 'bar'})
 ```
 
-### update(url, fn)
-
  - `url` String. The record to update.
- - `fn` Function. A method to modify the record.
-   - `record` Object. The record to modify.
-   - Returns Object.
+ - `updates` Object. The new values to set on the record.
  - Returns Promise&lt;Boolean&gt;.
 
-Example:
+### update(url, fn)
 
 ```js
 var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', record => {
@@ -541,35 +487,32 @@ var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', recor
 })
 ```
 
-### upsert(url, updates)
-
  - `url` String. The record to update.
- - `updates` Object. The new values to set on the record.
+ - `fn` Function. A method to modify the record.
+   - `record` Object. The record to modify.
+   - Returns Object.
  - Returns Promise&lt;Boolean&gt;.
 
-Example:
+### upsert(url, updates)
 
 ```js
 var didCreateNew = await webdb.mytable.upsert('dat://foo.com/myrecord.json', {foo: 'bar'})
 ```
 
+ - `url` String. The record to update.
+ - `updates` Object. The new values to set on the record.
+ - Returns Promise&lt;Boolean&gt;.
+
 ### where(key)
-
- - `key` String.
- - Returns IngestWhereClause.
-
-Example:
 
 ```js
 var whereClause = webdb.mytable.where('foo')
 ```
 
+ - `key` String.
+ - Returns IngestWhereClause.
+
 ### Event: 'index-updated'
-
- - `url` String. The site that was updated.
- - `version` Number. The version which was updated to.
-
-Example:
 
 ```js
 webdb.mytable.on('index-updated', (url, version) => {
@@ -577,46 +520,37 @@ webdb.mytable.on('index-updated', (url, version) => {
 })
 ```
 
+ - `url` String. The site that was updated.
+ - `version` Number. The version which was updated to.
+
+
 ## Instance: WebDBQuery
 
 ### clone()
-
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.query().clone()
 ```
 
+ - Returns WebDBQuery.
+
 ### count()
-
- - Returns Promise&lt;Number&gt;. The number of found records.
-
-Example:
 
 ```js
 var numRecords = await webdb.mytable.query().count()
 ```
 
+ - Returns Promise&lt;Number&gt;. The number of found records.
+
 ### delete()
+
+```js
+var numDeleted = await webdb.mytable.query().delete()
+```
 
  - Returns Promise&lt;Number&gt;. The number of deleted records.
 
-Example:
-
-```js
-var numDeleted = await query.delete()
-```
-
 ### each(fn)
-
- - `fn` Function.
-   - `record` Object.
-   - Returns Void.
- - Returns Promise&lt;Void&gt;.
-
-Example:
 
 ```js
 await webdb.mytable.query().each(record => {
@@ -624,7 +558,18 @@ await webdb.mytable.query().each(record => {
 })
 ```
 
+ - `fn` Function.
+   - `record` Object.
+   - Returns Void.
+ - Returns Promise&lt;Void&gt;.
+
 ### eachKey(fn)
+
+```js
+await webdb.mytable.query().eachKey(url => {
+  console.log('URL =', url)
+})
+```
 
  - `fn` Function.
    - `key` String.
@@ -632,14 +577,6 @@ await webdb.mytable.query().each(record => {
  - Returns Promise&lt;Void&gt;.
 
 Gives the value of the query's primary key for each matching record.
-
-Example:
-
-```js
-await webdb.mytable.query().eachKey(url => {
-  console.log('URL =', url)
-})
-```
 
 The `key` is determined by the index being used.
 By default, this is the `url` attribute, but it can be changed by using `where()` or `orderBy()`.
@@ -654,6 +591,12 @@ await webdb.mytable.orderBy('age').eachKey(age => {
 
 ### eachUrl(fn)
 
+```js
+await webdb.mytable.query().eachUrl(url => {
+  console.log('URL =', url)
+})
+```
+
  - `fn` Function.
    - `url` String.
    - Returns Void.
@@ -661,22 +604,7 @@ await webdb.mytable.orderBy('age').eachKey(age => {
 
 Gives the URL of each matching record.
 
-Example:
-
-```js
-await webdb.mytable.query().eachUrl(url => {
-  console.log('URL =', url)
-})
-```
-
 ### filter(fn)
-
- - `fn` Function.
-   - `record` Object.
-   - Returns Boolean.
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.query().filter(record => {
@@ -684,30 +612,29 @@ var query = webdb.mytable.query().filter(record => {
 })
 ```
 
+ - `fn` Function.
+   - `record` Object.
+   - Returns Boolean.
+ - Returns WebDBQuery.
+
 ### first()
-
- - Returns Promise&lt;Object&gt;.
-
-Example:
 
 ```js
 var record = await webdb.mytable.query().first()
 ```
 
+ - Returns Promise&lt;Object&gt;.
+
 ### keys()
-
- - Returns Promise&lt;Array&lt;String&gt;&gt;.
-
-Example:
 
 ```js
 var keys = await webdb.mytable.query().keys()
 ```
 
+ - Returns Promise&lt;Array&lt;String&gt;&gt;.
+
 The `key` is determined by the index being used.
 By default, this is the `url` attribute, but it can be changed by using `where()` or `orderBy()`.
-
-Example:
 
 ```js
 var ages = await webdb.mytable.orderBy('age').keys()
@@ -715,108 +642,96 @@ var ages = await webdb.mytable.orderBy('age').keys()
 
 ### last()
 
- - Returns Promise&lt;Object&gt;.
-
-Example:
-
 ```js
 var record = await webdb.mytable.query().last()
 ```
 
+ - Returns Promise&lt;Object&gt;.
+
 ### limit(n)
-
- - `n` Number.
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.query().limit(10)
 ```
 
-### offset(n)
-
  - `n` Number.
  - Returns WebDBQuery.
 
-Example:
+### offset(n)
 
 ```js
 var query = webdb.mytable.query().offset(10)
 ```
 
-### orderBy(key)
-
- - `key` String.
+ - `n` Number.
  - Returns WebDBQuery.
 
-Example:
+### orderBy(key)
 
 ```js
 var query = webdb.mytable.query().orderBy('foo')
 ```
 
+ - `key` String.
+ - Returns WebDBQuery.
+
 ### put(record)
-
- - `record` Object.
- - Returns Promise&lt;Number&gt;. The number of written records.
-
-Example:
 
 ```js
 var numWritten = await webdb.mytable.query().put({foo: 'bar'})
 ```
 
+ - `record` Object.
+ - Returns Promise&lt;Number&gt;. The number of written records.
+
 ### urls()
-
- - Returns Promise&lt;Array&lt;String&gt;&gt;.
-
-Example:
 
 ```js
 var urls = await webdb.mytable.query().urls()
 ```
 
+ - Returns Promise&lt;Array&lt;String&gt;&gt;.
+
 ### reverse()
-
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.query().reverse()
 ```
 
+ - Returns WebDBQuery.
+
 ### toArray()
-
- - Returns Promise&lt;Array&lt;Object&gt;&gt;.
-
-Example:
 
 ```js
 var records = await webdb.mytable.query().toArray()
 ```
 
+ - Returns Promise&lt;Array&lt;Object&gt;&gt;.
+
 ### uniqueKeys()
-
- - Returns Promise&lt;Array&lt;String&gt;&gt;.
-
-Example:
 
 ```js
 var keys = await webdb.mytable.query().uniqueKeys()
 ```
 
+ - Returns Promise&lt;Array&lt;String&gt;&gt;.
+
 The `key` is determined by the index being used.
 By default, this is the `url` attribute, but it can be changed by using `where()` or `orderBy()`.
 
-Example:
+Example: 
 
 ```js
 var ages = await webdb.mytable.orderBy('age').uniqueKeys()
 ```
 
 ### until(fn)
+
+```js
+var query = webdb.mytable.query().until(record => {
+  return record.foo == 'bar'
+})
+```
 
  - `fn` Function.
    - `record` Object.
@@ -825,23 +740,14 @@ var ages = await webdb.mytable.orderBy('age').uniqueKeys()
 
 ### update(updates)
 
- - `updates` Object. The new values to set on the record.
- - Returns Promise&lt;Number&gt;. The number of updated records.
-
-Example:
-
 ```js
 var numUpdated = await webdb.mytable.query().update({foo: 'bar'})
 ```
 
-### update(fn)
-
- - `fn` Function. A method to modify the record.
-   - `record` Object. The record to modify.
-   - Returns Object.
+ - `updates` Object. The new values to set on the record.
  - Returns Promise&lt;Number&gt;. The number of updated records.
 
-Example:
+### update(fn)
 
 ```js
 var numUpdated = await webdb.mytable.query().update(record => {
@@ -850,90 +756,86 @@ var numUpdated = await webdb.mytable.query().update(record => {
 })
 ```
 
+ - `fn` Function. A method to modify the record.
+   - `record` Object. The record to modify.
+   - Returns Object.
+ - Returns Promise&lt;Number&gt;. The number of updated records.
+
 ### where(key)
-
- - `key` String. The attribute to query against.
- - Returns IngestWhereClause.
-
-Example:
 
 ```js
 var whereClause = webdb.mytable.query().where('foo')
 ```
 
+ - `key` String. The attribute to query against.
+ - Returns IngestWhereClause.
+
 ## Instance: WebDBWhereClause
 
 ### above(value)
-
- - `value` Any. The lower bound of the query.
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.query().where('foo').above('bar')
 var query = webdb.mytable.query().where('age').above(18)
 ```
 
-### aboveOrEqual(value)
-
  - `value` Any. The lower bound of the query.
  - Returns WebDBQuery.
 
-Example:
+### aboveOrEqual(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').aboveOrEqual('bar')
 var query = webdb.mytable.query().where('age').aboveOrEqual(18)
 ```
 
-### anyOf(values)
-
- - `values` Array&lt;Any&gt;.
+ - `value` Any. The lower bound of the query.
  - Returns WebDBQuery.
 
-Example:
+### anyOf(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').anyOf(['bar', 'baz'])
 ```
 
-### anyOfIgnoreCase(values)
-
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-Example:
+### anyOfIgnoreCase(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').anyOfIgnoreCase(['bar', 'baz'])
 ```
 
-### below(value)
-
- - `value` Any. The upper bound of the query.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-Example:
+### below(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').below('bar')
 var query = webdb.mytable.query().where('age').below(18)
 ```
 
-### belowOrEqual(value)
-
  - `value` Any. The upper bound of the query.
  - Returns WebDBQuery.
 
-Example:
+### belowOrEqual(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').belowOrEqual('bar')
 var query = webdb.mytable.query().where('age').belowOrEqual(18)
 ```
 
+ - `value` Any. The upper bound of the query.
+ - Returns WebDBQuery.
+
 ### between(lowerValue, upperValue[, options])
+
+```js
+var query = webdb.mytable.query().where('foo').between('bar', 'baz', {includeUpper: true, includeLower: true})
+var query = webdb.mytable.query().where('age').between(18, 55, {includeLower: true})
+```
 
  - `lowerValue` Any.
  - `upperValue` Any.
@@ -942,100 +844,80 @@ var query = webdb.mytable.query().where('age').belowOrEqual(18)
    - `includeLower` Boolean.
  - Returns WebDBQuery.
 
-Example:
-
-```js
-var query = webdb.mytable.query().where('foo').between('bar', 'baz', {includeUpper: true, includeLower: true})
-var query = webdb.mytable.query().where('age').between(18, 55, {includeLower: true})
-```
-
 ### equals(value)
-
- - `value` Any.
- - Returns WebDBQuery.
-
-Example:
 
 ```js
 var query = webdb.mytable.query().where('foo').equals('bar')
 ```
 
-### equalsIgnoreCase(value)
-
  - `value` Any.
  - Returns WebDBQuery.
 
-Example:
+### equalsIgnoreCase(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').equalsIgnoreCase('bar')
 ```
 
-### noneOf(values)
-
- - `values` Array&lt;Any&gt;.
+ - `value` Any.
  - Returns WebDBQuery.
 
-Example:
+### noneOf(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').noneOf(['bar', 'baz'])
 ```
 
-### notEqual(value)
-
- - `value` Any.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-Example:
+### notEqual(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').notEqual('bar')
 ```
 
-### startsWith(value)
-
  - `value` Any.
  - Returns WebDBQuery.
 
-Example:
+### startsWith(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWith('ba')
 ```
 
-### startsWithAnyOf(values)
-
- - `values` Array&lt;Any&gt;.
+ - `value` Any.
  - Returns WebDBQuery.
 
-Example:
+### startsWithAnyOf(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWithAnyOf(['ba', 'bu'])
 ```
 
-### startsWithAnyOfIgnoreCase(values)
-
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-Example:
+
+### startsWithAnyOfIgnoreCase(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWithAnyOfIgnoreCase(['ba', 'bu'])
 ```
 
-### startsWithIgnoreCase(value)
-
- - `value` Any.
+ - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-Example:
+
+### startsWithIgnoreCase(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWithIgnoreCase('ba')
 ```
+
+ - `value` Any.
+ - Returns WebDBQuery.
+
 
 
 ## How it works
