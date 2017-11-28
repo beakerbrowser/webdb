@@ -60,12 +60,8 @@ await webdb.open()
 Next we add source archives to be indexed. The source archives are persisted in IndexedDB/LevelDB, so this doesn't have to be done every run.
 
 ```js
-// add as source to the people table:
-await webdb.people.addSource('dat://alice.com')
-await webdb.people.addSource(['dat://bob.com', 'dat://carla.com'])
-
-// add as source to all tables:
 await webdb.addSource('dat://alice.com')
+await webdb.addSource(['dat://bob.com', 'dat://carla.com'])
 ```
 
 Now we can begin querying the database for records.
@@ -189,9 +185,6 @@ var oldestPeople = await webdb.people
   - [Event: 'versionchange'](#event-versionchange)
   - [Event: 'indexes-updated'](#event-indexes-updated)
 - [Instance: WebDBTable](#instance-webdbtable)
-  - [table.addSource(url)](#tableaddsourceurl)
-  - [table.removeSource(url)](#tableremovesourceurl)
-  - [table.listSources()](#tablelistsources)
   - [table.count()](#tablecount)
   - [table.delete(url)](#tabledeleteurl)
   - [table.each(fn)](#tableeachfn)
@@ -620,41 +613,6 @@ webdb.on('indexes-updated', (url, version) => {
 Emitted when the WebDB instance has updated the stored data for a site.
 
 ## Instance: WebDBTable
-
-### table.addSource(url)
-
-```js
-await webdb.mytable.addSource('dat://foo.com')
-```
-
- - `url` String or DatArchive or Array&lt;String or DatArchive&gt;. The sites to index.
- - Returns Promise&lt;Void&gt;.
-
-Add one or more dat:// sites to be indexed on the table.
-The method will return when the site has been fully indexed.
-The added sites are saved, and therefore only need to be added once.
-
-### table.removeSource(url)
-
-```js
-await webdb.mytable.removeSource('dat://foo.com')
-```
-
- - `url` String or DatArchive. The site to deindex.
- - Returns Promise&lt;Void&gt;.
-
-Remove a dat:// site from the table's dataset.
-The method will return when the site has been fully de-indexed.
-
-### table.listSources()
-
-```js
-var urls = await webdb.mytable.listSources()
-```
-
- - Returns Promise&lt;String&gt;.
-
-Lists the URLs of the dat:// sites which are included in the table's dataset.
 
 ### table.count()
 
