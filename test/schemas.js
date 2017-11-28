@@ -257,7 +257,6 @@ test('simple v6: add / change / remove all at once', async t => {
   await testDB.close()
 })
 
-
 test('complex index test', async t => {
   const testDB = newDB()
 
@@ -276,6 +275,60 @@ test('complex index test', async t => {
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
   t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a+b', 'c+d', 'e', 'origin'])
+
+  await testDB.close()
+})
+
+test('multi-def index test', async t => {
+  const testDB = newDB()
+
+  // setup the schema
+  testDB.schema({
+    version: 1,
+    firstTable: {
+      path: '/table1/*.json',
+      buildPath: record => `/table1/${record.id}.json`,
+      index: [
+        {name: 'a', def: ['a', 'b']}, 
+        {name: 'c+d', def: ['c+d', 'cee+dee']},
+        {name: 'e', def: ['*e', '*eee']}
+      ]
+    }
+  })
+  await testDB.open()
+
+  // check that the table was created correctly
+  t.truthy(testDB.firstTable)
+  t.truthy(testDB.firstTable.level)
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'c+d', 'e', 'origin'])
+
+  await testDB.close()
+})
+
+test('multi-def index must have matching definitions', async t => {
+  const testDB = newDB()
+
+  t.throws(() => testDB.schema({
+    version: 1,
+    firstTable: {
+      path: '/table1/*.json',
+      buildPath: record => `/table1/${record.id}.json`,
+      index: [
+        {name: 'a', def: ['a', 'b+c']}
+      ]
+    }
+  }))
+
+  t.throws(() => testDB.schema({
+    version: 1,
+    firstTable: {
+      path: '/table1/*.json',
+      buildPath: record => `/table1/${record.id}.json`,
+      index: [
+        {name: 'a', def: ['*a', 'b']}
+      ]
+    }
+  }))
 
   await testDB.close()
 })
