@@ -13,11 +13,11 @@ async function setupNewDB () {
     version: 1,
     single: {
       singular: true,
-      index: ['first', 'second', 'first+second', 'third', '_author']
+      index: ['first', 'second', 'first+second', 'third']
     },
     multi: {
       primaryKey: 'first',
-      index: ['first', 'second', 'first+second', 'third', '_author']
+      index: ['first', 'second', 'first+second', 'third']
     }
   })
   await testDB.open()
@@ -201,8 +201,6 @@ test('equals()', async t => {
   t.falsy(result)
   var result = await testDB.single.where('origin').equals(archives[0].url).first()
   t.is(result.first, 'first0')
-  var result = await testDB.single.where('_author').equals('dat://99999999999999999999999999999999').first()
-  t.is(result.first, 'first9')
   await testDB.close()
 })
 
