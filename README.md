@@ -8,12 +8,12 @@ Instantiate:
 
 ```js
 // in the browser
-const WebDB = require('beaker-webdb')
+const WebDB = require('@beaker/webdb')
 var webdb = new WebDB()
 
 // in nodejs
 const DatArchive = require('node-dat-archive')
-const WebDB = require('beaker-webdb')
+const WebDB = require('@beaker/webdb')
 var webdb = new WebDB('./webdb', {DatArchive})
 ```
 
