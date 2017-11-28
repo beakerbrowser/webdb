@@ -192,67 +192,67 @@ var oldestPeople = await webdb.people
   - [table.addSource(url)](#tableaddsourceurl)
   - [table.removeSource(url)](#tableremovesourceurl)
   - [table.listSources()](#tablelistsources)
-  - [count()](#count)
-  - [delete(url)](#deleteurl)
-  - [each(fn)](#eachfn)
-  - [filter(fn)](#filterfn)
-  - [get(url)](#geturl)
-  - [get(key, value)](#getkey-value)
-  - [isRecordFile(url)](#isrecordfileurl)
-  - [limit(n)](#limitn)
-  - [listRecordFiles(url)](#listrecordfilesurl)
-  - [name](#name)
-  - [offset(n)](#offsetn)
-  - [orderBy(key)](#orderbykey)
-  - [put(url, record)](#puturl-record)
-  - [query()](#query)
-  - [reverse()](#reverse)
-  - [schema](#schema)
-  - [toArray()](#toarray)
-  - [update(url, updates)](#updateurl-updates)
-  - [update(url, fn)](#updateurl-fn)
-  - [upsert(url, updates)](#upserturl-updates)
-  - [where(key)](#wherekey)
+  - [table.count()](#tablecount)
+  - [table.delete(url)](#tabledeleteurl)
+  - [table.each(fn)](#tableeachfn)
+  - [table.filter(fn)](#tablefilterfn)
+  - [table.get(url)](#tablegeturl)
+  - [table.get(key, value)](#tablegetkey-value)
+  - [table.isRecordFile(url)](#tableisrecordfileurl)
+  - [table.limit(n)](#tablelimitn)
+  - [table.listRecordFiles(url)](#tablelistrecordfilesurl)
+  - [table.name](#tablename)
+  - [table.offset(n)](#tableoffsetn)
+  - [table.orderBy(key)](#tableorderbykey)
+  - [table.put(url, record)](#tableputurl-record)
+  - [table.query()](#tablequery)
+  - [table.reverse()](#tablereverse)
+  - [table.schema](#tableschema)
+  - [table.toArray()](#tabletoarray)
+  - [table.update(url, updates)](#tableupdateurl-updates)
+  - [table.update(url, fn)](#tableupdateurl-fn)
+  - [table.upsert(url, updates)](#tableupserturl-updates)
+  - [table.where(key)](#tablewherekey)
   - [Event: 'index-updated'](#event-index-updated)
 - [Instance: WebDBQuery](#instance-webdbquery)
-  - [clone()](#clone)
-  - [count()](#count-1)
-  - [delete()](#delete)
-  - [each(fn)](#eachfn-1)
-  - [eachKey(fn)](#eachkeyfn)
-  - [eachUrl(fn)](#eachurlfn)
-  - [filter(fn)](#filterfn-1)
-  - [first()](#first)
-  - [keys()](#keys)
-  - [last()](#last)
-  - [limit(n)](#limitn-1)
-  - [offset(n)](#offsetn-1)
-  - [orderBy(key)](#orderbykey-1)
-  - [put(record)](#putrecord)
-  - [urls()](#urls)
-  - [reverse()](#reverse-1)
-  - [toArray()](#toarray-1)
-  - [uniqueKeys()](#uniquekeys)
-  - [until(fn)](#untilfn)
-  - [update(updates)](#updateupdates)
-  - [update(fn)](#updatefn)
-  - [where(key)](#wherekey-1)
+  - [query.clone()](#queryclone)
+  - [query.count()](#querycount)
+  - [query.delete()](#querydelete)
+  - [query.each(fn)](#queryeachfn)
+  - [query.eachKey(fn)](#queryeachkeyfn)
+  - [query.eachUrl(fn)](#queryeachurlfn)
+  - [query.filter(fn)](#queryfilterfn)
+  - [query.first()](#queryfirst)
+  - [query.keys()](#querykeys)
+  - [query.last()](#querylast)
+  - [query.limit(n)](#querylimitn)
+  - [query.offset(n)](#queryoffsetn)
+  - [query.orderBy(key)](#queryorderbykey)
+  - [query.put(record)](#queryputrecord)
+  - [query.urls()](#queryurls)
+  - [query.reverse()](#queryreverse)
+  - [query.toArray()](#querytoarray)
+  - [query.uniqueKeys()](#queryuniquekeys)
+  - [query.until(fn)](#queryuntilfn)
+  - [query.update(updates)](#queryupdateupdates)
+  - [query.update(fn)](#queryupdatefn)
+  - [query.where(key)](#querywherekey)
 - [Instance: WebDBWhereClause](#instance-webdbwhereclause)
-  - [above(value)](#abovevalue)
-  - [aboveOrEqual(value)](#aboveorequalvalue)
-  - [anyOf(values)](#anyofvalues)
-  - [anyOfIgnoreCase(values)](#anyofignorecasevalues)
-  - [below(value)](#belowvalue)
-  - [belowOrEqual(value)](#beloworequalvalue)
-  - [between(lowerValue, upperValue[, options])](#betweenlowervalue-uppervalue-options)
-  - [equals(value)](#equalsvalue)
-  - [equalsIgnoreCase(value)](#equalsignorecasevalue)
-  - [noneOf(values)](#noneofvalues)
-  - [notEqual(value)](#notequalvalue)
-  - [startsWith(value)](#startswithvalue)
-  - [startsWithAnyOf(values)](#startswithanyofvalues)
-  - [startsWithAnyOfIgnoreCase(values)](#startswithanyofignorecasevalues)
-  - [startsWithIgnoreCase(value)](#startswithignorecasevalue)
+  - [where.above(value)](#whereabovevalue)
+  - [where.aboveOrEqual(value)](#whereaboveorequalvalue)
+  - [where.anyOf(values)](#whereanyofvalues)
+  - [where.anyOfIgnoreCase(values)](#whereanyofignorecasevalues)
+  - [where.below(value)](#wherebelowvalue)
+  - [where.belowOrEqual(value)](#wherebeloworequalvalue)
+  - [where.between(lowerValue, upperValue[, options])](#wherebetweenlowervalue-uppervalue-options)
+  - [where.equals(value)](#whereequalsvalue)
+  - [where.equalsIgnoreCase(value)](#whereequalsignorecasevalue)
+  - [where.noneOf(values)](#wherenoneofvalues)
+  - [where.notEqual(value)](#wherenotequalvalue)
+  - [where.startsWith(value)](#wherestartswithvalue)
+  - [where.startsWithAnyOf(values)](#wherestartswithanyofvalues)
+  - [where.startsWithAnyOfIgnoreCase(values)](#wherestartswithanyofignorecasevalues)
+  - [where.startsWithIgnoreCase(value)](#wherestartswithignorecasevalue)
 - [How it works](#how-it-works)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -272,7 +272,7 @@ Sources are stored in metadata and so `addSource()` does not have to be called f
 ### Creating queries
 
 Queries are created with a chained function API.
-You can create a query from the table object using [`.query()`](#query), [`.where()`](#wherekey), or [`.orderBy()`](#orderbykey).
+You can create a query from the table object using [`.query()`](#tablequery), [`.where()`](#tablewherekey), or [`.orderBy()`](#tableorderbykey).
 The `where()` method returns an object with [multiple filter functions that you can use](#instance-webdbwhereclause).
 
 ```js
@@ -283,7 +283,7 @@ var myQuery = webdb.where('foo').between('bar', 'baz', {includeLower: true, incl
 ```
 
 Each query has a primary key.
-By default, this is the `url` attribute, but it can be changed using [`.where()`](#wherekey) or [`.orderBy()`](#orderbykey).
+By default, this is the `url` attribute, but it can be changed using [`.where()`](#querywherekey) or [`.orderBy()`](#queryorderbykey).
 In this example, the primary key becomes 'foo':
 
 ```js
@@ -296,7 +296,7 @@ The other indexes are specified in your table's [`define()`](#webdbdefinename-de
 
 ### Applying linear-scan filters
 
-After the primary key index is applied, you can apply additional filters using [filter(fn)](#filterfn-1) and [until(fn)](#untilfn).
+After the primary key index is applied, you can apply additional filters using [filter(fn)](#queryfilterfn) and [until(fn)](#queryuntilfn).
 These methods are called "linear scan" filters because they require each record to be loaded and then filtered out.
 (Until stops when it hits the first `false` response.)
 
@@ -310,47 +310,47 @@ var myQuery = webdb.query()
 
 You can apply the following modifiers to your query to alter the output:
 
-  - [limit(n)](#limitn-1)
-  - [offset(n)](#offsetn-1)
-  - [reverse()](#reverse-1)
+  - [limit(n)](#querylimitn)
+  - [offset(n)](#queryoffsetn)
+  - [reverse()](#queryreverse)
 
 ### Executing 'read' queries
 
 Once your query has been defined, you can execute and read the results using one of these methods:
 
-  - [count()](#count-1)
-  - [each(fn)](#eachfn-1)
-  - [eachKey(fn)](#eachkeyfn)
-  - [eachUrl(fn)](#eachurlfn)
-  - [first()](#first)
-  - [keys()](#keys)
-  - [last()](#last)
-  - [urls()](#urls)
-  - [toArray()](#toarray-1)
-  - [uniqueKeys()](#uniquekeys)
+  - [count()](#querycount)
+  - [each(fn)](#queryeachfn)
+  - [eachKey(fn)](#queryeachkeyfn)
+  - [eachUrl(fn)](#queryeachurlfn)
+  - [first()](#queryfirst)
+  - [keys()](#querykeys)
+  - [last()](#querylast)
+  - [urls()](#queryurls)
+  - [toArray()](#querytoarray)
+  - [uniqueKeys()](#queryuniquekeys)
 
 ### Executing 'write' queries
 
 Once your query has been defined, you can execute and *modify* the results using one of these methods:
 
-  - [delete()](#delete)
-  - [put(record)](#putrecord)
-  - [update(updates)](#updateupdates)
-  - [update(fn)](#updatefn)
+  - [delete()](#querydelete)
+  - [put(record)](#queryputrecord)
+  - [update(updates)](#queryupdateupdates)
+  - [update(fn)](#queryupdatefn)
 
 ### Table helper methods
 
 The following methods exist on the table object for query reads and writes:
 
-  - [table.delete(url)](#deleteurl)
-  - [table.each(fn)](#eachfn)
-  - [table.get(url)](#geturl)
-  - [table.get(key, value)](#getkey-value)
-  - [table.put(url, record)](#puturl-record)
-  - [table.toArray()](#toarray)
-  - [table.update(url, updates)](#updateurl-updates)
-  - [table.update(url, fn)](#updateurl-fn)
-  - [table.upsert(url, updates)](#upserturl-updates)
+  - [table.delete(url)](#tabledeleteurl)
+  - [table.each(fn)](#tableeachfn)
+  - [table.get(url)](#tablegeturl)
+  - [table.get(key, value)](#tablegetkey-value)
+  - [table.put(url, record)](#tableputurl-record)
+  - [table.toArray()](#tabletoarray)
+  - [table.update(url, updates)](#tableupdateurl-updates)
+  - [table.update(url, fn)](#tableupdateurl-fn)
+  - [table.upsert(url, updates)](#tableupserturl-updates)
 
 ### Default attributes
 
@@ -652,7 +652,7 @@ var urls = await webdb.mytable.listSources()
 
 Lists the URLs of the dat:// sites which are included in the table's dataset.
 
-### count()
+### table.count()
 
 ```js
 var numRecords = await webdb.mytable.count()
@@ -662,7 +662,7 @@ var numRecords = await webdb.mytable.count()
 
 Count the number of records in the table.
 
-### delete(url)
+### table.delete(url)
 
 ```js
 await webdb.mytable.delete('dat://foo.com/bar.json')
@@ -672,7 +672,7 @@ await webdb.mytable.delete('dat://foo.com/bar.json')
 
 Delete the record at the given URL.
 
-### each(fn)
+### table.each(fn)
 
 ```js
 await webdb.mytable.each(record => {
@@ -687,7 +687,7 @@ await webdb.mytable.each(record => {
 
 Iterate over all records in the table with the given function.
 
-### filter(fn)
+### table.filter(fn)
 
 ```js
 var records = await webdb.mytable.filter(record => {
@@ -702,7 +702,7 @@ var records = await webdb.mytable.filter(record => {
 
 Start a new query and apply the given filter function to the resultset.
 
-### get(url)
+### table.get(url)
 
 ```js
 var record = await webdb.mytable.get('dat://foo.com/myrecord.json')
@@ -713,7 +713,7 @@ var record = await webdb.mytable.get('dat://foo.com/myrecord.json')
 
 Get the record at the given URL.
 
-### get(key, value)
+### table.get(key, value)
 
 ```js
 var record = await webdb.mytable.get('foo', 'bar')
@@ -725,7 +725,7 @@ var record = await webdb.mytable.get('foo', 'bar')
  
 Get the record first record to match the given key/value query.
 
-### isRecordFile(url)
+### table.isRecordFile(url)
 
 ```js
 var isRecord = webdb.mytable.isRecordFile('dat://foo.com/myrecord.json')
@@ -736,7 +736,7 @@ var isRecord = webdb.mytable.isRecordFile('dat://foo.com/myrecord.json')
 
 Tells you whether the given URL matches the table's file pattern.
 
-### limit(n)
+### table.limit(n)
 
 ```js
 var query = webdb.mytable.limit(10)
@@ -747,7 +747,7 @@ var query = webdb.mytable.limit(10)
 
 Creates a new query with the given limit applied.
 
-### listRecordFiles(url)
+### table.listRecordFiles(url)
 
 ```js
 var recordFiles = await webdb.mytable.listRecordFiles('dat://foo.com')
@@ -760,13 +760,13 @@ var recordFiles = await webdb.mytable.listRecordFiles('dat://foo.com')
 
 Lists all files on the given URL which match the table's file pattern.
 
-### name
+### table.name
 
  - String.
 
 The name of the table.
 
-### offset(n)
+### table.offset(n)
 
 ```js
 var query = webdb.mytable.offset(5)
@@ -777,7 +777,7 @@ var query = webdb.mytable.offset(5)
 
 Creates a new query with the given offset applied.
 
-### orderBy(key)
+### table.orderBy(key)
 
 ```js
 var query = webdb.mytable.orderBy('foo')
@@ -788,7 +788,7 @@ var query = webdb.mytable.orderBy('foo')
 
 Creates a new query ordered by the given key.
 
-### put(url, record)
+### table.put(url, record)
 
 ```js
 await webdb.mytable.put('dat://foo.com/myrecord.json', {foo: 'bar'})
@@ -800,7 +800,7 @@ await webdb.mytable.put('dat://foo.com/myrecord.json', {foo: 'bar'})
 
 Replaces or creates the record at the given URL with the `record`.
 
-### query()
+### table.query()
 
 ```js
 var query = webdb.mytable.query()
@@ -810,7 +810,7 @@ var query = webdb.mytable.query()
 
 Creates a new query.
 
-### reverse()
+### table.reverse()
 
 ```js
 var query = webdb.mytable.reverse()
@@ -820,13 +820,13 @@ var query = webdb.mytable.reverse()
 
 Creates a new query with reverse-order applied.
 
-### schema
+### table.schema
 
  - Object.
 
 The schema definition for the table.
 
-### toArray()
+### table.toArray()
 
 ```js
 var records = await webdb.mytable.toArray()
@@ -836,7 +836,7 @@ var records = await webdb.mytable.toArray()
 
 Returns an array of all records in the table.
 
-### update(url, updates)
+### table.update(url, updates)
 
 ```js
 var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', {foo: 'bar'})
@@ -849,7 +849,7 @@ var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', {foo:
 Updates the target record with the given key values, if it exists.
 Returns `false` if the target record did not exist.
 
-### update(url, fn)
+### table.update(url, fn)
 
 ```js
 var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', record => {
@@ -867,7 +867,7 @@ var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', recor
 Updates the target record with the given function, if it exists.
 Returns `false` if the target record did not exist.
 
-### upsert(url, updates)
+### table.upsert(url, updates)
 
 ```js
 var didCreateNew = await webdb.mytable.upsert('dat://foo.com/myrecord.json', {foo: 'bar'})
@@ -881,7 +881,7 @@ If a record exists at the target URL, will update it with the given key values.
 If a record does not exist, will create the record.
 Returns `true` if the target record was created.
 
-### where(key)
+### table.where(key)
 
 ```js
 var whereClause = webdb.mytable.where('foo')
@@ -907,7 +907,7 @@ Emitted when the table has updated the stored data for a site.
 
 ## Instance: WebDBQuery
 
-### clone()
+### query.clone()
 
 ```js
 var query = webdb.mytable.query().clone()
@@ -917,7 +917,7 @@ var query = webdb.mytable.query().clone()
 
 Creates a copy of the query.
 
-### count()
+### query.count()
 
 ```js
 var numRecords = await webdb.mytable.query().count()
@@ -927,7 +927,7 @@ var numRecords = await webdb.mytable.query().count()
 
 Gives the count of records which match the query.
 
-### delete()
+### query.delete()
 
 ```js
 var numDeleted = await webdb.mytable.query().delete()
@@ -937,7 +937,7 @@ var numDeleted = await webdb.mytable.query().delete()
 
 Deletes all records which match the query.
 
-### each(fn)
+### query.each(fn)
 
 ```js
 await webdb.mytable.query().each(record => {
@@ -952,7 +952,7 @@ await webdb.mytable.query().each(record => {
 
 Calls the given function with all records which match the query.
 
-### eachKey(fn)
+### query.eachKey(fn)
 
 ```js
 await webdb.mytable.query().eachKey(url => {
@@ -978,7 +978,7 @@ await webdb.mytable.orderBy('age').eachKey(age => {
 })
 ```
 
-### eachUrl(fn)
+### query.eachUrl(fn)
 
 ```js
 await webdb.mytable.query().eachUrl(url => {
@@ -993,7 +993,7 @@ await webdb.mytable.query().eachUrl(url => {
 
 Calls the given function with the URL of each matching record.
 
-### filter(fn)
+### query.filter(fn)
 
 ```js
 var query = webdb.mytable.query().filter(record => {
@@ -1008,7 +1008,7 @@ var query = webdb.mytable.query().filter(record => {
 
 Applies an additional filter on the query.
 
-### first()
+### query.first()
 
 ```js
 var record = await webdb.mytable.query().first()
@@ -1018,7 +1018,7 @@ var record = await webdb.mytable.query().first()
 
 Returns the first result in the query.
 
-### keys()
+### query.keys()
 
 ```js
 var keys = await webdb.mytable.query().keys()
@@ -1035,7 +1035,7 @@ By default, this is the `url` attribute, but it can be changed by using `where()
 var ages = await webdb.mytable.orderBy('age').keys()
 ```
 
-### last()
+### query.last()
 
 ```js
 var record = await webdb.mytable.query().last()
@@ -1045,7 +1045,7 @@ var record = await webdb.mytable.query().last()
 
 Returns the last result in the query.
 
-### limit(n)
+### query.limit(n)
 
 ```js
 var query = webdb.mytable.query().limit(10)
@@ -1056,7 +1056,7 @@ var query = webdb.mytable.query().limit(10)
 
 Limits the number of matching record to the given number.
 
-### offset(n)
+### query.offset(n)
 
 ```js
 var query = webdb.mytable.query().offset(10)
@@ -1067,7 +1067,7 @@ var query = webdb.mytable.query().offset(10)
 
 Skips the given number of matching records.
 
-### orderBy(key)
+### query.orderBy(key)
 
 ```js
 var query = webdb.mytable.query().orderBy('foo')
@@ -1078,7 +1078,7 @@ var query = webdb.mytable.query().orderBy('foo')
 
 Sets the primary key and sets the resulting order to match its values.
 
-### put(record)
+### query.put(record)
 
 ```js
 var numWritten = await webdb.mytable.query().put({foo: 'bar'})
@@ -1089,7 +1089,7 @@ var numWritten = await webdb.mytable.query().put({foo: 'bar'})
 
 Replaces each matching record with the given value.
 
-### urls()
+### query.urls()
 
 ```js
 var urls = await webdb.mytable.query().urls()
@@ -1099,7 +1099,7 @@ var urls = await webdb.mytable.query().urls()
 
 Returns the url of each matching record.
 
-### reverse()
+### query.reverse()
 
 ```js
 var query = webdb.mytable.query().reverse()
@@ -1109,7 +1109,7 @@ var query = webdb.mytable.query().reverse()
 
 Reverses the order of the results.
 
-### toArray()
+### query.toArray()
 
 ```js
 var records = await webdb.mytable.query().toArray()
@@ -1119,7 +1119,7 @@ var records = await webdb.mytable.query().toArray()
 
 Returns the value of each matching record.
 
-### uniqueKeys()
+### query.uniqueKeys()
 
 ```js
 var keys = await webdb.mytable.query().uniqueKeys()
@@ -1138,7 +1138,7 @@ Example:
 var ages = await webdb.mytable.orderBy('age').uniqueKeys()
 ```
 
-### until(fn)
+### query.until(fn)
 
 ```js
 var query = webdb.mytable.query().until(record => {
@@ -1153,7 +1153,7 @@ var query = webdb.mytable.query().until(record => {
 
 Stops emitting matching records when the given function returns true.
 
-### update(updates)
+### query.update(updates)
 
 ```js
 var numUpdated = await webdb.mytable.query().update({foo: 'bar'})
@@ -1164,7 +1164,7 @@ var numUpdated = await webdb.mytable.query().update({foo: 'bar'})
 
 Updates all matching record with the given values.
 
-### update(fn)
+### query.update(fn)
 
 ```js
 var numUpdated = await webdb.mytable.query().update(record => {
@@ -1180,7 +1180,7 @@ var numUpdated = await webdb.mytable.query().update(record => {
 
 Updates all matching record with the given function.
 
-### where(key)
+### query.where(key)
 
 ```js
 var whereClause = webdb.mytable.query().where('foo')
@@ -1193,7 +1193,7 @@ Creates a new where clause.
 
 ## Instance: WebDBWhereClause
 
-### above(value)
+### where.above(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').above('bar')
@@ -1203,7 +1203,7 @@ var query = webdb.mytable.query().where('age').above(18)
  - `value` Any. The lower bound of the query.
  - Returns WebDBQuery.
 
-### aboveOrEqual(value)
+### where.aboveOrEqual(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').aboveOrEqual('bar')
@@ -1213,7 +1213,7 @@ var query = webdb.mytable.query().where('age').aboveOrEqual(18)
  - `value` Any. The lower bound of the query.
  - Returns WebDBQuery.
 
-### anyOf(values)
+### where.anyOf(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').anyOf(['bar', 'baz'])
@@ -1222,7 +1222,7 @@ var query = webdb.mytable.query().where('foo').anyOf(['bar', 'baz'])
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-### anyOfIgnoreCase(values)
+### where.anyOfIgnoreCase(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').anyOfIgnoreCase(['bar', 'baz'])
@@ -1231,7 +1231,7 @@ var query = webdb.mytable.query().where('foo').anyOfIgnoreCase(['bar', 'baz'])
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-### below(value)
+### where.below(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').below('bar')
@@ -1241,7 +1241,7 @@ var query = webdb.mytable.query().where('age').below(18)
  - `value` Any. The upper bound of the query.
  - Returns WebDBQuery.
 
-### belowOrEqual(value)
+### where.belowOrEqual(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').belowOrEqual('bar')
@@ -1251,7 +1251,7 @@ var query = webdb.mytable.query().where('age').belowOrEqual(18)
  - `value` Any. The upper bound of the query.
  - Returns WebDBQuery.
 
-### between(lowerValue, upperValue[, options])
+### where.between(lowerValue, upperValue[, options])
 
 ```js
 var query = webdb.mytable.query().where('foo').between('bar', 'baz', {includeUpper: true, includeLower: true})
@@ -1265,7 +1265,7 @@ var query = webdb.mytable.query().where('age').between(18, 55, {includeLower: tr
    - `includeLower` Boolean.
  - Returns WebDBQuery.
 
-### equals(value)
+### where.equals(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').equals('bar')
@@ -1274,7 +1274,7 @@ var query = webdb.mytable.query().where('foo').equals('bar')
  - `value` Any.
  - Returns WebDBQuery.
 
-### equalsIgnoreCase(value)
+### where.equalsIgnoreCase(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').equalsIgnoreCase('bar')
@@ -1283,7 +1283,7 @@ var query = webdb.mytable.query().where('foo').equalsIgnoreCase('bar')
  - `value` Any.
  - Returns WebDBQuery.
 
-### noneOf(values)
+### where.noneOf(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').noneOf(['bar', 'baz'])
@@ -1292,7 +1292,7 @@ var query = webdb.mytable.query().where('foo').noneOf(['bar', 'baz'])
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
-### notEqual(value)
+### where.notEqual(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').notEqual('bar')
@@ -1301,7 +1301,7 @@ var query = webdb.mytable.query().where('foo').notEqual('bar')
  - `value` Any.
  - Returns WebDBQuery.
 
-### startsWith(value)
+### where.startsWith(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWith('ba')
@@ -1310,7 +1310,7 @@ var query = webdb.mytable.query().where('foo').startsWith('ba')
  - `value` Any.
  - Returns WebDBQuery.
 
-### startsWithAnyOf(values)
+### where.startsWithAnyOf(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWithAnyOf(['ba', 'bu'])
@@ -1320,7 +1320,7 @@ var query = webdb.mytable.query().where('foo').startsWithAnyOf(['ba', 'bu'])
  - Returns WebDBQuery.
 
 
-### startsWithAnyOfIgnoreCase(values)
+### where.startsWithAnyOfIgnoreCase(values)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWithAnyOfIgnoreCase(['ba', 'bu'])
@@ -1330,7 +1330,7 @@ var query = webdb.mytable.query().where('foo').startsWithAnyOfIgnoreCase(['ba', 
  - Returns WebDBQuery.
 
 
-### startsWithIgnoreCase(value)
+### where.startsWithIgnoreCase(value)
 
 ```js
 var query = webdb.mytable.query().where('foo').startsWithIgnoreCase('ba')
