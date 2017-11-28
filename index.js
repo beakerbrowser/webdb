@@ -110,23 +110,13 @@ class IngestDB extends EventEmitter {
       .map(name => this[name])
   }
 
-  async prepareArchive (archive) {
-    archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
-    await Promise.all(this.tables.map(table => {
-      if (!table.schema.singular) {
-        return archive.mkdir(`/${table.name}`).catch(() => {})
-      }
-    }))
-  }
-
-  async addArchive (archive, {prepare} = {}) {
+  async addArchive (archive) {
     // create our own new DatArchive instance
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (!(archive.url in this._archives)) {
       // store and process
       debug('Ingest.addArchive', archive.url)
       this._archives[archive.url] = archive
-      if (prepare !== false) await this.prepareArchive(archive)
       await Indexer.addArchive(this, archive)
     }
   }

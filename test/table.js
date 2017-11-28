@@ -188,11 +188,3 @@ test('toArray()', async t => {
   t.is(n, 30)
   await testDB.close()
 })
-
-test('prepareArchive()', async t => {
-  const testDB = await setupNewDB()
-  const a = await DatArchive.create({localPath: tempy.directory()})
-  await testDB.prepareArchive(a)
-  t.truthy((await a.stat('/multi')).isDirectory())
-  await testDB.close()  
-})
