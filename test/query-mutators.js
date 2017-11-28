@@ -4,6 +4,8 @@ const {debug} = require('../lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('query-mutators.js'))
+
 var archives = []
 
 async function setupNewDB () {

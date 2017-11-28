@@ -4,6 +4,8 @@ const {debug} = require('../lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('table-mutators.js'))
+
 async function setupNewDB () {
   var archives = []
   async function def (fn) {

@@ -14,9 +14,10 @@
     "level-promise": "^2.1.1",
     "level-sublevel": "^6.6.1",
     "lodash.flatten": "^4.4.0",
-    "url-parse": "^1.1.9",
+    "monotonic-timestamp-base36": "^1.0.0",
     "tempy": "^0.1.0",
     "through2": "^2.0.3",
+    "url-parse": "^1.1.9",
     "xtend": "~4.0.1"
   },
   "devDependencies": {
@@ -29,7 +30,7 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "ava -s test/*.js"
+    "test": "ava -s test/*.js -T 15000 -v"
   },
   "repository": {
     "type": "git",

@@ -3,6 +3,8 @@ const {newDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('table.js'))
+
 var archives = []
 
 async function setupNewDB () {

@@ -4,6 +4,8 @@ const sub = require('level-sublevel')
 const getStream = require('get-stream')
 const IndexedLevel = require('../lib/indexed-level.js')
 
+test.before(() => console.log('indexed-level.js'))
+
 test('indexes', async t => {
   const db = IndexedLevel(sub(level({ valueEncoding: 'json'})), [
     'lastName',

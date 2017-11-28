@@ -1,6 +1,8 @@
 const test = require('ava')
 const {newDB} = require('./lib/util')
 
+test.before(() => console.log('schemas.js'))
+
 test('simple v1: add table', async t => {
   const testDB = newDB()
 
