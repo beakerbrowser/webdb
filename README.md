@@ -212,6 +212,7 @@ var oldestPeople = await webdb.people
   - [table.update(url, updates)](#tableupdateurl-updates)
   - [table.update(url, fn)](#tableupdateurl-fn)
   - [table.upsert(url, updates)](#tableupserturl-updates)
+  - [table.upsert(url, fn)](#tableupserturl-fn)
   - [table.where(key)](#tablewherekey)
   - [Event: 'index-updated'](#event-index-updated)
 - [Instance: WebDBQuery](#instance-webdbquery)
@@ -351,6 +352,7 @@ The following methods exist on the table object for query reads and writes:
   - [table.update(url, updates)](#tableupdateurl-updates)
   - [table.update(url, fn)](#tableupdateurl-fn)
   - [table.upsert(url, updates)](#tableupserturl-updates)
+  - [table.upsert(url, fn)](#tableupserturl-fn)
 
 ### Default attributes
 
@@ -881,6 +883,30 @@ var didCreateNew = await webdb.mytable.upsert('dat://foo.com/myrecord.json', {fo
 
 If a record exists at the target URL, will update it with the given key values.
 If a record does not exist, will create the record.
+Returns `true` if the target record was created.
+
+### table.upsert(url, fn)
+
+```js
+var didCreateNew = await webdb.mytable.upsert('dat://foo.com/myrecord.json', record => {
+  if (record) {
+    // update
+    record.foo = 'bar'
+    return record
+  }
+  // create
+  return {foo: 'bar'}
+})
+```
+
+ - `url` String. The record to update.
+ - `fn` Function. A method to modify the record.
+   - `record` Object. The record to modify. Will be falsy if the record does ot previously exist
+   - Returns Object.
+ - Returns Promise&lt;Boolean&gt;.
+
+Updates the target record with the given function, if it exists.
+If a record does not exist, will give a falsy value to the method.
 Returns `true` if the target record was created.
 
 ### table.where(key)
