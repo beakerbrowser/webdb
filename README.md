@@ -1,6 +1,6 @@
 # WebDB
 
-A database that reads and writes records on dat:// websites. [How it works](#how-it-works
+A database that reads and writes records on dat:// websites. [How it works](#how-it-works)
 
 ## Example
 
