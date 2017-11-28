@@ -167,7 +167,7 @@ var oldestPeople = await webdb.people
   - [Applying query modifiers](#applying-query-modifiers)
   - [Executing 'read' queries](#executing-read-queries)
   - [Executing 'write' queries](#executing-write-queries)
-  - [Quick-query methods](#quick-query-methods)
+  - [Table helper methods](#table-helper-methods)
   - [Default attributes](#default-attributes)
   - [Handling multiple schemas](#handling-multiple-schemas)
 - [Class: WebDB](#class-webdb)
@@ -331,19 +331,19 @@ Once your query has been defined, you can execute and *modify* the results using
   - [update(updates)](#updateupdates)
   - [update(fn)](#updatefn)
 
-### Quick-query methods
+### Table helper methods
 
 The following methods exist on the table object for query reads and writes:
 
-  - [delete(url)](#deleteurl)
-  - [each(fn)](#eachfn)
-  - [get(url)](#geturl)
-  - [get(key, value)](#getkey-value)
-  - [put(url, record)](#puturl-record)
-  - [toArray()](#toarray)
-  - [update(url, updates)](#updateurl-updates)
-  - [update(url, fn)](#updateurl-fn)
-  - [upsert(url, updates)](#upserturl-updates)
+  - [table.delete(url)](#deleteurl)
+  - [table.each(fn)](#eachfn)
+  - [table.get(url)](#geturl)
+  - [table.get(key, value)](#getkey-value)
+  - [table.put(url, record)](#puturl-record)
+  - [table.toArray()](#toarray)
+  - [table.update(url, updates)](#updateurl-updates)
+  - [table.update(url, fn)](#updateurl-fn)
+  - [table.upsert(url, updates)](#upserturl-updates)
 
 ### Default attributes
 
