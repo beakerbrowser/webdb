@@ -360,6 +360,7 @@ Every record has the following attributes overridden by WebDB:
  - `origin` String. The URL of the site the record was found on.
  - `indexedAt` String. The timestamp of when the record was indexed.
 
+The `origin` is always included in the secondary indexes.
 These attributes should not be used in schemas, as they will always be overriden.
 
 ### Handling multiple schemas
