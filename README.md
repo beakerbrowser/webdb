@@ -161,6 +161,7 @@ var oldestPeople = await webdb.people
 
 - [How to use WebDB](#how-to-use-webdb)
   - [Table definitions](#table-definitions)
+  - [Indexing sites](#indexing-sites)
   - [Creating queries](#creating-queries)
   - [Applying linear-scan filters](#applying-linear-scan-filters)
   - [Applying query modifiers](#applying-query-modifiers)
@@ -255,6 +256,11 @@ var oldestPeople = await webdb.people
 
 Use the [`define()`](#webdbdefinename-definition) method to define your tables, and then call [`webdb.open()`](#webdbopen) to create them.
 Schemas are defined using [JSON Schema v6](http://json-schema.org/).
+
+### Indexing sites
+
+Use [`addSource()`](#webdbaddsourceurl) and [`removeSource()`](#webdbremovesourceurl) to control which sites will be indexed.
+Sources are stored in metadata and so `addSource()` does not have to be called for each site on load (but it doesn't cause harm if you do).
 
 ### Creating queries
 
