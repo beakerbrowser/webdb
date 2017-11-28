@@ -160,7 +160,7 @@ var oldestPeople = await webdb.people
 
 
 - [How to use WebDB](#how-to-use-webdb)
-  - [Schema definitions](#schema-definitions)
+  - [Table definitions](#table-definitions)
   - [Creating queries](#creating-queries)
   - [Applying linear-scan filters](#applying-linear-scan-filters)
   - [Applying query modifiers](#applying-query-modifiers)
@@ -176,7 +176,7 @@ var oldestPeople = await webdb.people
   - [webdb.open()](#webdbopen)
   - [webdb.close()](#webdbclose)
   - [webdb.define(name, definition)](#webdbdefinename-definition)
-  - [webdb.addSource(url[, options])](#webdbaddsourceurl-options)
+  - [webdb.addSource(url)](#webdbaddsourceurl)
   - [webdb.removeSource(url)](#webdbremovesourceurl)
   - [webdb.listSources()](#webdblistsources)
   - [Event: 'open'](#event-open)
