@@ -874,7 +874,7 @@ var whereClause = webdb.mytable.where('foo')
 ```
 
  - `key` String.
- - Returns IngestWhereClause.
+ - Returns WebDBWhereClause.
 
 Creates a new where-clause using the given key.
 
@@ -1173,7 +1173,7 @@ var whereClause = webdb.mytable.query().where('foo')
 ```
 
  - `key` String. The attribute to query against.
- - Returns IngestWhereClause.
+ - Returns WebDBWhereClause.
 
 Creates a new where clause.
 
@@ -1344,7 +1344,7 @@ Does not work on compound indexes.
 
 ## How it works
 
-WebDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using [LevelDB](https://github.com/beakerbrowser/ingestdb/tree/webdb#webdb). (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
+WebDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using [LevelDB](https://github.com/Level/level). (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
 
 WebDB scans a set of source Dat archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. WebDB also provides a simple interface for adding, editing, and removing records from archives.
 

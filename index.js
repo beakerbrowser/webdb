@@ -8,13 +8,13 @@ const {debug, veryDebug, assert, getObjectChecksum} = require('./lib/util')
 const {SchemaError} = require('./lib/errors')
 const TableDef = require('./lib/table-def')
 const Indexer = require('./lib/indexer')
-const IngestTable = require('./lib/table')
+const WebDBTable = require('./lib/table')
 
-class IngestDB extends EventEmitter {
+class WebDBDB extends EventEmitter {
   constructor (name, opts = {}) {
     super()
     if (typeof window === 'undefined' && !opts.DatArchive) {
-      throw new Error('Must provide {DatArchive} opt when using IngestDB outside the browser.')
+      throw new Error('Must provide {DatArchive} opt when using WebDBDB outside the browser.')
     }
     this.level = false
     this.name = name
@@ -56,7 +56,7 @@ class IngestDB extends EventEmitter {
       const tableNames = Object.keys(this._tableDefs)
       debug('adding tables', tableNames)
       tableNames.forEach(tableName => {
-        this[tableName] = new IngestTable(this, tableName, this._tableDefs[tableName])
+        this[tableName] = new WebDBTable(this, tableName, this._tableDefs[tableName])
         this._tableFilePatterns.push(this[tableName]._filePattern)
       })
 
@@ -146,7 +146,7 @@ class IngestDB extends EventEmitter {
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (!(archive.url in this._archives)) {
       // store and process
-      debug('Ingest.addSource', archive.url)
+      debug('WebDB.addSource', archive.url)
       this._archives[archive.url] = archive
       await Indexer.addArchive(this, archive)
     }
@@ -155,7 +155,7 @@ class IngestDB extends EventEmitter {
   async removeSource (archive) {
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (archive.url in this._archives) {
-      debug('Ingest.removeSource', archive.url)
+      debug('WebDB.removeSource', archive.url)
       delete this._archives[archive.url]
       await Indexer.removeArchive(this, archive)
     }
@@ -183,5 +183,5 @@ class IngestDB extends EventEmitter {
     })
   }
 }
-module.exports = IngestDB
+module.exports = WebDBDB
 
