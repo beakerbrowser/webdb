@@ -3,23 +3,22 @@ const {newDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('query.js'))
+
 var archives = []
 
 async function setupNewDB () {
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    single: {
-      singular: true,
-      index: ['first', 'second', 'first+second', 'third']
-    },
-    multi: {
-      primaryKey: 'first',
-      index: ['first', 'second', 'first+second', 'third']
-    }
+  testDB.define('single', {
+    filePattern: '/single.json',
+    index: ['first', 'second', 'first+second', 'third']
+  })
+  testDB.define('multi', {
+    filePattern: '/multi/*.json',
+    index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return testDB
 }
 
@@ -89,7 +88,7 @@ test('eachKey()', async t => {
   await testDB.single.query().eachKey(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -98,8 +97,9 @@ test('eachKey()', async t => {
   await testDB.multi.query().eachKey(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is .first
-    t.truthy(result.startsWith('first'))
+    // is .url
+    t.truthy(result.startsWith('dat://'))
+    t.truthy(result.endsWith('.json'))
   })
   t.is(n, 30)
   n = 0
@@ -121,7 +121,7 @@ test('keys()', async t => {
   keys.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -131,8 +131,9 @@ test('keys()', async t => {
   keys.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is .first
-    t.truthy(result.startsWith('first'))
+    // is .url
+    t.truthy(result.startsWith('dat://'))
+    t.truthy(result.endsWith('.json'))
   })
   t.is(n, 30)
   await testDB.close()
@@ -146,7 +147,7 @@ test('eachUrl()', async t => {
   await testDB.single.query().eachUrl(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -155,7 +156,7 @@ test('eachUrl()', async t => {
   await testDB.multi.query().eachUrl(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -172,7 +173,7 @@ test('urls()', async t => {
   urls.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -182,7 +183,7 @@ test('urls()', async t => {
   urls.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -263,7 +264,7 @@ test('uniqueKeys()', async t => {
   const testDB = await setupNewDB()
   result = await testDB.single.query().uniqueKeys()
   t.is(result.length, 10)
-  result = await testDB.multi.query().uniqueKeys()
+  result = await testDB.multi.query().orderBy('first').uniqueKeys()
   t.is(result.length, 20)
   await testDB.close()
 })

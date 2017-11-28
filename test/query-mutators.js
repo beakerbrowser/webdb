@@ -4,23 +4,22 @@ const {debug} = require('../lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('query-mutators.js'))
+
 var archives = []
 
 async function setupNewDB () {
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    single: {
-      singular: true,
-      index: ['first', 'second', 'first+second', 'third']
-    },
-    multi: {
-      primaryKey: 'first',
-      index: ['first', 'second', 'first+second', 'third']
-    }
+  testDB.define('single', {
+    filePattern: '/single.json',
+    index: ['first', 'second', 'first+second', 'third']
+  })
+  testDB.define('multi', {
+    filePattern: '/multi/*.json',
+    index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return testDB
 }
 

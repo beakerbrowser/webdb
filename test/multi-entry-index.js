@@ -3,19 +3,18 @@ const {newDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('multi-entry-index.js'))
+
 var archives = []
 
 async function setupNewDB () {
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    table: {
-      primaryKey: 'key',
-      index: ['key', '*fruits']
-    }
+  testDB.define('table', {
+    filePattern: '/table/*.json',
+    index: ['key', '*fruits']
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return testDB
 }
 

@@ -4,6 +4,8 @@ const {debug} = require('../lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('table-mutators.js'))
+
 async function setupNewDB () {
   var archives = []
   async function def (fn) {
@@ -23,28 +25,25 @@ async function setupNewDB () {
   }
 
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    single: {
-      singular: true,
-      index: ['first', 'second', 'first+second', 'third']
-    },
-    multi: {
-      primaryKey: 'first',
-      index: ['first', 'second', 'first+second', 'third']
-    }
+  testDB.define('single', {
+    filePattern: '/single.json',
+    index: ['first', 'second', 'first+second', 'third']
+  })
+  testDB.define('multi', {
+    filePattern: '/multi/*.json',
+    index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return [archives, testDB]
 }
 
-test('Table.add()', async t => {
+test('Table.put()', async t => {
   var result
   const [archives, testDB] = await setupNewDB()
 
   // add a multi record
-  result = await testDB.multi.add(archives[0], {
+  result = await testDB.multi.put(archives[0].url + '/multi/4.json', {
     first: 4,
     second: 'foobar',
     third: 'whoop'
@@ -58,7 +57,7 @@ test('Table.add()', async t => {
   t.is(result.third, 'whoop')
 
   // overwrite the single record
-  result = await testDB.single.add(archives[0], {
+  result = await testDB.single.put(archives[0].url + '/single.json', {
     first: 'first100000',
     second: 100000,
     third: 'third100000single'
@@ -79,7 +78,7 @@ test('Table.delete()', async t => {
   const [archives, testDB] = await setupNewDB()
 
   // delete a multi record
-  result = await testDB.multi.delete(archives[0], 'first0')
+  result = await testDB.multi.delete(archives[0].url + '/multi/first0.json')
   t.is(result, 1)
 
   // fetch it back
@@ -87,7 +86,7 @@ test('Table.delete()', async t => {
   t.falsy(result)
 
   // delete the single record
-  result = await testDB.single.delete(archives[0])
+  result = await testDB.single.delete(archives[0].url + '/single.json')
 
   // fetch it back
   result = await testDB.single.get(archives[0].url + '/single.json')
@@ -102,26 +101,16 @@ test('Table.update()', async t => {
   // update a multi record
   var record = await testDB.multi.get('third', 'third0multi3')
   record.n = 0
-  debug('== update by record')
-  t.is(await testDB.multi.update(record), 1)
-  t.is((await testDB.multi.get('third', 'third0multi3')).n, 0)
   debug('== update by url')
-  t.is(await testDB.multi.update(record._url, {n: 1}), 1)
+  t.is(await testDB.multi.update(record.url, {n: 1}), 1)
   t.is((await testDB.multi.get('third', 'third0multi3')).n, 1)
-  debug('== update by key')
-  t.is(await testDB.multi.update(archives[9], 'first0', {foo: 'bar'}), 1)
 
   // update a single record
   var record = await testDB.single.query().first()
   record.n = 0
-  debug('== update by record')
-  t.is(await testDB.single.update(record), 1)
-  t.is((await testDB.single.get(record._url)).n, 0)
   debug('== update by url')
-  t.is(await testDB.single.update(record._url, {n: 1}), 1)
-  t.is((await testDB.single.get(record._url)).n, 1)
-  debug('== update by archive')
-  t.is(await testDB.single.update(archives[9], {foo: 'bar'}), 1)
+  t.is(await testDB.single.update(record.url, {n: 1}), 1)
+  t.is((await testDB.single.get(record.url)).n, 1)
 
   await testDB.close()
 })
@@ -130,15 +119,15 @@ test('Table.upsert() using an object', async t => {
   const [archives, testDB] = await setupNewDB()
 
   // upsert a multi record
-  const url = await testDB.multi.upsert(archives[0], {first: 'upFirst', second: 'upSecond', third: 'upThird'})
-  t.is(typeof url, 'string')
-  t.is(await testDB.multi.upsert(archives[0], {first: 'upFirst', second: 'UPSECOND', third: 'UPTHIRD'}), 1)
+  const url = await testDB.multi.upsert(archives[0].url + '/multi/5.json', {first: 'upFirst', second: 'upSecond', third: 'upThird'})
+  t.is(url, archives[0].url + '/multi/5.json')
+  t.is(await testDB.multi.upsert(archives[0].url + '/multi/5.json', {first: 'upFirst', second: 'UPSECOND', third: 'UPTHIRD'}), 1)
   t.is((await testDB.multi.get('first', 'upFirst')).third, 'UPTHIRD') // this test data is upthird
 
   // upsert a single record
-  t.is(await testDB.single.upsert(archives[0], {first: 'upFirst', second: 'upSecond', third: 'upThird'}), 1)
+  t.is(await testDB.single.upsert(archives[0].url + '/single.json', {first: 'upFirst', second: 'upSecond', third: 'upThird'}), 1)
   t.is((await testDB.single.get('first', 'upFirst')).third, 'upThird')
-  t.is(await testDB.single.upsert(archives[0], {first: 'upFirst', second: 'UPSECOND', third: 'UPTHIRD'}), 1)
+  t.is(await testDB.single.upsert(archives[0].url + '/single.json', {first: 'upFirst', second: 'UPSECOND', third: 'UPTHIRD'}), 1)
   t.is((await testDB.single.get('first', 'upFirst')).third, 'UPTHIRD')
 
   await testDB.close()
@@ -156,13 +145,13 @@ test('Table.upsert() using a function', async t => {
   }
 
   // upsert a multi record
-  const url = await testDB.multi.upsert(archives[0], updater)
-  t.is(typeof url, 'string')
-  t.is(await testDB.multi.upsert(url, updater), 1)
+  const url = await testDB.multi.upsert(archives[0].url + '/multi/6.json', updater)
+  t.is(url, archives[0].url + '/multi/6.json')
+  t.is(await testDB.multi.upsert(archives[0].url + '/multi/6.json', updater), 1)
   t.is((await testDB.multi.get('first', 'upFirst')).third, 'UPTHIRD')
 
   // upsert a single record
-  t.is(await testDB.single.upsert(archives[0], updater), 1)
+  t.is(await testDB.single.upsert(archives[0].url + '/single.json', updater), 1)
   t.is((await testDB.single.get('first', 'first0')).third, 'THIRD0SINGLE')
 
   await testDB.close()

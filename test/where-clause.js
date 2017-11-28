@@ -3,23 +3,22 @@ const {newDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('where-clause.js'))
+
 var archives = []
 
 async function setupNewDB () {
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    single: {
-      singular: true,
-      index: ['first', 'second', 'first+second', 'third', '_author']
-    },
-    multi: {
-      primaryKey: 'first',
-      index: ['first', 'second', 'first+second', 'third', '_author']
-    }
+  testDB.define('single', {
+    filePattern: '/single.json',
+    index: ['first', 'second', 'first+second', 'third']
+  })
+  testDB.define('multi', {
+    filePattern: '/multi/*.json',
+    index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return testDB
 }
 
@@ -197,10 +196,8 @@ test('equals()', async t => {
   t.is(result.second, 4)
   var result = await testDB.single.where('first').equals('no match').first()
   t.falsy(result)
-  var result = await testDB.single.where('_origin').equals(archives[0].url).first()
+  var result = await testDB.single.where('origin').equals(archives[0].url).first()
   t.is(result.first, 'first0')
-  var result = await testDB.single.where('_author').equals('dat://99999999999999999999999999999999').first()
-  t.is(result.first, 'first9')
   await testDB.close()
 })
 

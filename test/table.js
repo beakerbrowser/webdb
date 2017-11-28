@@ -3,23 +3,22 @@ const {newDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
+test.before(() => console.log('table.js'))
+
 var archives = []
 
 async function setupNewDB () {
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    single: {
-      singular: true,
-      index: ['first', 'second', 'first+second', 'third']
-    },
-    multi: {
-      primaryKey: 'first',
-      index: ['first', 'second', 'first+second', 'third']
-    }
+  testDB.define('single', {
+    filePattern: '/single.json',
+    index: ['first', 'second', 'first+second', 'third']
+  })
+  testDB.define('multi', {
+    filePattern: '/multi/*.json',
+    index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return testDB
 }
 
@@ -89,10 +88,6 @@ test('get()', async t => {
 
   var result = await testDB.single.get(archives[0].url + '/single.json')
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
-  var result = await testDB.single.get(archives[0])
-  t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
-  var result = await testDB.single.get(archives[0].url)
-  t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   var result = await testDB.single.get('first', 'first0')
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   var result = await testDB.single.get('second', 0)
@@ -104,8 +99,6 @@ test('get()', async t => {
 
 
   var result = await testDB.multi.get(archives[0].url + '/multi/1.json')
-  t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
-  var result = await testDB.multi.get(archives[0], 1)
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
   var result = await testDB.multi.get('first', 'first0')
   t.truthy(result && 'first' in result && 'second' in result && 'third' in result)
@@ -185,12 +178,4 @@ test('toArray()', async t => {
   })
   t.is(n, 30)
   await testDB.close()
-})
-
-test('prepareArchive()', async t => {
-  const testDB = await setupNewDB()
-  const a = await DatArchive.create({localPath: tempy.directory()})
-  await testDB.prepareArchive(a)
-  t.truthy((await a.stat('/multi')).isDirectory())
-  await testDB.close()  
 })
