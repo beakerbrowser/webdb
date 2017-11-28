@@ -1,8 +1,8 @@
 # WebDB
 
-A database which reads and writes records on dat:// websites. [How it works](#how-it-works)
+A database that reads and writes records on dat:// websites. [How it works](#how-it-works)
 
-#### Example
+## Example
 
 Instantiate:
 
@@ -1295,12 +1295,12 @@ var query = webdb.mytable.query().where('foo').startsWithIgnoreCase('ba')
 
 ## How it works
 
-WebDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using LevelDB. (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
+WebDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using [LevelDB](https://github.com/beakerbrowser/ingestdb/tree/webdb#webdb). (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
 
-WebDB works by scanning a set of source archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. WebDB also provides a simple interface for adding, editing, and removing records on the archives that the local user owns.
+WebDB scans a set of source Dat archives for files that match a path pattern. Those files are indexed ("ingested") so that they can be queried easily. WebDB also provides a simple interface for adding, editing, and removing records from archives.
 
-WebDB sits on top of Dat archives. It duplicates the data it's handling into IndexedDB, and that duplicated data acts as a throwaway cache -- it can be reconstructed at any time from the Dat archives.
+WebDB sits on top of Dat archives. It duplicates ingested data into IndexedDB, which acts as a throwaway cache. The cached data can be reconstructed at any time from the source Dat archives.
 
-WebDB treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of .json files. For instance, if you had a 'tweets' table, it might map to the `/tweets/*.json` files. WebDB's mutators, such as put or add or update, simply write those json files. WebDB's readers & query-ers, such as get() or where(), read from the IndexedDB cache.
+WebDB treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of JSON files. For instance, if you had a `tweets` table, it might map to the `/tweets/*.json` files. WebDB's mutators, e.g., `put`, `add`, `update`, simply writes records as JSON files in the `tweets/` directory. WebDB's readers and query-ers, like `get()` and `where()`, read from the IndexedDB cache.
 
-WebDB watches its source archives for changes to the json files. When they change, it reads them and updates IndexedDB, thus the query results stay up-to-date. The flow is, roughly: `put() -&gt; archive/tweets/12345.json -&gt; indexer -&gt; indexeddb -&gt; get()`.
+WebDB watches its source archives for changes to the JSON files that compose its records. When the files change, it syncs and reads the changes, then updates IndexedDB, keeping query results up-to-date. Roughly, the flow is: `put() -&gt; archive/tweets/12345.json -&gt; indexer -&gt; indexeddb -&gt; get()`.
