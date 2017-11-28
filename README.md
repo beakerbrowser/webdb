@@ -450,7 +450,8 @@ Deletes the indexes and metadata for the given WebDB.
 await webdb.open()
 ```
 
- - Returns Promise&lt;Void&gt;.
+ - Returns Promise&lt;Object&gt;.
+   - `rebuilds` Array&lt;String&gt;. The tables which were built or rebuilt during setup.
 
 Runs final setup for the WebDB instance.
 This must be run after [`.define()`](#webdbdefinename-definition) to create the table instances.

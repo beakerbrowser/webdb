@@ -9,12 +9,9 @@ var archives = []
 
 async function setupNewDB () {
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    table: {
-      primaryKey: 'key',
-      index: ['key', '*fruits']
-    }
+  testDB.define('table', {
+    primaryKey: 'key',
+    index: ['key', '*fruits']
   })
   await testDB.open()
   await testDB.addArchives(archives)

@@ -12,6 +12,10 @@ exports.newDB = function () {
   return new IngestDB(dir, {DatArchive})
 }
 
+exports.reopenDB = function (db) {
+  return new IngestDB(db.name, {DatArchive})
+}
+
 var lastTs = 0
 exports.ts = function () {
   var ts = Date.now()

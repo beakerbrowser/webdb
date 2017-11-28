@@ -4,10 +4,11 @@ const EventEmitter = require('events')
 const level = require('level-browserify')
 const sublevel = require('level-sublevel')
 const levelPromisify = require('level-promise')
-const {debug, veryDebug, assert} = require('./lib/util')
+const {debug, veryDebug, assert, getObjectChecksum} = require('./lib/util')
 const {SchemaError} = require('./lib/errors')
-const Schemas = require('./lib/schemas')
+const TableDef = require('./lib/table-def')
 const Indexer = require('./lib/indexer')
+const IngestTable = require('./lib/table')
 
 class IngestDB extends EventEmitter {
   constructor (name, opts = {}) {
@@ -17,14 +18,14 @@ class IngestDB extends EventEmitter {
     }
     this.level = false
     this.name = name
-    this.version = 0
     this.isBeingOpened = false
     this.isOpen = false
     this.DatArchive = opts.DatArchive || window.DatArchive
-    this._schemas = []
+    this._tableDefs = {
+      _indexMeta: {index: []} // builtin table
+    }
     this._archives = {}
     this._tablesToRebuild = []
-    this._activeTableNames = []
     this._activeSchema = null
     this._tablePathPatterns = []
     this._dbReadyPromise = new Promise((resolve, reject) => {
@@ -42,8 +43,8 @@ class IngestDB extends EventEmitter {
     if (this.isOpen) {
       return
     }
-    this.isBeingOpened = true
-    Schemas.addBuiltinTableSchemas(this)
+    this.isBeingOpened = true // TODO needed?
+    var neededRebuilds = []
 
     // open the db
     debug('opening')
@@ -51,24 +52,46 @@ class IngestDB extends EventEmitter {
       this.level = sublevel(level(this.name, {valueEncoding: 'json'}))
       levelPromisify(this.level)
 
-      // run upgrades
-      try {
-        var oldVersion = (await this.level.get('version')) || 0
-      } catch (e) {
-        oldVersion = 0
-      }
-      if (oldVersion < this.version) {
-        await runUpgrades({db: this, oldVersion})
-        await this.level.put('version', this.version)
+      // construct the tables
+      const tableNames = Object.keys(this._tableDefs)
+      debug('adding tables', tableNames)
+      tableNames.forEach(tableName => {
+        this[tableName] = new IngestTable(this, tableName, this._tableDefs[tableName])
+        this._tablePathPatterns.push(this[tableName]._pathPattern)
+      })
+
+      // detect table-definition changes
+      for (let i = 0; i < tableNames.length; i++) {
+        let tableName = tableNames[i]
+        let tableChecksum = this._tableDefs[tableName].checksum
+
+        // load the saved checksum
+        let lastChecksum
+        try { 
+          let tableMeta = await this.level.get('table:' + tableName)
+          lastChecksum = tableMeta.checksum
+        } catch (e) {}
+        
+        // compare
+        if (lastChecksum !== tableChecksum) {
+          neededRebuilds.push(tableName)
+        }
       }
 
-      // construct the final ingestdb object
-      this._activeSchema = this._schemas.reduce(Schemas.merge, {})
+      // run rebuilds
+      // TODO go per-table
+      await Indexer.resetOutdatedIndexes(this, neededRebuilds)
+      await Indexer.loadArchives(this, neededRebuilds.length > 0)
+
+      // save checksums
+      for (let i = 0; i < tableNames.length; i++) {
+        let tableName = tableNames[i]
+        let tableChecksum = this._tableDefs[tableName].checksum
+        await this.level.put('table:' + tableName, {checksum: tableChecksum})
+      }
+
       this.isBeingOpened = false
       this.isOpen = true
-      Schemas.addTables(this)
-      let needsRebuild = await Indexer.resetOutdatedIndexes(this)
-      await Indexer.loadArchives(this, needsRebuild)
 
       // events
       debug('opened')
@@ -77,6 +100,11 @@ class IngestDB extends EventEmitter {
       console.error('Upgrade has failed', e)
       this.isBeingOpened = false
       this.emit('open-failed', e)
+      throw e
+    }
+
+    return {
+      rebuilds: neededRebuilds
     }
   }
 
@@ -84,7 +112,7 @@ class IngestDB extends EventEmitter {
     debug('closing')
     this.isOpen = false
     if (this.level) {
-      Schemas.removeTables(this)
+      // Schemas.removeTables(this) TODO
       this.listArchives().forEach(archive => Indexer.unwatchArchive(this, archive))
       await new Promise(resolve => this.level.close(resolve))
       this.level = null
@@ -94,18 +122,16 @@ class IngestDB extends EventEmitter {
     }
   }
 
-  schema (desc) {
-    assert(!this.level && !this.isBeingOpened, SchemaError, 'Cannot add version when database is open')
-    Schemas.validateAndSanitize(desc)
-
-    // update current version
-    this.version = Math.max(this.version, desc.version)
-    this._schemas.push(desc)
-    this._schemas.sort(lowestVersionFirst)
+  define (tableName, definition) {
+    assert(!this.level && !this.isBeingOpened, SchemaError, 'Cannot define a table when database is open')
+    let checksum = getObjectChecksum(definition)
+    TableDef.validateAndSanitize(definition)
+    definition.checksum = checksum
+    this._tableDefs[tableName] = definition
   }
 
   get tables () {
-    return this._activeTableNames
+    return Object.keys(this._tableDefs)
       .filter(name => !name.startsWith('_'))
       .map(name => this[name])
   }
@@ -158,39 +184,4 @@ class IngestDB extends EventEmitter {
   }
 }
 module.exports = IngestDB
-
-// run the database's queued upgrades
-async function runUpgrades ({db, oldVersion}) {
-  // get the ones that haven't been run
-  var upgrades = db._schemas.filter(s => s.version > oldVersion)
-  db._activeSchema = db._schemas.filter(s => s.version <= oldVersion).reduce(Schemas.merge, {})
-  if (oldVersion > 0 && !db._activeSchema) {
-    throw new SchemaError(`Missing schema for previous version (${oldVersion}), unable to run upgrade.`)
-  }
-  debug(`running upgrade from ${oldVersion}, ${upgrades.length} upgrade(s) found`)
-
-  // diff and apply changes
-  var tablesToRebuild = []
-  for (let schema of upgrades) {
-    // compute diff
-    debug(`applying upgrade for version ${schema.version}`)
-    var diff = Schemas.diff(db._activeSchema, schema)
-
-    // apply diff
-    await Schemas.applyDiff(db, diff)
-    tablesToRebuild.push(diff.tablesToRebuild)
-
-    // update current schema
-    db._activeSchema = Schemas.merge(db._activeSchema, schema)
-    debug(`version ${schema.version} applied`)
-  }
-
-  // track the tables that need rebuilding
-  db._tablesToRebuild = Array.from(new Set(...tablesToRebuild))
-  debug('Ingest.runUpgrades complete', (db._tablesToRebuild.length === 0) ? '- no rebuilds needed' : 'REBUILD REQUIRED')
-}
-
-function lowestVersionFirst (a, b) {
-  return a.version - b.version
-}
 

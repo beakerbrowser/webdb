@@ -1,5 +1,5 @@
 const test = require('ava')
-const {newDB, ts} = require('./lib/util')
+const {newDB, reopenDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
@@ -10,25 +10,22 @@ var bobArchive
 
 async function setupNewDB () {
   const testDB = newDB()
-  testDB.schema({
-    version: 1,
-    profile: {
-      singular: true,
-      index: 'name',
-      validator: record => {
-        if (!(record.name && typeof record.name === 'string')) {
-          return false
-        }
-        return {
-          name: record.name,
-          bio: record.bio
-        }
+  testDB.define('profile', {
+    singular: true,
+    index: 'name',
+    validator: record => {
+      if (!(record.name && typeof record.name === 'string')) {
+        return false
       }
-    },
-    broadcasts: {
-      primaryKey: 'createdAt',
-      index: ['createdAt', 'type+createdAt']
+      return {
+        name: record.name,
+        bio: record.bio
+      }
     }
+  })
+  testDB.define('broadcasts', {
+    primaryKey: 'createdAt',
+    index: ['createdAt', 'type+createdAt']
   })
   await testDB.open()
   return testDB
@@ -109,25 +106,35 @@ test('make schema changes that require a full rebuild', async t => {
 
   // close, make destructive change, and reopen
   await testDB.close()
-  testDB.schema({
-    version: 2,
-    profile: {
-      index: ['name', 'bio']
-    },
-    broadcasts: {
-      index: ['createdAt', 'type', 'type+createdAt']
+  const testDB2 = reopenDB(testDB)
+  testDB2.define('profile', {
+    singular: true,
+    index: ['name', 'bio'],
+    validator: record => {
+      if (!(record.name && typeof record.name === 'string')) {
+        return false
+      }
+      return {
+        name: record.name,
+        bio: record.bio
+      }
     }
   })
-  await testDB.open()
+  testDB2.define('broadcasts', {
+    primaryKey: 'createdAt',
+    index: ['createdAt', 'type', 'type+createdAt']
+  })
+  var res = await testDB2.open()
+  t.deepEqual(res, {rebuilds: ['profile', 'broadcasts']})
 
     // test the indexed values
-  // await testAliceIndex(t, testDB)
-  // await testBobIndex(t, testDB)
+  // await testAliceIndex(t, testDB2)
+  // await testBobIndex(t, testDB2)
 
   // check counts
-  t.is(profileCount, await testDB.profile.count())
-  t.is(broadcastsCount, await testDB.broadcasts.count())
-  await testDB.close()
+  t.is(profileCount, await testDB2.profile.count())
+  t.is(broadcastsCount, await testDB2.broadcasts.count())
+  await testDB2.close()
 })
 
 test('index two archives, then make changes', async t => {
