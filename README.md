@@ -21,8 +21,7 @@ Define your schema:
 
 ```js
 webdb.define('people', {
-  // the schema that objects must match
-  // (uses JSONSchema v6)
+  // uses JSONSchema v6
   schema: {
     type: 'object',
     properties: {
@@ -173,6 +172,7 @@ var oldestPeople = await webdb.people
   - [Executing 'write' queries](#executing-write-queries)
   - [Quick-query methods](#quick-query-methods)
   - [Default attributes](#default-attributes)
+  - [Handling multiple schemas](#handling-multiple-schemas)
 - [Class: WebDB](#class-webdb)
   - [new WebDB([name])](#new-webdbname)
   - [WebDB.delete([name])](#webdbdeletename)
@@ -352,6 +352,60 @@ Every record has the following attributes overridden by WebDB:
 
 These attributes should not be used in schemas, as they will always be overriden.
 
+### Handling multiple schemas
+
+Since the Web is a complex place, you'll frequently have to deal with multiple schemas which are slightly different.
+This is solved in a two-step process.
+
+Step 1, use [JSON Schema's support for multiple definitions](https://spacetelescope.github.io/understanding-json-schema/reference/combining.html#anyof) to define as many schemas as you want to match:
+
+```js
+  schema: {
+    anyOf: [
+      { 
+        type: 'object',
+        properties: {
+          name: {type: 'string'},
+          zip_code: {type: 'string'}
+        },
+        required: ['name', 'zip_code']
+      },
+      { 
+        type: 'object',
+        properties: {
+          name: {type: 'string'},
+          zipCode: {type: 'string'}
+        },
+        required: ['name', 'zipCode']
+      }
+    ]
+  }
+```
+
+Step 2, in your index, use a definition object to support multiple attribute names under one index.
+
+```js
+  index: [
+    // a simple index definition:
+    'name',
+
+    // an object index definition:
+    {name: 'zipCode', def: ['zipCode', 'zip_code']}
+  ]
+```
+
+Now, when you run queries on the `'zipCode'` key, you will search against both `'zipCode'` and `'zip_code'`.
+Note, however, that the records emitted from the query will not be changed by WebDB and so they may differ.
+
+For example:
+
+```js
+webdb.places.where('zipCode').equals('78705').each(record => {
+  console.log(record.zipCode) // may be '78705' or undefined
+  console.log(record.zip_code) // may be '78705' or undefined
+})
+```
+
 ## Class: WebDB
 
 ### new WebDB([name])
@@ -405,22 +459,33 @@ Closes and deconstructs the WebDB instance.
  - `name` String. The name of the table.
  - `definition` Object.
    - `schema` Object. A [JSON Schema v6](http://json-schema.org/) definition.
-   - `index` Array&lt;String&gt;. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path).
+   - `index` Array&lt;String or Object&gt;. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition (see below).
  - Returns Void.
 
 Creates a new table on the `webdb` object.
 The table will be set at `webdb.{name}` and be the `WebDBTable` type.
 This method must be called before [`open()`](#webdbopen)
 
-You can specify compound indexes with a `+` separator in the keypath.
+Indexes may either be defined as a [keypath string](https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition.
+The object definition has the following values:
+
+ - `name` String. The name of the index.
+ - `def` String or Array&lt;String&gt;. The definition of the index.
+
+If the value of `def` is an array, it supports each definition.
+This is useful when supporting multiple schemas ([learn more here](#handling-multiple-schemas)).
+
+In the index definition, you can specify compound indexes with a `+` separator in the keypath.
 You can also index each value of an array using the `*` sigil at the start of the name.
 Some example index definitions:
 
 ```
-one index               - index: 'firstName' 
-two indexes             - index: ['firstName', 'lastName']
-add a compound index    - index: ['firstName', 'lastName', 'firstName+lastName']
-index an array's values - index: ['firstName', '*favoriteFruits']
+a simple index           - 'firstName'
+as an object def         - {name: 'firstName', def: 'firstName'}
+a compound index         - 'firstName+lastName'
+index an array's values  - '*favoriteFruits'
+many keys                - {name: 'firstName', def: ['firstName', 'first_name']}
+many keys, compound      - {name: 'firstName+lastName', def: ['firstName+lastName', 'first_name+last_name']}
 ```
 
 Example:
