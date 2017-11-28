@@ -8,9 +8,9 @@ test.before(() => console.log('indexed-level.js'))
 
 test('indexes', async t => {
   const db = IndexedLevel(sub(level({ valueEncoding: 'json'})), [
-    'lastName',
-    'lastName+firstName',
-    '*attributes',
+    {name: 'lastName', def: 'lastName'},
+    {name: 'fullName', def: 'lastName+firstName'},
+    {name: 'attributes', def: '*attributes'},
   ])
 
   const PAUL = {firstName: 'Paul', lastName: 'Frazee', attributes: ['ginger', 'hacker']}
@@ -30,9 +30,9 @@ test('indexes', async t => {
   t.deepEqual(await db.indexes.lastName.get('Frazee'), PAUL)
   t.deepEqual(await db.indexes.lastName.get('Vancil'), TARA)
 
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Frazee', 'Paul']), PAUL)
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Frazee', 'Jack']), JACK)
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Vancil', 'Tara']), TARA)
+  t.deepEqual(await db.indexes['fullName'].get(['Frazee', 'Paul']), PAUL)
+  t.deepEqual(await db.indexes['fullName'].get(['Frazee', 'Jack']), JACK)
+  t.deepEqual(await db.indexes['fullName'].get(['Vancil', 'Tara']), TARA)
 
   t.deepEqual(await db.indexes.attributes.get('hacker'), PAUL)
   t.deepEqual(await db.indexes.attributes.get('ginger'), PAUL)
@@ -73,14 +73,14 @@ test('indexes', async t => {
 
   // test compound index ranges
 
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee']})), [JACK, PAUL, TARA])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lte: ['Frazee']})), [])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lte: ['Frazee', 'Jack']})), [JACK])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lt: ['Frazee', 'Jack']})), [])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee'], lte: ['Vancil']})), [JACK, PAUL])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gt: ['Frazee'], lte: ['Vancil']})), [JACK, PAUL])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gt: ['Frazee'], lte: ['Vancil', 'Tara']})), [JACK, PAUL, TARA])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee'], lt: ['Vancil']})), [JACK, PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee']})), [JACK, PAUL, TARA])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lte: ['Frazee']})), [])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lte: ['Frazee', 'Jack']})), [JACK])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lt: ['Frazee', 'Jack']})), [])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee'], lte: ['Vancil']})), [JACK, PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gt: ['Frazee'], lte: ['Vancil']})), [JACK, PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gt: ['Frazee'], lte: ['Vancil', 'Tara']})), [JACK, PAUL, TARA])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee'], lt: ['Vancil']})), [JACK, PAUL])
 
   // test multiple index ranges
 
@@ -101,9 +101,9 @@ test('indexes', async t => {
   t.deepEqual(await db.indexes.lastName.get('Frazee-Walthall'), JACK)
   t.deepEqual(await db.indexes.lastName.get('Vancil'), TARA)
 
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Frazee', 'Paul']), PAUL)
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Frazee-Walthall', 'Jack']), JACK)
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Vancil', 'Tara']), TARA)
+  t.deepEqual(await db.indexes['fullName'].get(['Frazee', 'Paul']), PAUL)
+  t.deepEqual(await db.indexes['fullName'].get(['Frazee-Walthall', 'Jack']), JACK)
+  t.deepEqual(await db.indexes['fullName'].get(['Vancil', 'Tara']), TARA)
 
   t.deepEqual(await db.indexes.attributes.get('hacker'), PAUL)
   t.deepEqual(await db.indexes.attributes.get('ginger'), PAUL)
@@ -145,14 +145,14 @@ test('indexes', async t => {
 
   // test compound index ranges
 
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee']})), [PAUL, JACK, TARA])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lte: ['Frazee']})), [])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lte: ['Frazee-Walthall', 'Jack']})), [PAUL, JACK])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lt: ['Frazee-Walthall', 'Jack']})), [PAUL])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee'], lte: ['Vancil']})), [PAUL, JACK])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gt: ['Frazee'], lte: ['Vancil']})), [PAUL, JACK])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gt: ['Frazee'], lte: ['Vancil', 'Tara']})), [PAUL, JACK, TARA])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee'], lt: ['Vancil']})), [PAUL, JACK])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee']})), [PAUL, JACK, TARA])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lte: ['Frazee']})), [])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lte: ['Frazee-Walthall', 'Jack']})), [PAUL, JACK])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lt: ['Frazee-Walthall', 'Jack']})), [PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee'], lte: ['Vancil']})), [PAUL, JACK])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gt: ['Frazee'], lte: ['Vancil']})), [PAUL, JACK])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gt: ['Frazee'], lte: ['Vancil', 'Tara']})), [PAUL, JACK, TARA])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee'], lt: ['Vancil']})), [PAUL, JACK])
 
   // test multiple index ranges
 
@@ -169,8 +169,8 @@ test('indexes', async t => {
   t.deepEqual(await db.indexes.lastName.get('Frazee'), PAUL)
   t.deepEqual(await db.indexes.lastName.get('Vancil'), TARA)
 
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Frazee', 'Paul']), PAUL)
-  t.deepEqual(await db.indexes['lastName+firstName'].get(['Vancil', 'Tara']), TARA)
+  t.deepEqual(await db.indexes['fullName'].get(['Frazee', 'Paul']), PAUL)
+  t.deepEqual(await db.indexes['fullName'].get(['Vancil', 'Tara']), TARA)
 
   t.deepEqual(await db.indexes.attributes.get('hacker'), PAUL)
   t.deepEqual(await db.indexes.attributes.get('ginger'), PAUL)
@@ -211,14 +211,14 @@ test('indexes', async t => {
 
   // test compound index ranges
 
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee']})), [PAUL, TARA])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lte: ['Frazee']})), [])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lte: ['Frazee-Walthall', 'Jack']})), [PAUL])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({lt: ['Frazee-Walthall', 'Jack']})), [PAUL])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee'], lte: ['Vancil']})), [PAUL])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gt: ['Frazee'], lte: ['Vancil']})), [PAUL])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gt: ['Frazee'], lte: ['Vancil', 'Tara']})), [PAUL, TARA])
-  t.deepEqual(await getStream.array(db.indexes['lastName+firstName'].createValueStream({gte: ['Frazee'], lt: ['Vancil']})), [PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee']})), [PAUL, TARA])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lte: ['Frazee']})), [])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lte: ['Frazee-Walthall', 'Jack']})), [PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({lt: ['Frazee-Walthall', 'Jack']})), [PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee'], lte: ['Vancil']})), [PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gt: ['Frazee'], lte: ['Vancil']})), [PAUL])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gt: ['Frazee'], lte: ['Vancil', 'Tara']})), [PAUL, TARA])
+  t.deepEqual(await getStream.array(db.indexes['fullName'].createValueStream({gte: ['Frazee'], lt: ['Vancil']})), [PAUL])
 
   // test multiple index ranges
 
