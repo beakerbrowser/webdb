@@ -27,7 +27,7 @@ class IngestDB extends EventEmitter {
     this._archives = {}
     this._tablesToRebuild = []
     this._activeSchema = null
-    this._tablePathPatterns = []
+    this._tableFilePatterns = []
     this._dbReadyPromise = new Promise((resolve, reject) => {
       this.once('open', () => resolve(this))
       this.once('open-failed', reject)
@@ -57,7 +57,7 @@ class IngestDB extends EventEmitter {
       debug('adding tables', tableNames)
       tableNames.forEach(tableName => {
         this[tableName] = new IngestTable(this, tableName, this._tableDefs[tableName])
-        this._tablePathPatterns.push(this[tableName]._filePattern)
+        this._tableFilePatterns.push(this[tableName]._filePattern)
       })
 
       // detect table-definition changes
