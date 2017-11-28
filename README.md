@@ -60,8 +60,8 @@ await webdb.open()
 Next we add source archives to be indexed. The source archives are persisted in IndexedDB/LevelDB, so this doesn't have to be done every run.
 
 ```js
-await webdb.people.addSource(alicesUrl)
-await webdb.people.addSource([bobsUrl, carlasUrl])
+await webdb.people.addSource('dat://alice.com')
+await webdb.people.addSource(['dat://bob.com', 'dat://carla.com'])
 ```
 
 Now we can begin querying the database for records.
@@ -91,7 +91,7 @@ var robertsFamilyWithaBName = await webdb.broadcasts
 // - origin is an auto-generated attribute
 var personsOnBobsSite = await webdb.people
   .where('origin')
-  .equals(bobsSiteUrl)
+  .equals('dat://bob.com')
   .toArray()
 
 // get the 30 oldest people indexed
@@ -112,24 +112,24 @@ We can also use WebDB to create, modify, and delete records (and their matching 
 
 ```js
 // set the record
-await webdb.people.put(bobsUrl + '/person.json', {
+await webdb.people.put('dat://bob.com/person.json', {
   firstName: 'Bob',
   lastName: 'Roberts',
   age: 31
 })
 
 // update the record if it exists
-await webdb.people.update(bobsUrl + '/person.json', {
+await webdb.people.update('dat://bob.com/person.json', {
   age: 32
 })
 
 // update or create the record
-await webdb.people.upsert(bobsUrl + '/person.json', {
+await webdb.people.upsert('dat://bob.com/person.json', {
   age: 32
 })
 
 // delete the record
-await webdb.people.delete(bobsUrl + '/person.json')
+await webdb.people.delete('dat://bob.com/person.json')
 
 // update the spelling of all Roberts records
 await webdb.people
