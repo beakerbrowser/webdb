@@ -113,7 +113,7 @@ class IngestDB extends EventEmitter {
     this.isOpen = false
     if (this.level) {
       // Schemas.removeTables(this) TODO
-      this.listArchives().forEach(archive => Indexer.unwatchArchive(this, archive))
+      this.listSources().forEach(archive => Indexer.unwatchArchive(this, archive))
       await new Promise(resolve => this.level.close(resolve))
       this.level = null
       veryDebug('db .level closed')
@@ -136,32 +136,32 @@ class IngestDB extends EventEmitter {
       .map(name => this[name])
   }
 
-  async addArchive (archive) {
+  async addSource (archive) {
+    // handle array case
+    if (Array.isArray(archive)) {
+      return Promise.all(archive.map(a => this.addSource(a)))
+    }
+
     // create our own new DatArchive instance
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (!(archive.url in this._archives)) {
       // store and process
-      debug('Ingest.addArchive', archive.url)
+      debug('Ingest.addSource', archive.url)
       this._archives[archive.url] = archive
       await Indexer.addArchive(this, archive)
     }
   }
 
-  async addArchives (archives, opts) {
-    archives = Array.isArray(archives) ? archives : [archives]
-    return Promise.all(archives.map(a => this.addArchive(a, opts)))
-  }
-
-  async removeArchive (archive) {
+  async removeSource (archive) {
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (archive.url in this._archives) {
-      debug('Ingest.removeArchive', archive.url)
+      debug('Ingest.removeSource', archive.url)
       delete this._archives[archive.url]
       await Indexer.removeArchive(this, archive)
     }
   }
 
-  listArchives (archive) {
+  listSources () {
     return Object.keys(this._archives).map(url => this._archives[url])
   }
 

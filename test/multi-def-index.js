@@ -19,7 +19,7 @@ async function setupNewDB () {
     ]
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return testDB
 }
 

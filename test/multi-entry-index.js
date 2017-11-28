@@ -14,7 +14,7 @@ async function setupNewDB () {
     index: ['key', '*fruits']
   })
   await testDB.open()
-  await testDB.addArchives(archives)
+  await testDB.addSource(archives)
   return testDB
 }
 

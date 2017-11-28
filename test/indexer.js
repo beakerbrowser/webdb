@@ -72,7 +72,7 @@ test.before('setup archives', async () => {
 test('index an archive', async t => {
   // index the archive
   var testDB = await setupNewDB()
-  await testDB.addArchive(aliceArchive)
+  await testDB.addSource(aliceArchive)
 
   // test the indexed values
   await testAliceIndex(t, testDB)
@@ -84,8 +84,8 @@ test('index two archives', async t => {
   // index the archive
   var testDB = await setupNewDB()
   await Promise.all([
-    testDB.addArchive(aliceArchive),
-    testDB.addArchive(bobArchive)
+    testDB.addSource(aliceArchive),
+    testDB.addSource(bobArchive)
   ])
 
   // test the indexed values
@@ -99,8 +99,8 @@ test('make schema changes that require a full rebuild', async t => {
   // index the archive
   var testDB = await setupNewDB()
   await Promise.all([
-    testDB.addArchive(aliceArchive),
-    testDB.addArchive(bobArchive)
+    testDB.addSource(aliceArchive),
+    testDB.addSource(bobArchive)
   ])
 
   // test the indexed values
@@ -157,8 +157,8 @@ test('index two archives, then make changes', async t => {
   // index the archive
   var testDB = await setupNewDB()
   await Promise.all([
-    testDB.addArchive(aliceArchive),
-    testDB.addArchive(bobArchive)
+    testDB.addSource(aliceArchive),
+    testDB.addSource(bobArchive)
   ])
 
   // test the indexed values
