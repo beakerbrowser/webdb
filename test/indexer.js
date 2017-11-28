@@ -13,19 +13,26 @@ async function setupNewDB () {
   testDB.define('profile', {
     singular: true,
     index: 'name',
-    validator: record => {
-      if (!(record.name && typeof record.name === 'string')) {
-        return false
-      }
-      return {
-        name: record.name,
-        bio: record.bio
-      }
+    schema: {
+      type: 'object',
+      properties: {
+        name: {type: 'string'},
+        bio: {type: 'string'}
+      },
+      required: ['name']
     }
   })
   testDB.define('broadcasts', {
     primaryKey: 'createdAt',
-    index: ['createdAt', 'type+createdAt']
+    index: ['createdAt', 'type+createdAt'],
+    schema: {
+      type: 'object',
+      properties: {
+        type: {type: 'string'},
+        createdAt: {type: 'number'}
+      },
+      required: ['type', 'createdAt']
+    }
   })
   await testDB.open()
   return testDB
@@ -38,7 +45,7 @@ test.before('setup archives', async () => {
     title: 'Alice Archive',
     author: {url: 'dat://ffffffffffffffffffffffffffffffff'}
   })
-  await a.writeFile('/profile.json', JSON.stringify({name: 'alice', bio: 'Cool computer girl', avatarUrl: 'notincluded.png'}))
+  await a.writeFile('/profile.json', JSON.stringify({name: 'alice', bio: 'Cool computer girl', avatarUrl: 'alice.png'}))
   await a.mkdir('/broadcasts')
   a.broadcast1TS = ts()
   await a.writeFile(`/broadcasts/${a.broadcast1TS}.json`, JSON.stringify({type: 'comment', text: 'Hello, world!', createdAt: a.broadcast1TS}))
@@ -46,18 +53,20 @@ test.before('setup archives', async () => {
   await a.writeFile(`/broadcasts/${a.broadcast2TS}.json`, JSON.stringify({type: 'comment', text: 'Whoop', createdAt: a.broadcast2TS}))
   a.broadcast3TS = ts()
   await a.writeFile(`/broadcasts/${a.broadcast3TS}.json`, JSON.stringify({type: 'image', imageUrl: 'foo.png', createdAt: a.broadcast3TS}))
+  await a.writeFile(`/broadcasts/bad.json`, JSON.stringify({this: 'is not included'}))
 
   // setup bob
   const b = bobArchive = await DatArchive.create({
     localPath: tempy.directory(),
     title: 'Bob Archive'
   })
-  await b.writeFile('/profile.json', JSON.stringify({name: 'bob', bio: 'Cool computer guy', avatarUrl: 'notincluded.png'}))
+  await b.writeFile('/profile.json', JSON.stringify({name: 'bob', bio: 'Cool computer guy', avatarUrl: 'alice.png'}))
   await b.mkdir('/broadcasts')
   b.broadcast1TS = ts()
   await b.writeFile(`/broadcasts/${b.broadcast1TS}.json`, JSON.stringify({type: 'comment', text: 'Hello, world!', createdAt: b.broadcast1TS}))
   b.broadcast2TS = ts()
   await b.writeFile(`/broadcasts/${b.broadcast2TS}.json`, JSON.stringify({type: 'image', imageUrl: 'baz.png', createdAt: b.broadcast2TS}))
+  await b.writeFile(`/broadcasts/bad.json`, JSON.stringify({this: 'is not included'}))
 })
 
 test('index an archive', async t => {
@@ -110,19 +119,26 @@ test('make schema changes that require a full rebuild', async t => {
   testDB2.define('profile', {
     singular: true,
     index: ['name', 'bio'],
-    validator: record => {
-      if (!(record.name && typeof record.name === 'string')) {
-        return false
-      }
-      return {
-        name: record.name,
-        bio: record.bio
-      }
+    schema: {
+      type: 'object',
+      properties: {
+        name: {type: 'string'},
+        bio: {type: 'string'}
+      },
+      required: ['name']
     }
   })
   testDB2.define('broadcasts', {
     primaryKey: 'createdAt',
-    index: ['createdAt', 'type', 'type+createdAt']
+    index: ['createdAt', 'type', 'type+createdAt'],
+    schema: {
+      type: 'object',
+      properties: {
+        type: {type: 'string'},
+        createdAt: {type: 'number'}
+      },
+      required: ['type', 'createdAt']
+    }
   })
   var res = await testDB2.open()
   t.deepEqual(res, {rebuilds: ['profile', 'broadcasts']})
@@ -191,7 +207,6 @@ async function testAliceIndex (t, testDB) {
   t.truthy(profile)
   t.is(profile.name, 'alice')
   t.is(profile.bio, 'Cool computer girl')
-  t.falsy(profile.avatarUrl) // not included by the validator
   var broadcast1 = await testDB.broadcasts.level.get(aliceArchive.url + '/broadcasts/' + aliceArchive.broadcast1TS + '.json')
   t.truthy(broadcast1)
   t.is(broadcast1.type, 'comment')
@@ -214,7 +229,6 @@ async function testBobIndex (t, testDB) {
   t.truthy(profile)
   t.is(profile.name, 'bob')
   t.is(profile.bio, 'Cool computer guy')
-  t.falsy(profile.avatarUrl) // not included by the validator
   var broadcast1 = await testDB.broadcasts.level.get(bobArchive.url + '/broadcasts/' + bobArchive.broadcast1TS + '.json')
   t.truthy(broadcast1)
   t.is(broadcast1.type, 'comment')
