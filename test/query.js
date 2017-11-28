@@ -10,11 +10,11 @@ var archives = []
 async function setupNewDB () {
   const testDB = newDB()
   testDB.define('single', {
-    singular: true,
+    filePattern: '/single.json',
     index: ['first', 'second', 'first+second', 'third']
   })
   testDB.define('multi', {
-    primaryKey: 'first',
+    filePattern: '/multi/*.json',
     index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()
@@ -97,8 +97,9 @@ test('eachKey()', async t => {
   await testDB.multi.query().eachKey(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is .first
-    t.truthy(result.startsWith('first'))
+    // is .url
+    t.truthy(result.startsWith('dat://'))
+    t.truthy(result.endsWith('.json'))
   })
   t.is(n, 30)
   n = 0
@@ -130,8 +131,9 @@ test('keys()', async t => {
   keys.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is .first
-    t.truthy(result.startsWith('first'))
+    // is .url
+    t.truthy(result.startsWith('dat://'))
+    t.truthy(result.endsWith('.json'))
   })
   t.is(n, 30)
   await testDB.close()
@@ -262,7 +264,7 @@ test('uniqueKeys()', async t => {
   const testDB = await setupNewDB()
   result = await testDB.single.query().uniqueKeys()
   t.is(result.length, 10)
-  result = await testDB.multi.query().uniqueKeys()
+  result = await testDB.multi.query().orderBy('first').uniqueKeys()
   t.is(result.length, 20)
   await testDB.close()
 })

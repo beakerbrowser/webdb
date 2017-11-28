@@ -10,11 +10,11 @@ var archives = []
 async function setupNewDB () {
   const testDB = newDB()
   testDB.define('single', {
-    singular: true,
+    filePattern: '/single.json',
     index: ['first', 'second', 'first+second', 'third']
   })
   testDB.define('multi', {
-    primaryKey: 'first',
+    filePattern: '/multi/*.json',
     index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()

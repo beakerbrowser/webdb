@@ -57,7 +57,7 @@ class IngestDB extends EventEmitter {
       debug('adding tables', tableNames)
       tableNames.forEach(tableName => {
         this[tableName] = new IngestTable(this, tableName, this._tableDefs[tableName])
-        this._tablePathPatterns.push(this[tableName]._pathPattern)
+        this._tablePathPatterns.push(this[tableName]._filePattern)
       })
 
       // detect table-definition changes

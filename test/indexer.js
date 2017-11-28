@@ -11,7 +11,7 @@ var bobArchive
 async function setupNewDB () {
   const testDB = newDB()
   testDB.define('profile', {
-    singular: true,
+    filePattern: '/profile.json',
     index: 'name',
     schema: {
       type: 'object',
@@ -23,7 +23,7 @@ async function setupNewDB () {
     }
   })
   testDB.define('broadcasts', {
-    primaryKey: 'createdAt',
+    filePattern: '/broadcasts/*.json',
     index: ['createdAt', 'type+createdAt'],
     schema: {
       type: 'object',
@@ -117,7 +117,7 @@ test('make schema changes that require a full rebuild', async t => {
   await testDB.close()
   const testDB2 = reopenDB(testDB)
   testDB2.define('profile', {
-    singular: true,
+    filePattern: '/profile.json',
     index: ['name', 'bio'],
     schema: {
       type: 'object',
@@ -129,7 +129,7 @@ test('make schema changes that require a full rebuild', async t => {
     }
   })
   testDB2.define('broadcasts', {
-    primaryKey: 'createdAt',
+    filePattern: '/broadcasts/*.json',
     index: ['createdAt', 'type', 'type+createdAt'],
     schema: {
       type: 'object',

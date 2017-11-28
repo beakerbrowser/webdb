@@ -10,7 +10,7 @@ var archives = []
 async function setupNewDB () {
   const testDB = newDB()
   testDB.define('table', {
-    primaryKey: 'key',
+    filePattern: '/table/*.json',
     index: [
       'key',
       {name: 'fruits', def: ['*fruits', '*theFruits']},
