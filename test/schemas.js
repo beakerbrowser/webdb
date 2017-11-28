@@ -20,7 +20,7 @@ test('simple v1: add table', async t => {
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', '_origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', 'origin'])
 
   await testDB.close()
 })
@@ -50,10 +50,10 @@ test('simple v2: add another table', async t => {
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', '_origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', 'origin'])
   t.truthy(testDB.secondTable)
   t.truthy(testDB.secondTable.level)
-  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', '_origin'])
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', 'origin'])
 
   await testDB.close()
 })
@@ -88,7 +88,7 @@ test('simple v3: delete the first table', async t => {
   t.falsy(testDB.firstTable)
   t.truthy(testDB.secondTable)
   t.truthy(testDB.secondTable.level)
-  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', '_origin'])
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', 'origin'])
   
   await testDB.close()
 })
@@ -131,7 +131,7 @@ test('simple v4: modify the index', async t => {
   t.falsy(testDB.firstTable)
   t.truthy(testDB.secondTable)
   t.truthy(testDB.secondTable.level)
-  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'f', 'g', '_origin'])
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'f', 'g', 'origin'])
 
   await testDB.close()
 })
@@ -181,10 +181,10 @@ test('simple v5: add another table', async t => {
   t.falsy(testDB.firstTable)
   t.truthy(testDB.secondTable)
   t.truthy(testDB.secondTable.level)
-  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'f', 'g', '_origin'])
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'f', 'g', 'origin'])
   t.truthy(testDB.thirdTable)
   t.truthy(testDB.thirdTable.level)
-  t.deepEqual(Object.keys(testDB.thirdTable.level.indexes), ['_origin'])
+  t.deepEqual(Object.keys(testDB.thirdTable.level.indexes), ['origin'])
 
   await testDB.close()
 })
@@ -250,9 +250,9 @@ test('simple v6: add / change / remove all at once', async t => {
   t.truthy(testDB.fourthTable)
 
   t.truthy(testDB.secondTable.level)
-  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['z', '_origin'])
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['z', 'origin'])
   t.truthy(testDB.fourthTable.level)
-  t.deepEqual(Object.keys(testDB.fourthTable.level.indexes), ['_origin'])
+  t.deepEqual(Object.keys(testDB.fourthTable.level.indexes), ['origin'])
 
   await testDB.close()
 })
@@ -275,7 +275,7 @@ test('complex index test', async t => {
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a+b', 'c+d', 'e', '_origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a+b', 'c+d', 'e', 'origin'])
 
   await testDB.close()
 })

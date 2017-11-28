@@ -108,7 +108,7 @@ test('Table.update()', async t => {
   t.is(await testDB.multi.update(record), 1)
   t.is((await testDB.multi.get('third', 'third0multi3')).n, 0)
   debug('== update by url')
-  t.is(await testDB.multi.update(record._url, {n: 1}), 1)
+  t.is(await testDB.multi.update(record.url, {n: 1}), 1)
   t.is((await testDB.multi.get('third', 'third0multi3')).n, 1)
   debug('== update by key')
   t.is(await testDB.multi.update(archives[9], 'first0', {foo: 'bar'}), 1)
@@ -118,10 +118,10 @@ test('Table.update()', async t => {
   record.n = 0
   debug('== update by record')
   t.is(await testDB.single.update(record), 1)
-  t.is((await testDB.single.get(record._url)).n, 0)
+  t.is((await testDB.single.get(record.url)).n, 0)
   debug('== update by url')
-  t.is(await testDB.single.update(record._url, {n: 1}), 1)
-  t.is((await testDB.single.get(record._url)).n, 1)
+  t.is(await testDB.single.update(record.url, {n: 1}), 1)
+  t.is((await testDB.single.get(record.url)).n, 1)
   debug('== update by archive')
   t.is(await testDB.single.update(archives[9], {foo: 'bar'}), 1)
 

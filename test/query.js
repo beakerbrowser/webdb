@@ -91,7 +91,7 @@ test('eachKey()', async t => {
   await testDB.single.query().eachKey(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -123,7 +123,7 @@ test('keys()', async t => {
   keys.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -148,7 +148,7 @@ test('eachUrl()', async t => {
   await testDB.single.query().eachUrl(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -157,7 +157,7 @@ test('eachUrl()', async t => {
   await testDB.multi.query().eachUrl(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -174,7 +174,7 @@ test('urls()', async t => {
   urls.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
@@ -184,7 +184,7 @@ test('urls()', async t => {
   urls.forEach(result => {
     n++
     t.truthy(typeof result === 'string')
-    // is ._url
+    // is .url
     t.truthy(result.startsWith('dat://'))
     t.truthy(result.endsWith('.json'))
   })
