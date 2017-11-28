@@ -41,7 +41,13 @@ webdb.define('people', {
   },
 
   // secondary indexes for fast queries (optional)
-  index: ['lastName', 'lastName+firstName', 'age']
+  index: ['lastName', 'lastName+firstName', 'age'],
+
+  // files to index
+  filePattern: [
+    '/person.json',
+    '/people/*.json'
+  ]
 })
 ```
 
@@ -54,18 +60,8 @@ await webdb.open()
 Next we add source archives to be indexed. The source archives are persisted in IndexedDB/LevelDB, so this doesn't have to be done every run.
 
 ```js
-await webdb.people.addSource(alicesUrl, {
-  filePattern: '/people/*.json'
-})
-await webdb.people.addSource(bobsUrl, {
-  filePattern: '/person.json'
-})
-await webdb.people.addSource(carlasUrl, {
-  filePattern: [
-    '/person.json',
-    '/people/*.json'
-  ]
-})
+await webdb.people.addSource(alicesUrl)
+await webdb.people.addSource([bobsUrl, carlasUrl])
 ```
 
 Now we can begin querying the database for records.
@@ -255,8 +251,9 @@ var oldestPeople = await webdb.people
 
 ## How to use WebDB
 
-### Schema definitions
+### Table definitions
 
+Use the [`define()`](#webdbdefinename-definition) method to define your tables, and then call [`webdb.open()`](#webdbopen) to create them.
 Schemas are defined using [JSON Schema v6](http://json-schema.org/).
 
 ### Creating queries
@@ -460,6 +457,7 @@ Closes and deconstructs the WebDB instance.
  - `definition` Object.
    - `schema` Object. A [JSON Schema v6](http://json-schema.org/) definition.
    - `index` Array&lt;String or Object&gt;. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition (see below).
+   - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
  - Returns Void.
 
 Creates a new table on the `webdb` object.
@@ -488,6 +486,9 @@ many keys                - {name: 'firstName', def: ['firstName', 'first_name']}
 many keys, compound      - {name: 'firstName+lastName', def: ['firstName+lastName', 'first_name+last_name']}
 ```
 
+You can specify which files should be processed into the table using the `filePattern` option.
+If unspecified, it will default to all json files on the site (`'*.json'`).
+
 Example:
 
 ```js
@@ -510,35 +511,29 @@ webdb.define('people', {
     },
     required: ['firstName', 'lastName']
   },
-  index: ['lastName', 'lastName+firstName', 'age']
+  index: ['lastName', 'lastName+firstName', 'age'],
+  filePattern: [
+    '/person.json',
+    '/people/*.json'
+  ]
 })
 
 await webdb.open()
 // the new table will now be defined at webdb.people
 ```
 
-### webdb.addSource(url[, options])
+### webdb.addSource(url)
 
 ```js
-await webdb.people.addSource('dat://foo.com', {
-  filePattern: [
-    '/myrecord.json',
-    '/myrecords/*.json'
-  ]
-})
+await webdb.people.addSource('dat://foo.com')
 ```
 
  - `url` String or DatArchive or Array&lt;String or DatArchive&gt;. The sites to index.
- - `options` Object.
-   - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
  - Returns Promise&lt;Void&gt;.
 
 Add one or more dat:// sites to be indexed.
 The method will return when the site has been fully indexed.
 The added sites are saved, and therefore only need to be added once.
-
-You can specify which files should be processed using the `filePattern` option.
-If unspecified, it will default to all json files on the site (`'*.json'`).
 
 ### webdb.removeSource(url)
 
@@ -691,7 +686,7 @@ var isRecord = webdb.mytable.isRecordFile('dat://foo.com/myrecord.json')
  - `url` String.
  - Returns Boolean.
 
-Tells you whether the given URL matches any source's file pattern.
+Tells you whether the given URL matches the table's file pattern.
 
 ### limit(n)
 
@@ -715,7 +710,7 @@ var recordFiles = await webdb.mytable.listRecordFiles('dat://foo.com')
    - `recordUrl` String.
    - `table` WebDBTable.
 
-Lists all files on the given URL which match the file pattern.
+Lists all files on the given URL which match the table's file pattern.
 
 ### name
 
