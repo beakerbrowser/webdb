@@ -1222,6 +1222,8 @@ var query = webdb.mytable.query().where('foo').anyOf(['bar', 'baz'])
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
+Does not work on compound indexes.
+
 ### where.anyOfIgnoreCase(values)
 
 ```js
@@ -1230,6 +1232,8 @@ var query = webdb.mytable.query().where('foo').anyOfIgnoreCase(['bar', 'baz'])
 
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
+
+Does not work on compound indexes.
 
 ### where.below(value)
 
@@ -1283,6 +1287,8 @@ var query = webdb.mytable.query().where('foo').equalsIgnoreCase('bar')
  - `value` Any.
  - Returns WebDBQuery.
 
+Does not work on compound indexes.
+
 ### where.noneOf(values)
 
 ```js
@@ -1291,6 +1297,8 @@ var query = webdb.mytable.query().where('foo').noneOf(['bar', 'baz'])
 
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
+
+Does not work on compound indexes.
 
 ### where.notEqual(value)
 
@@ -1301,6 +1309,8 @@ var query = webdb.mytable.query().where('foo').notEqual('bar')
  - `value` Any.
  - Returns WebDBQuery.
 
+Does not work on compound indexes.
+
 ### where.startsWith(value)
 
 ```js
@@ -1309,6 +1319,8 @@ var query = webdb.mytable.query().where('foo').startsWith('ba')
 
  - `value` Any.
  - Returns WebDBQuery.
+
+Does not work on compound indexes.
 
 ### where.startsWithAnyOf(values)
 
@@ -1319,6 +1331,7 @@ var query = webdb.mytable.query().where('foo').startsWithAnyOf(['ba', 'bu'])
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
+Does not work on compound indexes.
 
 ### where.startsWithAnyOfIgnoreCase(values)
 
@@ -1329,6 +1342,7 @@ var query = webdb.mytable.query().where('foo').startsWithAnyOfIgnoreCase(['ba', 
  - `values` Array&lt;Any&gt;.
  - Returns WebDBQuery.
 
+Does not work on compound indexes.
 
 ### where.startsWithIgnoreCase(value)
 
@@ -1339,6 +1353,7 @@ var query = webdb.mytable.query().where('foo').startsWithIgnoreCase('ba')
  - `value` Any.
  - Returns WebDBQuery.
 
+Does not work on compound indexes.
 
 
 ## How it works
