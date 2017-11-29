@@ -22,9 +22,7 @@ class WebDBDB extends EventEmitter {
     this.isBeingOpened = false
     this.isOpen = false
     this.DatArchive = opts.DatArchive || window.DatArchive
-    this._tableDefs = {
-      _indexMeta: {index: []} // builtin table
-    }
+    this._tableDefs = {}
     this._archives = {}
     this._tablesToRebuild = []
     this._activeSchema = null
@@ -52,6 +50,7 @@ class WebDBDB extends EventEmitter {
     try {
       this.level = sublevel(level(this.name, {valueEncoding: 'json'}))
       levelPromisify(this.level)
+      this._indexMetaLevel = this.level.sublevel('_indexMeta')
 
       // construct the tables
       const tableNames = Object.keys(this._tableDefs)

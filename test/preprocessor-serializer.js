@@ -3,7 +3,7 @@ const {newDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
 
-test.before(() => console.log('to-file.js'))
+test.before(() => console.log('preprocessor-serializer.js'))
 
 var archive
 
@@ -48,7 +48,6 @@ test('Different data is stored in the records than in the files', async t => {
   const testDB = await setupNewDB()
   // check records
   var results = await testDB.multi.toArray()
-  console.log(results)
   t.deepEqual(results[0].fileAttr, 'foo')
   t.deepEqual(results[0].recordOnly, 'foorecord')
   t.deepEqual(results[1].fileAttr, 'bar')
