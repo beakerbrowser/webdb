@@ -18,7 +18,7 @@ test('one table', async t => {
   t.deepEqual(res, {rebuilds: ['firstTable']})
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', 'origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', ':origin'])
 
   await testDB.close()
 })
@@ -43,10 +43,10 @@ test('two tables', async t => {
   t.deepEqual(res, {rebuilds: ['firstTable', 'secondTable']})
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', 'origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', ':origin'])
   t.truthy(testDB.secondTable)
   t.truthy(testDB.secondTable.level)
-  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', 'origin'])
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', ':origin'])
 
   await testDB.close()
 })
@@ -70,10 +70,10 @@ test('properly detect changes', async t => {
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', 'origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'b', 'c', ':origin'])
   t.truthy(testDB.secondTable)
   t.truthy(testDB.secondTable.level)
-  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', 'origin'])
+  t.deepEqual(Object.keys(testDB.secondTable.level.indexes), ['d', 'e', 'f', ':origin'])
 
   await testDB.close()
   const testDB2 = reopenDB(testDB)
@@ -95,10 +95,10 @@ test('properly detect changes', async t => {
   t.deepEqual(res, {rebuilds: ['firstTable']})
   t.truthy(testDB2.firstTable)
   t.truthy(testDB2.firstTable.level)
-  t.deepEqual(Object.keys(testDB2.firstTable.level.indexes), ['g', 'h', 'i', 'origin'])
+  t.deepEqual(Object.keys(testDB2.firstTable.level.indexes), ['g', 'h', 'i', ':origin'])
   t.truthy(testDB2.secondTable)
   t.truthy(testDB2.secondTable.level)
-  t.deepEqual(Object.keys(testDB2.secondTable.level.indexes), ['d', 'e', 'f', 'origin'])
+  t.deepEqual(Object.keys(testDB2.secondTable.level.indexes), ['d', 'e', 'f', ':origin'])
 
   await testDB2.close()
   const testDB3 = reopenDB(testDB)
@@ -120,10 +120,10 @@ test('properly detect changes', async t => {
   t.deepEqual(res, {rebuilds: ['firstTable', 'secondTable']})
   t.truthy(testDB3.firstTable)
   t.truthy(testDB3.firstTable.level)
-  t.deepEqual(Object.keys(testDB3.firstTable.level.indexes), ['g', 'h', 'i', 'j', 'origin'])
+  t.deepEqual(Object.keys(testDB3.firstTable.level.indexes), ['g', 'h', 'i', 'j', ':origin'])
   t.truthy(testDB3.secondTable)
   t.truthy(testDB3.secondTable.level)
-  t.deepEqual(Object.keys(testDB3.secondTable.level.indexes), ['d', 'e', 'f', 'g', 'origin'])
+  t.deepEqual(Object.keys(testDB3.secondTable.level.indexes), ['d', 'e', 'f', 'g', ':origin'])
 
   await testDB3.close()
 })
@@ -142,7 +142,7 @@ test('complex index test', async t => {
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a+b', 'c+d', 'e', 'origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a+b', 'c+d', 'e', ':origin'])
 
   await testDB.close()
 })
@@ -165,7 +165,7 @@ test('multi-def index test', async t => {
   // check that the table was created correctly
   t.truthy(testDB.firstTable)
   t.truthy(testDB.firstTable.level)
-  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'c+d', 'e', 'origin'])
+  t.deepEqual(Object.keys(testDB.firstTable.level.indexes), ['a', 'c+d', 'e', ':origin'])
 
   await testDB.close()
 })

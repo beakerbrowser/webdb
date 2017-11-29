@@ -196,7 +196,7 @@ test('equals()', async t => {
   t.is(result.second, 4)
   var result = await testDB.single.where('first').equals('no match').first()
   t.falsy(result)
-  var result = await testDB.single.where('origin').equals(archives[0].url).first()
+  var result = await testDB.single.where(':origin').equals(archives[0].url).first()
   t.is(result.first, 'first0')
   await testDB.close()
 })

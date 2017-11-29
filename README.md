@@ -70,6 +70,13 @@ Now we can begin querying the database for records.
 // get any person record where lastName === 'Roberts'
 var mrRoberts = await webdb.people.get('lastName', 'Roberts')
 
+// response attributes:
+console.log(mrRoberts.lastName)          // => 'Roberts'
+console.log(mrRoberts)                   // => {lastName: 'Roberts', ...}
+console.log(mrRoberts.getRecordURL())    // => 'dat://foo.com/bar.json'
+console.log(mrRoberts.getRecordOrigin()) // => 'dat://foo.com'
+console.log(mrRoberts.getIndexedAt())    // => 1511913554723
+
 // get any person record named Bob Roberts
 var mrRoberts = await webdb.people.get('lastName+firstName', ['Roberts', 'Bob'])
 
@@ -88,9 +95,9 @@ var robertsFamilyWithaBName = await webdb.broadcasts
   .toArray()
 
 // get all person records on a given origin
-// - origin is an auto-generated attribute
+// - `:origin` is an auto-generated attribute
 var personsOnBobsSite = await webdb.people
-  .where('origin')
+  .where(':origin')
   .equals('dat://bob.com')
   .toArray()
 
@@ -347,16 +354,41 @@ The following methods exist on the table object for query reads and writes:
   - [table.upsert(url, updates)](#tableupserturl-updates)
   - [table.upsert(url, fn)](#tableupserturl-fn)
 
-### Default attributes
+### Record methods
 
-Every record has the following attributes overridden by WebDB:
+```js
+record.getRecordURL()    // => 'dat://foo.com/bar.json'
+record.getRecordOrigin() // => 'dat://foo.com'
+record.getIndexedAt()    // => 1511913554723
+```
 
- - `url` String. The URL of the record.
- - `origin` String. The URL of the site the record was found on.
- - `indexedAt` String. The timestamp of when the record was indexed.
+Every record is emitted in a wrapper object with the following methods:
 
-The `origin` is always included in the secondary indexes.
-These attributes should not be used in schemas, as they will always be overriden.
+ - `getURL()` The URL of the record.
+ - `getOrigin()` The URL of the site the record was found on.
+ - `getIndexedAt` The timestamp of when the record was indexed.
+
+These attributes can be used in indexes with the following IDs:
+
+ - `:url`. (Automatically included in all indexes.)
+ - `:origin`. (Automatically included in all indexes.)
+ - `:indexedAt`
+
+For instance:
+
+```js
+webdb.define('things', {
+  // ...
+  index: [
+    ':indexedAt', // ordered by time the record was indexed
+    ':origin+createdAt' // ordered by origin and declared create timestamp (a record attribute)
+  ],
+  // ...
+})
+await webdb.open()
+webdb.things.where(':indexedAt').above(Date.now() - ms('1 week'))
+webdb.things.where(':origin+createdAt').between(['dat://bob.com', 0], ['dat://bob.com', Infinity])
+```
 
 ### Handling multiple schemas
 

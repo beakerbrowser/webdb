@@ -13,9 +13,9 @@ test('indexes', async t => {
     {name: 'attributes', def: '*attributes'},
   ])
 
-  const PAUL = {firstName: 'Paul', lastName: 'Frazee', attributes: ['ginger', 'hacker']}
-  const JACK = {firstName: 'Jack', lastName: 'Frazee', attributes: ['ginger', 'lawyer']}
-  const TARA = {firstName: 'Tara', lastName: 'Vancil', attributes: ['brunette', 'hacker']}
+  const PAUL = {record: {firstName: 'Paul', lastName: 'Frazee', attributes: ['ginger', 'hacker']}}
+  const JACK = {record: {firstName: 'Jack', lastName: 'Frazee', attributes: ['ginger', 'lawyer']}}
+  const TARA = {record: {firstName: 'Tara', lastName: 'Vancil', attributes: ['brunette', 'hacker']}}
 
   await db.put(1, PAUL)
   await db.put(2, JACK)
@@ -90,9 +90,9 @@ test('indexes', async t => {
 
   // test modifications
 
-  JACK.attributes.push('hacker')
-  JACK.attributes.push('houstonian')
-  JACK.lastName = 'Frazee-Walthall'
+  JACK.record.attributes.push('hacker')
+  JACK.record.attributes.push('houstonian')
+  JACK.record.lastName = 'Frazee-Walthall'
   await db.put(2, JACK)
 
   // test all getters

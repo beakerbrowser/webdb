@@ -102,15 +102,15 @@ test('Table.update()', async t => {
   var record = await testDB.multi.get('third', 'third0multi3')
   record.n = 0
   debug('== update by url')
-  t.is(await testDB.multi.update(record.url, {n: 1}), 1)
+  t.is(await testDB.multi.update(record.getRecordURL(), {n: 1}), 1)
   t.is((await testDB.multi.get('third', 'third0multi3')).n, 1)
 
   // update a single record
   var record = await testDB.single.query().first()
   record.n = 0
   debug('== update by url')
-  t.is(await testDB.single.update(record.url, {n: 1}), 1)
-  t.is((await testDB.single.get(record.url)).n, 1)
+  t.is(await testDB.single.update(record.getRecordURL(), {n: 1}), 1)
+  t.is((await testDB.single.get(record.getRecordURL())).n, 1)
 
   await testDB.close()
 })
