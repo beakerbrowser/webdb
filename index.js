@@ -9,6 +9,7 @@ const {SchemaError} = require('./lib/errors')
 const TableDef = require('./lib/table-def')
 const Indexer = require('./lib/indexer')
 const WebDBTable = require('./lib/table')
+const flatten = require('lodash.flatten')
 
 class WebDBDB extends EventEmitter {
   constructor (name, opts = {}) {
@@ -59,6 +60,7 @@ class WebDBDB extends EventEmitter {
         this[tableName] = new WebDBTable(this, tableName, this._tableDefs[tableName])
         this._tableFilePatterns.push(this[tableName]._filePattern)
       })
+      this._tableFilePatterns = flatten(this._tableFilePatterns)
 
       // detect table-definition changes
       for (let i = 0; i < tableNames.length; i++) {

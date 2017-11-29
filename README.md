@@ -175,8 +175,10 @@ var oldestPeople = await webdb.people
   - [Executing 'read' queries](#executing-read-queries)
   - [Executing 'write' queries](#executing-write-queries)
   - [Table helper methods](#table-helper-methods)
-  - [Default attributes](#default-attributes)
+  - [Record methods](#record-methods)
   - [Handling multiple schemas](#handling-multiple-schemas)
+  - [Preprocessing records](#preprocessing-records)
+  - [Serializing records](#serializing-records)
 - [Class: WebDB](#class-webdb)
   - [new WebDB([name])](#new-webdbname)
   - [WebDB.delete([name])](#webdbdeletename)
@@ -423,6 +425,9 @@ Step 1, use [JSON Schema's support for multiple definitions](https://spacetelesc
 Step 2, in your index, use a definition object to support multiple attribute names under one index.
 
 ```js
+webdb.define('places', {
+  // ...
+
   index: [
     // a simple index definition:
     'name',
@@ -430,6 +435,9 @@ Step 2, in your index, use a definition object to support multiple attribute nam
     // an object index definition:
     {name: 'zipCode', def: ['zipCode', 'zip_code']}
   ]
+
+  // ...
+})
 ```
 
 Now, when you run queries on the `'zipCode'` key, you will search against both `'zipCode'` and `'zip_code'`.
@@ -441,6 +449,68 @@ For example:
 webdb.places.where('zipCode').equals('78705').each(record => {
   console.log(record.zipCode) // may be '78705' or undefined
   console.log(record.zip_code) // may be '78705' or undefined
+})
+```
+
+To solve this, you can [preprocess records](#preprocessing-records).
+
+### Preprocessing records
+
+Sometimes, you need to modify records before they're stored in the database. This can be for a number of reasons:
+
+ - Normalization. Small differences in accepted record schemas may need to be merged (see [handling multiple schemas](#handling-multiple-schemas)).
+ - Indexing. WebDB's index spec only supports toplevel attributes. If the data is embedded in a sub-object, you'll need to place the data at the top-level.
+ - Computed attributes.
+
+For these cases, you can use the `preprocess(record)` function in the table definition:
+
+```js
+webdb.define('places', {
+  // ...
+
+  preprocess(record) {
+    // normalize zipCode and zip_code
+    if (record.zip_code) {
+      record.zipCode = record.zip_code
+    }
+
+    // move an attribute to the root object for indexing
+    record.title = record.info.title
+
+    // compute an attribute
+    record.location = `${record.address} ${record.city}, ${record.state} ${record.zipCode}`
+
+    return record
+  }
+
+  // ...
+})
+```
+
+These attributes will be stored in the WebDB table.
+
+### Serializing records
+
+When records are updated by WebDB, they are published to a Dat site as a file.
+Since these files are distributed on the Web, it's wise to avoid adding noise to the record.
+
+To control the exact record that will be published, you can set the `serialize(record)` function in the table definition:
+
+```js
+webdb.define('places', {
+  // ...
+
+  serialize(record) {
+    // write the following object to the dat site:
+    return {
+      info: record.info,
+      city: record.city,
+      state: record.state,
+      zipCode: record.zipCode
+    }
+  }
+
+  // ...
 })
 ```
 
@@ -500,6 +570,12 @@ Closes and deconstructs the WebDB instance.
    - `schema` Object. A [JSON Schema v6](http://json-schema.org/) definition.
    - `index` Array&lt;String or Object&gt;. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition (see below).
    - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
+   - `preprocess` Function. A method to modify the record after read from the dat site. See [preprocessing records](#preprocessing-records).
+     - `record` Object.
+     - Returns Object.
+   - `serialize` Function. A method to modify the record before write to the dat site. See [serializing records](#serializing-records).
+     - `record` Object.
+     - Returns Object.
  - Returns Void.
 
 Creates a new table on the `webdb` object.
