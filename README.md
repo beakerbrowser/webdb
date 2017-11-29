@@ -366,7 +366,7 @@ Every record is emitted in a wrapper object with the following methods:
 
  - `getURL()` The URL of the record.
  - `getOrigin()` The URL of the site the record was found on.
- - `getIndexedAt` The timestamp of when the record was indexed.
+ - `getIndexedAt()` The timestamp of when the record was indexed.
 
 These attributes can be used in indexes with the following IDs:
 
