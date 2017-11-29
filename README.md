@@ -370,8 +370,8 @@ Every record is emitted in a wrapper object with the following methods:
 
 These attributes can be used in indexes with the following IDs:
 
- - `:url`. (Automatically included in all indexes.)
- - `:origin`. (Automatically included in all indexes.)
+ - `:url`
+ - `:origin`
  - `:indexedAt`
 
 For instance:
