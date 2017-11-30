@@ -737,7 +737,7 @@ When this occurs, WebDB will continue searching for the data, and emit `'source-
 ### Event: 'source-found'
 
 ```js
-webdb.on('source-missing', (url) => {
+webdb.on('source-found', (url) => {
   console.log('WebDB has found and indexed', url)
 })
 ```
