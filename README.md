@@ -193,6 +193,9 @@ var oldestPeople = await webdb.people
   - [Event: 'open-failed'](#event-open-failed)
   - [Event: 'versionchange'](#event-versionchange)
   - [Event: 'indexes-updated'](#event-indexes-updated)
+  - [Event: 'source-missing'](#event-source-missing)
+  - [Event: 'source-found'](#event-source-found)
+  - [Event: 'source-error'](#event-source-error)
 - [Instance: WebDBTable](#instance-webdbtable)
   - [table.count()](#tablecount)
   - [table.delete(url)](#tabledeleteurl)
@@ -719,6 +722,38 @@ webdb.on('indexes-updated', (url, version) => {
  - `version` Number. The version which was updated to.
 
 Emitted when the WebDB instance has updated the stored data for a site.
+
+### Event: 'source-missing'
+
+```js
+webdb.on('source-missing', (url) => {
+  console.log('WebDB couldnt find', url, '- now searching')
+})
+```
+
+Emitted when a source's data was not locally available or found on the network.
+When this occurs, WebDB will continue searching for the data, and emit `'source-found'` on success.
+
+### Event: 'source-found'
+
+```js
+webdb.on('source-missing', (url) => {
+  console.log('WebDB has found and indexed', url)
+})
+```
+
+Emitted when a source's data was found after originally not being found during indexing.
+This event will only be emitted after `'source-missing'` is emitted.
+
+### Event: 'source-error'
+
+```js
+webdb.on('source-error', (url, err) => {
+  console.log('WebDB failed to index', url, err)
+})
+```
+
+Emitted when a source fails to load.
 
 ## Instance: WebDBTable
 
