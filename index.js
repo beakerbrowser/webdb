@@ -114,7 +114,7 @@ class WebDBDB extends EventEmitter {
     this.isOpen = false
     if (this.level) {
       // Schemas.removeTables(this) TODO
-      this.listSources().forEach(archive => Indexer.unwatchArchive(this, archive))
+      this.listSources().forEach(url => Indexer.unwatchArchive(this, this._archives[url]))
       await new Promise(resolve => this.level.close(resolve))
       this.level = null
       veryDebug('db .level closed')
@@ -163,7 +163,7 @@ class WebDBDB extends EventEmitter {
   }
 
   listSources () {
-    return Object.keys(this._archives).map(url => this._archives[url])
+    return Object.keys(this._archives)
   }
 
   static list () {
