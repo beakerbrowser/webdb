@@ -1,6 +1,6 @@
 {
   "name": "@beaker/webdb",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A database that reads and writes records on dat:// websites.",
   "main": "index.js",
   "directories": {
