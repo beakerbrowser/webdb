@@ -773,7 +773,7 @@ Count the number of records in the table.
 await webdb.mytable.delete('dat://foo.com/bar.json')
 ```
 
- - Returns Promise&lt;Void&gt;.
+ - Returns Promise&lt;Number&gt;. The number of deleted records (should be 0 or 1).
 
 Delete the record at the given URL.
 
@@ -901,7 +901,7 @@ await webdb.mytable.put('dat://foo.com/myrecord.json', {foo: 'bar'})
 
  - `url` String.
  - `record` Object.
- - Returns Promise&lt;Void&gt;.
+ - Returns Promise&lt;String&gt;. The URL of the written record.
 
 Replaces or creates the record at the given URL with the `record`.
 
@@ -949,10 +949,9 @@ var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', {foo:
 
  - `url` String. The record to update.
  - `updates` Object. The new values to set on the record.
- - Returns Promise&lt;Boolean&gt;.
+ - Returns Promise&lt;Number&gt;. The number of records updated.
 
 Updates the target record with the given key values, if it exists.
-Returns `false` if the target record did not exist.
 
 ### table.update(url, fn)
 
@@ -967,10 +966,9 @@ var wasUpdated = await webdb.mytable.update('dat://foo.com/myrecord.json', recor
  - `fn` Function. A method to modify the record.
    - `record` Object. The record to modify.
    - Returns Object.
- - Returns Promise&lt;Boolean&gt;.
+ - Returns Promise&lt;Number&gt;. The number of records updated.
 
 Updates the target record with the given function, if it exists.
-Returns `false` if the target record did not exist.
 
 ### table.upsert(url, updates)
 
@@ -980,11 +978,10 @@ var didCreateNew = await webdb.mytable.upsert('dat://foo.com/myrecord.json', {fo
 
  - `url` String. The record to update.
  - `updates` Object. The new values to set on the record.
- - Returns Promise&lt;Boolean&gt;.
+ - Returns Promise&lt;Number&gt;. The number of records updated.
 
 If a record exists at the target URL, will update it with the given key values.
 If a record does not exist, will create the record.
-Returns `true` if the target record was created.
 
 ### table.upsert(url, fn)
 
@@ -1004,11 +1001,10 @@ var didCreateNew = await webdb.mytable.upsert('dat://foo.com/myrecord.json', rec
  - `fn` Function. A method to modify the record.
    - `record` Object. The record to modify. Will be falsy if the record does ot previously exist
    - Returns Object.
- - Returns Promise&lt;Boolean&gt;.
+ - Returns Promise&lt;Number&gt;. The number of records updated.
 
 Updates the target record with the given function, if it exists.
 If a record does not exist, will give a falsy value to the method.
-Returns `true` if the target record was created.
 
 ### table.where(key)
 
