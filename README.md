@@ -9,12 +9,12 @@ Instantiate:
 ```js
 // in the browser
 const WebDB = require('@beaker/webdb')
-var webdb = new WebDB()
+var webdb = new WebDB('webdb-example')
 
 // in nodejs
 const DatArchive = require('node-dat-archive')
 const WebDB = require('@beaker/webdb')
-var webdb = new WebDB('./webdb', {DatArchive})
+var webdb = new WebDB('./webdb-example', {DatArchive})
 ```
 
 Define your schema:
@@ -519,13 +519,15 @@ webdb.define('places', {
 
 ## Class: WebDB
 
-### new WebDB([name])
+### new WebDB([name, opts])
 
 ```js
 var webdb = new WebDB('mydb')
 ```
 
  - `name` String. Defaults to `'webdb'`. If run in the browser, this will be the name of the IndexedDB instance. If run in NodeJS, this will be the path of the LevelDB folder.
+ - `opts` Object.
+   - `DatArchive` Constructor. The class constructor for dat archive instances. If in node, you should specify [node-dat-archive](https://npm.im/node-dat-archive).
 
 Create a new `WebDB` instance.
 The given `name` will control where the indexes are saved.
