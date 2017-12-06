@@ -89,9 +89,9 @@ var robertsFamily = await webdb.people
 // get all person records with the 'Roberts' lastname
 // and a firstname that starts with 'B'
 // - this uses a compound index
-var robertsFamilyWithaBName = await webdb.broadcasts
+var robertsFamilyWithaBName = await webdb.people
   .where('lastName+firstName')
-  .between(['Roberts', 'b'], ['Roberts', 'b\uffff'])
+  .between(['Roberts', 'B'], ['Roberts', 'B\uffff'])
   .toArray()
 
 // get all person records on a given origin
