@@ -11,7 +11,7 @@ const Indexer = require('./lib/indexer')
 const WebDBTable = require('./lib/table')
 const flatten = require('lodash.flatten')
 
-class WebDBDB extends EventEmitter {
+class WebDB extends EventEmitter {
   constructor (name, opts = {}) {
     super()
     if (typeof window === 'undefined' && !opts.DatArchive) {
