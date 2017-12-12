@@ -166,6 +166,10 @@ class WebDB extends EventEmitter {
     return Object.keys(this._archives)
   }
 
+  isSource (url) {
+    return (url in this._archives)
+  }
+
   static list () {
     // TODO
   }

@@ -180,7 +180,7 @@ var oldestPeople = await webdb.people
   - [Preprocessing records](#preprocessing-records)
   - [Serializing records](#serializing-records)
 - [Class: WebDB](#class-webdb)
-  - [new WebDB([name])](#new-webdbname)
+  - [new WebDB([name, opts])](#new-webdbname-opts)
   - [WebDB.delete([name])](#webdbdeletename)
 - [Instance: WebDB](#instance-webdb)
   - [webdb.open()](#webdbopen)
@@ -189,6 +189,7 @@ var oldestPeople = await webdb.people
   - [webdb.addSource(url)](#webdbaddsourceurl)
   - [webdb.removeSource(url)](#webdbremovesourceurl)
   - [webdb.listSources()](#webdblistsources)
+  - [webdb.isSource(url)](#webdbissourceurl)
   - [Event: 'open'](#event-open)
   - [Event: 'open-failed'](#event-open-failed)
   - [Event: 'versionchange'](#event-versionchange)
@@ -676,9 +677,19 @@ The method will return when the site has been fully de-indexed.
 var urls = await webdb.listSources()
 ```
 
- - Returns Promise&lt;String&gt;.
+ - Returns Array&lt;String&gt;.
 
 Lists the URLs of the dat:// sites which are included in the dataset.
+
+### webdb.isSource(url)
+
+```js
+var urls = await webdb.isSource('dat://foo.com')
+```
+
+ - Returns Boolean.
+
+Is the given dat:// URL included in the dataset?
 
 ### Event: 'open'
 
