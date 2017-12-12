@@ -167,6 +167,8 @@ class WebDB extends EventEmitter {
   }
 
   isSource (url) {
+    if (!url) return false
+    if (url.url) url = url.url // an archive
     return (url in this._archives)
   }
 
