@@ -1,6 +1,6 @@
 const tempy = require('tempy')
 const DatArchive = require('node-dat-archive')
-const WebDBDB = require('../../index')
+const WebDB = require('../../index')
 const {debug, veryDebug} = require('../../lib/util')
 
 var __counter = 0
@@ -9,11 +9,11 @@ exports.newDB = function () {
   debug('\n##', name, '\n')
   var dir = tempy.directory()
   veryDebug('DB dir:', dir)
-  return new WebDBDB(dir, {DatArchive})
+  return new WebDB(dir, {DatArchive})
 }
 
 exports.reopenDB = function (db) {
-  return new WebDBDB(db.name, {DatArchive})
+  return new WebDB(db.name, {DatArchive})
 }
 
 var lastTs = 0

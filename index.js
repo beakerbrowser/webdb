@@ -188,5 +188,5 @@ class WebDB extends EventEmitter {
     })
   }
 }
-module.exports = WebDBDB
+module.exports = WebDB
 
