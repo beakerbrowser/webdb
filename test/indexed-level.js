@@ -1,13 +1,12 @@
 const test = require('ava')
 const level = require('memdb')
-const sub = require('level-sublevel')
 const getStream = require('get-stream')
 const IndexedLevel = require('../lib/indexed-level.js')
 
 test.before(() => console.log('indexed-level.js'))
 
 test('indexes', async t => {
-  const db = IndexedLevel(sub(level({ valueEncoding: 'json'})), [
+  const db = IndexedLevel(level({ valueEncoding: 'json'}), [
     {name: 'lastName', def: 'lastName'},
     {name: 'fullName', def: 'lastName+firstName'},
     {name: 'attributes', def: '*attributes'},
@@ -26,7 +25,6 @@ test('indexes', async t => {
   t.deepEqual(await db.get(1), PAUL)
   t.deepEqual(await db.get(2), JACK)
   t.deepEqual(await db.get(3), TARA)
-
   t.deepEqual(await db.indexes.lastName.get('Frazee'), PAUL)
   t.deepEqual(await db.indexes.lastName.get('Vancil'), TARA)
 

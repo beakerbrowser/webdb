@@ -2,7 +2,7 @@
 
 const EventEmitter = require('events')
 const level = require('level-browserify')
-const sublevel = require('level-sublevel')
+const sublevel = require('subleveldown')
 const levelPromisify = require('level-promise')
 const {debug, veryDebug, assert, getObjectChecksum} = require('./lib/util')
 const {SchemaError} = require('./lib/errors')
@@ -15,13 +15,15 @@ class WebDB extends EventEmitter {
   constructor (name, opts = {}) {
     super()
     if (typeof window === 'undefined' && !opts.DatArchive) {
-      throw new Error('Must provide {DatArchive} opt when using WebDBDB outside the browser.')
+      throw new Error('Must provide {DatArchive} opt when using WebDB outside the browser.')
     }
     this.level = false
     this.name = name
     this.isBeingOpened = false
     this.isOpen = false
     this.DatArchive = opts.DatArchive || window.DatArchive
+    this._indexMetaLevel = null
+    this._tableSchemaLevel = null
     this._tableDefs = {}
     this._archives = {}
     this._tablesToRebuild = []
@@ -48,9 +50,11 @@ class WebDB extends EventEmitter {
     // open the db
     debug('opening')
     try {
-      this.level = sublevel(level(this.name, {valueEncoding: 'json'}))
-      levelPromisify(this.level)
-      this._indexMetaLevel = this.level.sublevel('_indexMeta')
+      this.level = level(this.name, {valueEncoding: 'json'})
+      this._tableSchemaLevel = sublevel(this.level, '_tableSchema', {valueEncoding: 'json'})
+      levelPromisify(this._tableSchemaLevel)
+      this._indexMetaLevel = sublevel(this.level, '_indexMeta', {valueEncoding: 'json'})
+      levelPromisify(this._indexMetaLevel)
 
       // construct the tables
       const tableNames = Object.keys(this._tableDefs)
@@ -69,7 +73,7 @@ class WebDB extends EventEmitter {
         // load the saved checksum
         let lastChecksum
         try { 
-          let tableMeta = await this.level.get('table:' + tableName)
+          let tableMeta = await this._tableSchemaLevel.get(tableName)
           lastChecksum = tableMeta.checksum
         } catch (e) {}
         
@@ -88,7 +92,7 @@ class WebDB extends EventEmitter {
       for (let i = 0; i < tableNames.length; i++) {
         let tableName = tableNames[i]
         let tableChecksum = this._tableDefs[tableName].checksum
-        await this.level.put('table:' + tableName, {checksum: tableChecksum})
+        await this._tableSchemaLevel.put(tableName, {checksum: tableChecksum})
       }
 
       this.isBeingOpened = false
