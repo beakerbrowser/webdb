@@ -188,6 +188,10 @@ var oldestPeople = await webdb.people
   - [webdb.define(name, definition)](#webdbdefinename-definition)
   - [webdb.indexArchive(url[, opts])](#webdbindexarchiveurl-opts)
   - [webdb.unindexArchive(url)](#webdbunindexarchiveurl)
+  - [webdb.indexFile(archive, filepath)](#webdbindexfilearchive-filepath)
+  - [webdb.indexFile(url)](#webdbindexfileurl)
+  - [webdb.unindexFile(archive, filepath)](#webdbunindexfilearchive-filepath)
+  - [webdb.unindexFile(url)](#webdbunindexfileurl)
   - [webdb.listSources()](#webdblistsources)
   - [webdb.isSource(url)](#webdbissourceurl)
   - [Event: 'open'](#event-open)
@@ -278,6 +282,8 @@ Indexed data will persist in the database until `unindexArchive()` is called.
 However, `indexArchive()` should always be called on load to get the latest data.
 
 If you only want to index the current state of a site, and do not want to watch for updates, call `indexArchive()` with the `{watch: false}` option.
+
+You can index and de-index individual files using [`indexFile()`](#webdbindexfileurl) and [`unindexFile()`](#webdbunindexfileurl).
 
 ### Creating queries
 
@@ -662,7 +668,7 @@ await webdb.indexArchive('dat://foo.com')
 
 Add one or more dat:// sites to be indexed.
 The method will return when the site has been fully indexed.
-The added sites are saved, and therefore only need to be added once.
+This will add the given archive to the "sources" list.
 
 ### webdb.unindexArchive(url)
 
@@ -675,6 +681,62 @@ await webdb.unindexArchive('dat://foo.com')
 
 Remove a dat:// site from the dataset.
 The method will return when the site has been fully de-indexed.
+This will remove the given archive from the "sources" list.
+
+### webdb.indexFile(archive, filepath)
+
+```js
+await webdb.indexFile(fooArchive, '/bar.json')
+```
+
+ - `archive` DatArchive. The site containing the file to index.
+ - `filepath` String. The path of the file to index.
+ - Returns Promise&lt;Void&gt;.
+
+Add a single file to the index.
+The method will return when the file has been indexed.
+
+This will not add the file or its archive to the "sources" list.
+Unlike `indexArchive`, WebDB will not watch the file after this call.
+
+### webdb.indexFile(url)
+
+```js
+await webdb.indexFile('dat://foo.com/bar.json')
+```
+
+ - `url` String. The url of the file to index.
+ - Returns Promise&lt;Void&gt;.
+
+Add a single file to the index.
+The method will return when the file has been indexed.
+
+This will not add the file or its archive to the "sources" list.
+
+### webdb.unindexFile(archive, filepath)
+
+```js
+await webdb.unindexFile(fooArchive, '/bar.json')
+```
+
+ - `archive` DatArchive. The site containing the file to deindex.
+ - `filepath` String. The path of the file to deindex.
+ - Returns Promise&lt;Void&gt;.
+
+Remove a single file from the dataset.
+The method will return when the file has been de-indexed.
+
+### webdb.unindexFile(url)
+
+```js
+await webdb.unindexFile('dat://foo.com')
+```
+
+ - `url` String. The url of the file to deindex.
+ - Returns Promise&lt;Void&gt;.
+
+Remove a single file from the dataset.
+The method will return when the file has been de-indexed.
 
 ### webdb.listSources()
 
@@ -1510,3 +1572,18 @@ WebDB sits on top of Dat archives. It duplicates ingested data into IndexedDB, w
 WebDB treats individual files in the Dat archive as individual records in a table. As a result, there's a direct mapping for each table to a folder of JSON files. For instance, if you had a `posts` table, it might map to the `/posts/*.json` files. WebDB's mutators, e.g., `put`, `add`, `update`, simply writes records as JSON files in the `posts/` directory. WebDB's readers and query-ers, like `get()` and `where()`, read from the IndexedDB cache.
 
 WebDB watches its source archives for changes to the JSON files that compose its records. When the files change, it syncs and reads the changes, then updates IndexedDB, keeping query results up-to-date. Roughly, the flow is: `put() -> archive/posts/12345.json -> indexer -> indexeddb -> get()`.
+
+
+## Change history
+
+A quick overview of the notable changes to WebDB:
+
+### 3.0.0
+
+The `addSource()` and `removeSource()` methods were replaced with `indexArchive()`, `indexFile()`, `unindexArchive()`, and `unindexFile()`.
+The `indexArchive()` method also provides an option to disable watching.
+
+This change was made as we found controlling the index was an important part of using WebDB.
+Frequently we'd want to index a site temporarily, for instance to view a user's profile on first visit.
+
+This new API gives better control for those use-cases, and no longer assumes you want to continue watching an archive after indexing it once.

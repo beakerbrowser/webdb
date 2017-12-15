@@ -4,7 +4,7 @@ const EventEmitter = require('events')
 const level = require('level-browserify')
 const sublevel = require('subleveldown')
 const levelPromisify = require('level-promise')
-const {debug, veryDebug, assert, getObjectChecksum} = require('./lib/util')
+const {debug, veryDebug, assert, getObjectChecksum, URL} = require('./lib/util')
 const {SchemaError} = require('./lib/errors')
 const TableDef = require('./lib/table-def')
 const Indexer = require('./lib/indexer')
@@ -164,6 +164,24 @@ class WebDB extends EventEmitter {
       delete this._archives[archive.url]
       await Indexer.removeArchive(this, archive)
     }
+  }
+
+  async indexFile (archive, filepath) {
+    if (typeof archive === 'string') {
+      const urlp = new URL(archive)
+      archive = new (this.DatArchive)(urlp.protocol + '//' + urlp.hostname)
+      return this.indexFile(archive, urlp.pathname)
+    }
+    await Indexer.readAndIndexFile(this, archive, filepath)
+  }
+
+  async unindexFile (archive, filepath) {
+    if (typeof archive === 'string') {
+      const urlp = new URL(archive)
+      archive = new (this.DatArchive)(urlp.protocol + '//' + urlp.hostname)
+      return this.indexFile(archive, urlp.pathname)
+    }
+    await Indexer.unindexFile(this, archive, filepath)
   }
 
   listSources () {
