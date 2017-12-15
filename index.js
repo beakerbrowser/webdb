@@ -86,7 +86,6 @@ class WebDB extends EventEmitter {
       // run rebuilds
       // TODO go per-table
       await Indexer.resetOutdatedIndexes(this, neededRebuilds)
-      await Indexer.loadArchives(this, neededRebuilds.length > 0)
 
       // save checksums
       for (let i = 0; i < tableNames.length; i++) {
@@ -117,7 +116,6 @@ class WebDB extends EventEmitter {
     debug('closing')
     this.isOpen = false
     if (this.level) {
-      // Schemas.removeTables(this) TODO
       this.listSources().forEach(url => Indexer.unwatchArchive(this, this._archives[url]))
       await new Promise(resolve => this.level.close(resolve))
       this.level = null
@@ -141,26 +139,28 @@ class WebDB extends EventEmitter {
       .map(name => this[name])
   }
 
-  async addSource (archive) {
+  async indexArchive (archive, opts = {}) {
+    opts.watch = (typeof opts.watch === 'boolean') ? opts.watch : true
+
     // handle array case
     if (Array.isArray(archive)) {
-      return Promise.all(archive.map(a => this.addSource(a)))
+      return Promise.all(archive.map(a => this.indexArchive(a, opts)))
     }
 
     // create our own new DatArchive instance
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (!(archive.url in this._archives)) {
       // store and process
-      debug('WebDB.addSource', archive.url)
+      debug('WebDB.indexArchive', archive.url)
       this._archives[archive.url] = archive
-      await Indexer.addArchive(this, archive)
+      await Indexer.addArchive(this, archive, opts)
     }
   }
 
-  async removeSource (archive) {
+  async unindexArchive (archive) {
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
     if (archive.url in this._archives) {
-      debug('WebDB.removeSource', archive.url)
+      debug('WebDB.unindexArchive', archive.url)
       delete this._archives[archive.url]
       await Indexer.removeArchive(this, archive)
     }

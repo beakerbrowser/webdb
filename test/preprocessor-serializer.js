@@ -25,7 +25,7 @@ async function setupNewDB () {
     serialize: record => ({fileAttr: record.fileAttr})
   })
   await testDB.open()
-  await testDB.addSource(archive)
+  await testDB.indexArchive(archive)
   return testDB
 }
 

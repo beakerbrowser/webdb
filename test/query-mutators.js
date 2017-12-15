@@ -19,7 +19,7 @@ async function setupNewDB () {
     index: ['first', 'second', 'first+second', 'third']
   })
   await testDB.open()
-  await testDB.addSource(archives)
+  await testDB.indexArchive(archives)
   return testDB
 }
 

@@ -57,11 +57,11 @@ Then open the DB:
 await webdb.open()
 ```
 
-Next we add source archives to be indexed. The source archives are persisted in IndexedDB/LevelDB, so this doesn't have to be done every run.
+Next we add archives to be indexed into the database.
 
 ```js
-await webdb.addSource('dat://alice.com')
-await webdb.addSource(['dat://bob.com', 'dat://carla.com'])
+await webdb.indexArchive('dat://alice.com')
+await webdb.indexArchive(['dat://bob.com', 'dat://carla.com'])
 ```
 
 Now we can begin querying the database for records.
@@ -186,8 +186,8 @@ var oldestPeople = await webdb.people
   - [webdb.open()](#webdbopen)
   - [webdb.close()](#webdbclose)
   - [webdb.define(name, definition)](#webdbdefinename-definition)
-  - [webdb.addSource(url)](#webdbaddsourceurl)
-  - [webdb.removeSource(url)](#webdbremovesourceurl)
+  - [webdb.indexArchive(url[, opts])](#webdbindexarchiveurl-opts)
+  - [webdb.unindexArchive(url)](#webdbunindexarchiveurl)
   - [webdb.listSources()](#webdblistsources)
   - [webdb.isSource(url)](#webdbissourceurl)
   - [Event: 'open'](#event-open)
@@ -273,8 +273,11 @@ Schemas are defined using [JSON Schema v6](http://json-schema.org/).
 
 ### Indexing sites
 
-Use [`addSource()`](#webdbaddsourceurl) and [`removeSource()`](#webdbremovesourceurl) to control which sites will be indexed.
-Sources are stored in metadata and so `addSource()` does not have to be called for each site on load (but it doesn't cause harm if you do).
+Use [`indexArchive()`](#webdbindexarchiveurl-opts) and [`unindexArchive()`](#webdbunindexarchiveurl) to control which sites will be indexed.
+Indexed data will persist in the database until `unindexArchive()` is called.
+However, `indexArchive()` should always be called on load to get the latest data.
+
+If you only want to index the current state of a site, and do not want to watch for updates, call `indexArchive()` with the `{watch: false}` option.
 
 ### Creating queries
 
@@ -646,23 +649,25 @@ await webdb.open()
 // the new table will now be defined at webdb.people
 ```
 
-### webdb.addSource(url)
+### webdb.indexArchive(url[, opts])
 
 ```js
-await webdb.addSource('dat://foo.com')
+await webdb.indexArchive('dat://foo.com')
 ```
 
  - `url` String or DatArchive or Array&lt;String or DatArchive&gt;. The sites to index.
+ - `opts` Object.
+   - `watch` Boolean. Should WebDB watch the archive for changes, and index them immediately? Defaults to true.
  - Returns Promise&lt;Void&gt;.
 
 Add one or more dat:// sites to be indexed.
 The method will return when the site has been fully indexed.
 The added sites are saved, and therefore only need to be added once.
 
-### webdb.removeSource(url)
+### webdb.unindexArchive(url)
 
 ```js
-await webdb.removeSource('dat://foo.com')
+await webdb.unindexArchive('dat://foo.com')
 ```
 
  - `url` String or DatArchive. The site to deindex.
