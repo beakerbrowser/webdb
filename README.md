@@ -265,6 +265,8 @@ var oldestPeople = await webdb.people
   - [where.startsWithAnyOfIgnoreCase(values)](#wherestartswithanyofignorecasevalues)
   - [where.startsWithIgnoreCase(value)](#wherestartswithignorecasevalue)
 - [How it works](#how-it-works)
+- [Change history](#change-history)
+  - [3.0.0](#300)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
