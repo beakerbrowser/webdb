@@ -196,7 +196,7 @@ var oldestPeople = await webdb.people
   - [webdb.isSource(url)](#webdbissourceurl)
   - [Event: 'open'](#event-open)
   - [Event: 'open-failed'](#event-open-failed)
-  - [Event: 'versionchange'](#event-versionchange)
+  - [Event: 'indexes-reset'](#event-indexes-reset)
   - [Event: 'indexes-updated'](#event-indexes-updated)
   - [Event: 'source-missing'](#event-source-missing)
   - [Event: 'source-found'](#event-source-found)
@@ -782,15 +782,16 @@ webdb.on('open-failed', (err) => {
 
 Emitted when the WebDB instance fails to open during [`open()`](#webdbopen).
 
-### Event: 'versionchange'
+### Event: 'indexes-reset'
 
 ```js
-webdb.on('versionchange', () => {
-  console.log('WebDB detected a change in schemas and rebuilt all data')
+webdb.on('indexes-reset', () => {
+  console.log('WebDB detected a change in schemas and reset all indexes')
 })
 ```
 
 Emitted when the WebDB instance detects a change in the schemas and has to reindex the dataset.
+All indexes are cleared and will be reindexed as sources are added.
 
 ### Event: 'indexes-updated'
 
@@ -800,10 +801,24 @@ webdb.on('indexes-updated', (url, version) => {
 })
 ```
 
- - `url` String. The site that was updated.
+ - `url` String. The archive that was updated.
  - `version` Number. The version which was updated to.
 
-Emitted when the WebDB instance has updated the stored data for a site.
+Emitted when the WebDB instance has updated the stored data for a archive.
+
+### Event: 'source-indexed'
+
+```js
+webdb.on('source-indexed', (url, version) => {
+  console.log('Tables were updated for', url, 'at version', version)
+})
+```
+
+ - `url` String. The archive that was updated.
+ - `version` Number. The version which was updated to.
+
+Emitted when the WebDB instance has indexed the given archive.
+This is similar to `'indexes-updated'`, but it fires every time a source is indexed, whether or not it results in updates to the indexes.
 
 ### Event: 'source-missing'
 
@@ -1107,10 +1122,10 @@ webdb.mytable.on('index-updated', (url, version) => {
 })
 ```
 
- - `url` String. The site that was updated.
+ - `url` String. The archive that was updated.
  - `version` Number. The version which was updated to.
 
-Emitted when the table has updated the stored data for a site.
+Emitted when the table has updated the stored data for a archive.
 
 ## Instance: WebDBQuery
 
@@ -1586,6 +1601,6 @@ The `addSource()` and `removeSource()` methods were replaced with `indexArchive(
 The `indexArchive()` method also provides an option to disable watching.
 
 This change was made as we found controlling the index was an important part of using WebDB.
-Frequently we'd want to index a site temporarily, for instance to view a user's profile on first visit.
+Frequently we'd want to index an archive temporarily, for instance to view a user's profile on first visit.
 
 This new API gives better control for those use-cases, and no longer assumes you want to continue watching an archive after indexing it once.
