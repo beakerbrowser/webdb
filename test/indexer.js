@@ -171,7 +171,7 @@ test('index two archives, then make changes', async t => {
 
   // write changes to alice's profile.json
   await aliceArchive.writeFile('/profile.json', JSON.stringify({name: 'alice', bio: '_Very_ cool computer girl'}))
-  await new Promise(resolve => testDB.profile.once('index-updated', resolve))
+  await new Promise(resolve => testDB.once('indexes-updated', resolve))
 
   // test updated values
   var profile = await testDB.profile.level.get(aliceArchive.url + '/profile.json')
@@ -182,7 +182,7 @@ test('index two archives, then make changes', async t => {
   // add a new broadcast to alice
   aliceArchive.broadcast4TS = ts()
   await aliceArchive.writeFile(`/broadcasts/${aliceArchive.broadcast4TS}.json`, JSON.stringify({type: 'comment', text: 'Index me!', createdAt: aliceArchive.broadcast4TS}))
-  await new Promise(resolve => testDB.broadcasts.once('index-updated', resolve))
+  await new Promise(resolve => testDB.once('indexes-updated', resolve))
 
   // test updated values
   var broadcast4 = await testDB.broadcasts.level.get(aliceArchive.url + `/broadcasts/${aliceArchive.broadcast4TS}.json`)
@@ -193,7 +193,7 @@ test('index two archives, then make changes', async t => {
 
   // delete broadcast 1 from alice
   await aliceArchive.unlink(`/broadcasts/${aliceArchive.broadcast1TS}.json`)
-  await new Promise(resolve => testDB.broadcasts.once('index-updated', resolve))
+  await new Promise(resolve => testDB.once('indexes-updated', resolve))
 
   // test updated values
   try {
