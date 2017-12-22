@@ -355,6 +355,8 @@ Once your query has been defined, you can execute and *modify* the results using
   - [put(record)](#queryputrecord)
   - [update(updates)](#queryupdateupdates)
   - [update(fn)](#queryupdatefn)
+  
+If you try to modify rows in archives that are not writable, WebDB will throw an error.
 
 ### Table helper methods
 
