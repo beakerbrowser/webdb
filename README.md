@@ -17,27 +17,14 @@ const WebDB = require('@beaker/webdb')
 var webdb = new WebDB('./webdb-example', {DatArchive})
 ```
 
-Define your schema:
+Define your table:
 
 ```js
 webdb.define('people', {
-  // uses JSONSchema v6
-  schema: {
-    type: 'object',
-    properties: {
-      firstName: {
-        type: 'string'
-      },
-      lastName: {
-        type: 'string'
-      },
-      age: {
-        description: 'Age in years',
-        type: 'integer',
-        minimum: 0
-      }
-    },
-    required: ['firstName', 'lastName']
+  // validate required attributes before indexing
+  validate(record) {
+    assert(record.firstName && typeof record.firstName === 'string')
+    assert(record.lastName && typeof record.lastName === 'string')
   },
 
   // secondary indexes for fast queries (optional)
@@ -275,7 +262,6 @@ var oldestPeople = await webdb.people
 ### Table definitions
 
 Use the [`define()`](#webdbdefinename-definition) method to define your tables, and then call [`webdb.open()`](#webdbopen) to create them.
-Schemas are defined using [JSON Schema v6](http://json-schema.org/).
 
 ### Indexing sites
 
@@ -410,34 +396,7 @@ webdb.things.where(':origin+createdAt').between(['dat://bob.com', 0], ['dat://bo
 ### Handling multiple schemas
 
 Since the Web is a complex place, you'll frequently have to deal with multiple schemas which are slightly different.
-This is solved in a two-step process.
-
-Step 1, use [JSON Schema's support for multiple definitions](https://spacetelescope.github.io/understanding-json-schema/reference/combining.html#anyof) to define as many schemas as you want to match:
-
-```js
-  schema: {
-    anyOf: [
-      { 
-        type: 'object',
-        properties: {
-          name: {type: 'string'},
-          zip_code: {type: 'string'}
-        },
-        required: ['name', 'zip_code']
-      },
-      { 
-        type: 'object',
-        properties: {
-          name: {type: 'string'},
-          zipCode: {type: 'string'}
-        },
-        required: ['name', 'zipCode']
-      }
-    ]
-  }
-```
-
-Step 2, in your index, use a definition object to support multiple attribute names under one index.
+To deal with this, you can use a definition object to support multiple attribute names under one index.
 
 ```js
 webdb.define('places', {
@@ -529,6 +488,38 @@ webdb.define('places', {
 })
 ```
 
+### Using JSON-Schema to validate
+
+The default way to validate records is to provide a validator function.
+If the function throws an error or returns falsy, the record will not be indexed.
+
+It can be tedious to write validation functions, so you might want to use JSON-Schema:
+
+```js
+const Ajv = require('ajv')
+webdb.define('people', {
+  validate: (new Ajv()).compile({
+    type: 'object',
+    properties: {
+      firstName: {
+        type: 'string'
+      },
+      lastName: {
+        type: 'string'
+      },
+      age: {
+        description: 'Age in years',
+        type: 'integer',
+        minimum: 0
+      }
+    },
+    required: ['firstName', 'lastName']
+  }),
+
+  // ...
+})
+```
+
 ## Class: WebDB
 
 ### new WebDB([name, opts])
@@ -584,9 +575,11 @@ Closes and deconstructs the WebDB instance.
 
  - `name` String. The name of the table.
  - `definition` Object.
-   - `schema` Object. A [JSON Schema v6](http://json-schema.org/) definition.
    - `index` Array&lt;String or Object&gt;. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition (see below).
    - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
+   - `validate` Function. A method to accept or reject a file from indexing based on its content. If the method returns falsy or throws an error, the file will not be indexed.
+     - `record` Object.
+     - Returns Boolean.
    - `preprocess` Function. A method to modify the record after read from the dat site. See [preprocessing records](#preprocessing-records).
      - `record` Object.
      - Returns Object.
@@ -599,7 +592,7 @@ Creates a new table on the `webdb` object.
 The table will be set at `webdb.{name}` and be the `WebDBTable` type.
 This method must be called before [`open()`](#webdbopen)
 
-Indexes may either be defined as a [keypath string](https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition.
+Indexed attributes may either be defined as a [keypath string](https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition.
 The object definition has the following values:
 
  - `name` String. The name of the index.
@@ -628,23 +621,9 @@ Example:
 
 ```js
 webdb.define('people', {
-  // (uses JSONSchema v6)
-  schema: {
-    type: 'object',
-    properties: {
-      firstName: {
-        type: 'string'
-      },
-      lastName: {
-        type: 'string'
-      },
-      age: {
-        description: 'Age in years',
-        type: 'integer',
-        minimum: 0
-      }
-    },
-    required: ['firstName', 'lastName']
+  validate(record) {
+    assert(record.firstName && typeof record.firstName === 'string')
+    assert(record.lastName && typeof record.lastName === 'string')
   },
   index: ['lastName', 'lastName+firstName', 'age'],
   filePattern: [
@@ -1594,6 +1573,10 @@ WebDB watches its source archives for changes to the JSON files that compose its
 ## Change history
 
 A quick overview of the notable changes to WebDB:
+
+### 4.0.0
+
+Replaced JSON-Schema validation with an open `validate` function. This was done to reduce the output bundle size (by 200kb!) and to improve overall flexibility (JSON-Schema and JSON-LD do not work together very well).
 
 ### 3.0.0
 

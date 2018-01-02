@@ -2,6 +2,7 @@ const test = require('ava')
 const {newDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
+const Ajv = require('ajv')
 
 test.before(() => console.log('preprocessor-serializer.js'))
 
@@ -11,13 +12,13 @@ async function setupNewDB () {
   const testDB = newDB()
   testDB.define('multi', {
     filePattern: ['/multi/*.json'],
-    schema: {
+    validate: (new Ajv()).compile({
       type: 'object',
       properties: {
         fileAttr: {type: 'string'}
       },
       required: ['fileAttr']
-    },
+    }),
     preprocess: record => ({
       recordOnly: record.fileAttr + 'record',
       fileAttr: record.fileAttr

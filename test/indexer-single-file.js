@@ -2,6 +2,7 @@ const test = require('ava')
 const {newDB, reopenDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
+const Ajv = require('ajv')
 
 test.before(() => console.log('one-time-index.js'))
 
@@ -13,26 +14,26 @@ async function setupNewDB () {
   testDB.define('profile', {
     filePattern: '/profile.json',
     index: 'name',
-    schema: {
+    validate: (new Ajv()).compile({
       type: 'object',
       properties: {
         name: {type: 'string'},
         bio: {type: 'string'}
       },
       required: ['name']
-    }
+    })
   })
   testDB.define('broadcasts', {
     filePattern: '/broadcasts/*.json',
     index: ['createdAt', 'type+createdAt'],
-    schema: {
+    validate: (new Ajv()).compile({
       type: 'object',
       properties: {
         type: {type: 'string'},
         createdAt: {type: 'number'}
       },
       required: ['type', 'createdAt']
-    }
+    })
   })
   await testDB.open()
   return testDB

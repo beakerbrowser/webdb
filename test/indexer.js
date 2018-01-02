@@ -2,6 +2,7 @@ const test = require('ava')
 const {newDB, reopenDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
+const Ajv = require('ajv')
 
 test.before(() => console.log('indexer.js'))
 
@@ -13,26 +14,26 @@ async function setupNewDB () {
   testDB.define('profile', {
     filePattern: '/profile.json',
     index: 'name',
-    schema: {
+    validate: (new Ajv()).compile({
       type: 'object',
       properties: {
         name: {type: 'string'},
         bio: {type: 'string'}
       },
       required: ['name']
-    }
+    })
   })
   testDB.define('broadcasts', {
     filePattern: '/broadcasts/*.json',
     index: ['createdAt', 'type+createdAt'],
-    schema: {
+    validate: (new Ajv()).compile({
       type: 'object',
       properties: {
         type: {type: 'string'},
         createdAt: {type: 'number'}
       },
       required: ['type', 'createdAt']
-    }
+    })
   })
   await testDB.open()
   return testDB
@@ -119,26 +120,26 @@ test('make schema changes that require a full rebuild', async t => {
   testDB2.define('profile', {
     filePattern: '/profile.json',
     index: ['name', 'bio'],
-    schema: {
+    validate: (new Ajv()).compile({
       type: 'object',
       properties: {
         name: {type: 'string'},
         bio: {type: 'string'}
       },
       required: ['name']
-    }
+    })
   })
   testDB2.define('broadcasts', {
     filePattern: '/broadcasts/*.json',
     index: ['createdAt', 'type', 'type+createdAt'],
-    schema: {
+    validate: (new Ajv()).compile({
       type: 'object',
       properties: {
         type: {type: 'string'},
         createdAt: {type: 'number'}
       },
       required: ['type', 'createdAt']
-    }
+    })
   })
   var res = await testDB2.open()
   t.deepEqual(res, {rebuilds: ['profile', 'broadcasts']})
