@@ -167,6 +167,7 @@ var oldestPeople = await webdb.people
   - [Handling multiple schemas](#handling-multiple-schemas)
   - [Preprocessing records](#preprocessing-records)
   - [Serializing records](#serializing-records)
+  - [Using JSON-Schema to validate](#using-json-schema-to-validate)
 - [Class: WebDB](#class-webdb)
   - [new WebDB([name, opts])](#new-webdbname-opts)
   - [WebDB.delete([name])](#webdbdeletename)
@@ -186,6 +187,7 @@ var oldestPeople = await webdb.people
   - [Event: 'open-failed'](#event-open-failed)
   - [Event: 'indexes-reset'](#event-indexes-reset)
   - [Event: 'indexes-updated'](#event-indexes-updated)
+  - [Event: 'source-indexed'](#event-source-indexed)
   - [Event: 'source-missing'](#event-source-missing)
   - [Event: 'source-found'](#event-source-found)
   - [Event: 'source-error'](#event-source-error)
@@ -254,6 +256,7 @@ var oldestPeople = await webdb.people
   - [where.startsWithIgnoreCase(value)](#wherestartswithignorecasevalue)
 - [How it works](#how-it-works)
 - [Change history](#change-history)
+  - [4.0.0](#400)
   - [3.0.0](#300)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
