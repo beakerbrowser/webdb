@@ -25,6 +25,7 @@ webdb.define('people', {
   validate(record) {
     assert(record.firstName && typeof record.firstName === 'string')
     assert(record.lastName && typeof record.lastName === 'string')
+    return true
   },
 
   // secondary indexes for fast queries (optional)
@@ -626,6 +627,7 @@ webdb.define('people', {
   validate(record) {
     assert(record.firstName && typeof record.firstName === 'string')
     assert(record.lastName && typeof record.lastName === 'string')
+    return true
   },
   index: ['lastName', 'lastName+firstName', 'age'],
   filePattern: [
