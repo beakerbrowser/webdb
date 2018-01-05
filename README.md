@@ -1582,7 +1582,7 @@ Storing records in one file—`posts.json` for example—is an intuitive way to 
 
 #### Performance
 
-The `dat://` protocol doesn't support partial updates at the file-level, which means that with multiple records in a single-file, every time a user adds a record, anyone who follows that user must sync and re-download the *entire* file. As the file continues to grow, performance will degrade. Putting each record in an individual file is much more efficient: when a record is created, peers in the network will only download the newly-created file.
+The `dat://` protocol doesn't support partial updates at the file-level, which means that with multiple records in a single file, every time a user adds a record, anyone who follows that user must sync and re-download the *entire* file. As the file continues to grow, performance will degrade. Putting each record in an individual file is much more efficient: when a record is created, peers in the network will only download the newly-created file.
 
 #### Linkability
 
