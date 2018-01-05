@@ -1566,9 +1566,9 @@ Does not work on compound indexes.
 
 ## How it works
 
-WebDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It is inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using [LevelDB](https://github.com/Level/level). (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
+WebDB abstracts over the [DatArchive API](https://beakerbrowser.com/docs/apis/dat.html) to provide a simple database-like interface. It's inspired by [Dexie.js](https://github.com/dfahlander/Dexie.js) and built using [LevelDB](https://github.com/Level/level). (In the browser, it runs on IndexedDB using [level.js](https://github.com/maxogden/level.js).
 
-WebDB scans a set of source Dat archives for files that match a path pattern. Those files are indexed so that they can be queried easily. WebDB also provides a simple interface for adding, editing, and removing records from archives.
+WebDB scans a set of source Dat archives for files that match a path pattern. Web DB caches and indexes those files so they can be queried easily and quickly. WebDB also provides a simple interface for adding, editing, and removing records from archives.
 
 WebDB sits on top of Dat archives. It duplicates ingested data into IndexedDB, which acts as a throwaway cache. The cached data can be reconstructed at any time from the source Dat archives.
 
@@ -1576,6 +1576,21 @@ WebDB treats individual files in the Dat archive as individual records in a tabl
 
 WebDB watches its source archives for changes to the JSON files that compose its records. When the files change, it syncs and reads the changes, then updates IndexedDB, keeping query results up-to-date. Roughly, the flow is: `put() -> archive/posts/12345.json -> indexer -> indexeddb -> get()`.
 
+### Why not put all records in one file?
+
+Storing records in one file—`posts.json` for example—is an intuitive way to manage data on the peer-to-peer Web, but putting each record in an individual file is a much better choice for performance and linkability.
+
+#### Performance
+
+The `dat://` protocol doesn't support partial updates at the file-level, which means that with multiple records in a single-file, every time a user adds a record, anyone who follows that user must sync and re-download the *entire* file. As the file continues to grow, performance will degrade. Putting each record in an individual file is much more efficient: when a record is created, peers in the network will only download the newly-created file.
+
+#### Linkability
+
+Putting each record in an individual file also makes each record linkable! This isn't as important as performance, but it's a nice feature to have. See Dog Legs McBoot's status update as an example:
+
+```
+dat://232ac2ce8ad4ed80bd1b6de4cbea7d7b0cad1441fa62312c57a6088394717e41/posts/0jbdviucy.json`
+```
 
 ## Change history
 
