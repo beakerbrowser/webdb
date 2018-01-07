@@ -1592,7 +1592,7 @@ Putting each record in an individual file also makes each record linkable! This 
 dat://232ac2ce8ad4ed80bd1b6de4cbea7d7b0cad1441fa62312c57a6088394717e41/posts/0jbdviucy.json`
 ```
 
-## Change history
+## Changelog
 
 A quick overview of the notable changes to WebDB:
 
