@@ -85,8 +85,8 @@ class WebDB extends EventEmitter {
 
       // run rebuilds
       // TODO go per-table
-      this.emit('indexes-reset')
       await Indexer.resetOutdatedIndexes(this, neededRebuilds)
+      this.emit('indexes-reset')
 
       // save checksums
       for (let i = 0; i < tableNames.length; i++) {

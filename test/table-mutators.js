@@ -39,10 +39,20 @@ async function setupNewDB () {
 }
 
 test('Table.put()', async t => {
+  t.plan(14)
   var result
   const [archives, testDB] = await setupNewDB()
 
   // add a multi record
+  testDB.multi.once('put-record', ({url, origin, record}) => {
+    t.deepEqual(url, `${archives[0].url}/multi/4.json`)
+    t.deepEqual(origin, archives[0].url)
+    t.deepEqual(record, {
+      first: 4,
+      second: 'foobar',
+      third: 'whoop'
+    })
+  })
   result = await testDB.multi.put(archives[0].url + '/multi/4.json', {
     first: 4,
     second: 'foobar',
@@ -57,6 +67,15 @@ test('Table.put()', async t => {
   t.is(result.third, 'whoop')
 
   // overwrite the single record
+  testDB.single.once('put-record', ({url, origin, record}) => {
+    t.deepEqual(url, `${archives[0].url}/single.json`)
+    t.deepEqual(origin, archives[0].url)
+    t.deepEqual(record, {
+      first: 'first100000',
+      second: 100000,
+      third: 'third100000single'
+    })
+  })
   result = await testDB.single.put(archives[0].url + '/single.json', {
     first: 'first100000',
     second: 100000,
@@ -74,10 +93,15 @@ test('Table.put()', async t => {
 })
 
 test('Table.delete()', async t => {
+  t.plan(7)
   var result
   const [archives, testDB] = await setupNewDB()
 
   // delete a multi record
+  testDB.multi.once('del-record', ({url, origin, record}) => {
+    t.deepEqual(url, `${archives[0].url}/multi/first0.json`)
+    t.deepEqual(origin, archives[0].url)
+  })
   result = await testDB.multi.delete(archives[0].url + '/multi/first0.json')
   t.is(result, 1)
 
@@ -86,6 +110,10 @@ test('Table.delete()', async t => {
   t.falsy(result)
 
   // delete the single record
+  testDB.single.once('del-record', ({url, origin, record}) => {
+    t.deepEqual(url, `${archives[0].url}/single.json`)
+    t.deepEqual(origin, archives[0].url)
+  })
   result = await testDB.single.delete(archives[0].url + '/single.json')
 
   // fetch it back

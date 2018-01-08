@@ -71,8 +71,22 @@ test.before('setup archives', async () => {
 })
 
 test('index an archive', async t => {
+  t.plan(7)
+
   // index the archive
   var testDB = await setupNewDB()
+
+  // test the put event
+  testDB.profile.on('put-record', ({url, origin, record}) => {
+    t.deepEqual(url, `${aliceArchive.url}/profile.json`)
+    t.deepEqual(origin, aliceArchive.url)
+    t.deepEqual(record, {
+      name: 'alice',
+      bio: 'Cool computer girl',
+      avatarUrl: 'alice.png'
+    })
+  })
+
   await testDB.indexArchive(aliceArchive)
 
   // test the indexed values

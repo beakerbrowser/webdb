@@ -214,7 +214,8 @@ var oldestPeople = await webdb.people
   - [table.upsert(url, updates)](#tableupserturl-updates)
   - [table.upsert(url, fn)](#tableupserturl-fn)
   - [table.where(key)](#tablewherekey)
-  - [Event: 'index-updated'](#event-index-updated)
+  - [Event: 'put-record'](#event-put-record)
+  - [Event: 'del-record'](#event-del-record)
 - [Instance: WebDBQuery](#instance-webdbquery)
   - [query.clone()](#queryclone)
   - [query.count()](#querycount)
@@ -255,7 +256,10 @@ var oldestPeople = await webdb.people
   - [where.startsWithAnyOfIgnoreCase(values)](#wherestartswithanyofignorecasevalues)
   - [where.startsWithIgnoreCase(value)](#wherestartswithignorecasevalue)
 - [How it works](#how-it-works)
-- [Change history](#change-history)
+  - [Why not put all records in one file?](#why-not-put-all-records-in-one-file)
+    - [Performance](#performance)
+    - [Linkability](#linkability)
+- [Changelog](#changelog)
   - [4.0.0](#400)
   - [3.0.0](#300)
 
@@ -1100,18 +1104,36 @@ var whereClause = webdb.mytable.where('foo')
 
 Creates a new where-clause using the given key.
 
-### Event: 'index-updated'
+### Event: 'put-record'
 
 ```js
-webdb.mytable.on('index-updated', (url, version) => {
-  console.log('Table was updated for', url, 'at version', version)
+webdb.mytable.on('put-record', ({url, origin, indexedAt, record}) => {
+  console.log('Table was updated for', url, '(origin:', origin, ') at ', indexedAt)
+  console.log('Record data:', record)
 })
 ```
 
- - `url` String. The archive that was updated.
- - `version` Number. The version which was updated to.
+ - `url` String. The url of the record that was updated.
+ - `origin` String. The url origin of the record that was updated.
+ - `indexedAt` Number. The timestamp of the index update.
+ - `record` Object. The content of the updated record.
 
-Emitted when the table has updated the stored data for a archive.
+Emitted when the table has updated the stored data for a record.
+
+### Event: 'del-record'
+
+```js
+webdb.mytable.on('del-record', ({url, origin, indexedAt}) => {
+  console.log('Table was updated for', url, '(origin:', origin, ') at ', indexedAt)
+})
+```
+
+ - `url` String. The url of the record that was deleted.
+ - `origin` String. The url origin of the record that was deleted.
+ - `indexedAt` Number. The timestamp of the index update.
+
+Emitted when the table has deleted the stored data for a record.
+This can happen because the record has been deleted, or because a new version of the record fails validation.
 
 ## Instance: WebDBQuery
 
