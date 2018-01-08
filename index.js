@@ -114,16 +114,25 @@ class WebDB extends EventEmitter {
   }
 
   async close () {
+    if (!this.isOpen) return
     debug('closing')
     this.isOpen = false
     if (this.level) {
       this.listSources().forEach(url => Indexer.unwatchArchive(this, this._archives[url]))
+      this._archives = {}
       await new Promise(resolve => this.level.close(resolve))
       this.level = null
       veryDebug('db .level closed')
     } else {
       veryDebug('db .level didnt yet exist')
     }
+  }
+
+  async delete () {
+    if (this.isOpen) {
+      await this.close()
+    }
+    await WebDB.delete(this.name)
   }
 
   define (tableName, definition) {

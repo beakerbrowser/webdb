@@ -110,6 +110,24 @@ test('index two archives', async t => {
   await testDB.close()
 })
 
+test('index, delete db, then reindex', async t => {
+  var testDB = await setupNewDB()
+
+  // index the archive
+  await testDB.indexArchive(aliceArchive)
+  await testAliceIndex(t, testDB)
+
+  // delete db
+  await testDB.delete()
+  await testDB.open()
+  
+  // index the archive
+  await testDB.indexArchive(aliceArchive)
+  await testAliceIndex(t, testDB)
+
+  await testDB.close()
+})
+
 test('make schema changes that require a full rebuild', async t => {
   // index the archive
   var testDB = await setupNewDB()

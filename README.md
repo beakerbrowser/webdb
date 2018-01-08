@@ -174,6 +174,7 @@ var oldestPeople = await webdb.people
 - [Instance: WebDB](#instance-webdb)
   - [webdb.open()](#webdbopen)
   - [webdb.close()](#webdbclose)
+  - [webdb.delete()](#webdbdelete)
   - [webdb.define(name, definition)](#webdbdefinename-definition)
   - [webdb.indexArchive(url[, opts])](#webdbindexarchiveurl-opts)
   - [webdb.unindexArchive(url)](#webdbunindexarchiveurl)
@@ -579,7 +580,24 @@ await webdb.close()
 
  - Returns Promise&lt;Void&gt;.
 
-Closes and deconstructs the WebDB instance.
+Closes the WebDB instance.
+
+### webdb.delete()
+
+```js
+await webdb.delete()
+```
+
+ - Returns Promise&lt;Void&gt;.
+
+Closes and destroys all indexes in the WebDB instance.
+
+You can `.delete()` and then `.open()` a WebDB to recreate its indexes.
+
+```js
+await webdb.delete()
+await webdb.open()
+```
 
 ### webdb.define(name, definition)
 
