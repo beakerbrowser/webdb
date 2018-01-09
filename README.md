@@ -168,6 +168,7 @@ var oldestPeople = await webdb.people
   - [Preprocessing records](#preprocessing-records)
   - [Serializing records](#serializing-records)
   - [Using JSON-Schema to validate](#using-json-schema-to-validate)
+  - [Helper tables](#helper-tables)
 - [Class: WebDB](#class-webdb)
   - [new WebDB([name, opts])](#new-webdbname-opts)
   - [WebDB.delete([name])](#webdbdeletename)
@@ -261,6 +262,7 @@ var oldestPeople = await webdb.people
     - [Performance](#performance)
     - [Linkability](#linkability)
 - [Changelog](#changelog)
+  - [4.1.0](#410)
   - [4.0.0](#400)
   - [3.0.0](#300)
 
@@ -531,6 +533,46 @@ webdb.define('people', {
 })
 ```
 
+### Helper tables
+
+Sometimes you need internal storage to help you maintain application state.
+This may be for interfaces, or data which is private, or for special kinds of indexes.
+
+For instance, in the [Fritter](https://github.com/beakerbrowser/fritter) app, we needed an index for notifications.
+This index was conditional: it needed to contain posts which were replies to the user, or likes which were on the user's post.
+For cases like this, you can use a "helper table."
+
+```js
+webdb.define('notifications', {
+  helperTable: true,
+  index: ['createdAt'],
+  preprocess (record) {
+    record.createdAt = Date.now()
+  }
+})
+```
+
+When the `helperTable` attribute is set to `true` in a table definition, the table will not be used to index Dat archives.
+Instead, it will exist purely in the local data cache, and only contain data which is `.put()` there.
+In all other respects, it behaves like a normal table.
+
+In [Fritter](https://github.com/beakerbrowser/fritter), the helper table is used with events to track notifications:
+
+```js
+// track reply notifications
+webdb.posts.on('put', async ({record, url, origin}) => {
+  if (origin === userUrl) return // dont index the user's own posts
+  if (isAReplyToUser(record) === false) return // only index replies to the user
+  if (await isNotificationIndexed(url)) return // don't index if already indexed
+  await db.notifications.put(url, {type: 'reply', url})
+})
+webdb.posts.on('del', async ({url}) => {
+  if (await isNotificationIndexed(url)) {
+    await db.notifications.delete(url)
+  }
+})
+```
+
 ## Class: WebDB
 
 ### new WebDB([name, opts])
@@ -605,6 +647,7 @@ await webdb.open()
  - `definition` Object.
    - `index` Array&lt;String or Object&gt;. A list of attributes which should have secondary indexes produced for querying. Each `index` value is a keypath (see https://www.w3.org/TR/IndexedDB/#dfn-key-path) or an object definition (see below).
    - `filePattern` String or Array&lt;String&gt;. An [anymatch](https://www.npmjs.com/package/anymatch) list of files to index.
+   - `helperTable` Boolean. If true, the table will be used for storing internal data and will not be used to index Dat archives. See [helper tables](#helper-tables)
    - `validate` Function. A method to accept or reject a file from indexing based on its content. If the method returns falsy or throws an error, the file will not be indexed.
      - `record` Object.
      - Returns Boolean.
@@ -1635,6 +1678,10 @@ dat://232ac2ce8ad4ed80bd1b6de4cbea7d7b0cad1441fa62312c57a6088394717e41/posts/0jb
 ## Changelog
 
 A quick overview of the notable changes to WebDB:
+
+### 4.1.0
+
+Added "helper tables," which make it possible to track private state and build more sophisticated indexes.
 
 ### 4.0.0
 
