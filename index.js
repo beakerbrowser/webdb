@@ -1,5 +1,6 @@
 /* globals window */
 
+require('babel-polyfill')
 const EventEmitter = require('events')
 const level = require('level-browserify')
 const sublevel = require('subleveldown')
@@ -72,11 +73,11 @@ class WebDB extends EventEmitter {
 
         // load the saved checksum
         let lastChecksum
-        try { 
+        try {
           let tableMeta = await this._tableSchemaLevel.get(tableName)
           lastChecksum = tableMeta.checksum
         } catch (e) {}
-        
+
         // compare
         if (lastChecksum !== tableChecksum) {
           neededRebuilds.push(tableName)
@@ -223,4 +224,3 @@ class WebDB extends EventEmitter {
   }
 }
 module.exports = WebDB
-
