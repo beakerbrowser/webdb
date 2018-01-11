@@ -36,7 +36,8 @@
   },
   "scripts": {
     "lint": "standard --fix",
-    "test": "ava -s test/*.js -T 30000 -v"
+    "test": "ava -s test/*.js -T 30000 -v",
+    "build": "webpack --progress"
   },
   "repository": {
     "type": "git",
