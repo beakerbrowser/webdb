@@ -22,6 +22,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'webdb-bundle.js'
+        filename: 'webdb-bundle.js',
+        library: 'WebDB'
     }
 }
