@@ -2,7 +2,7 @@ const path = require('path')
 const webpack = require('webpack')
 
 module.exports = {
-    entry: './index.js',
+    entry: ['babel-polyfill', './index.js'],
     plugins: [
         new webpack.optimize.UglifyJsPlugin()
     ],
@@ -22,7 +22,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'webdb-bundle.js',
+        filename: 'bundle.js',
         library: 'WebDB'
     }
 }

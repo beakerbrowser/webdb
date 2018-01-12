@@ -1,6 +1,5 @@
 /* globals window */
 
-require('babel-polyfill')
 const EventEmitter = require('events')
 const level = require('level-browserify')
 const sublevel = require('subleveldown')
