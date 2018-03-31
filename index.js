@@ -158,7 +158,7 @@ class WebDB extends EventEmitter {
     }
 
     // create our own new DatArchive instance
-    archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
+    archive = typeof archive === 'string' ? new (this.DatArchive)(archive, opts.dat) : archive
     if (!(archive.url in this._archives)) {
       // store and process
       debug('WebDB.indexArchive', archive.url)
@@ -167,8 +167,8 @@ class WebDB extends EventEmitter {
     }
   }
 
-  async unindexArchive (archive) {
-    archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
+  async unindexArchive (archive, opts = {}) {
+    archive = typeof archive === 'string' ? new (this.DatArchive)(archive, opts.dat) : archive
     if (archive.url in this._archives) {
       debug('WebDB.unindexArchive', archive.url)
       delete this._archives[archive.url]

@@ -717,19 +717,22 @@ await webdb.indexArchive('dat://foo.com')
  - `url` String or DatArchive or Array&lt;String or DatArchive&gt;. The sites to index.
  - `opts` Object.
    - `watch` Boolean. Should WebDB watch the archive for changes, and index them immediately? Defaults to true.
+   - `dat`: Object. Passed through as options to DatArchive.
  - Returns Promise&lt;Void&gt;.
 
 Add one or more dat:// sites to be indexed.
 The method will return when the site has been fully indexed.
 This will add the given archive to the "sources" list.
 
-### webdb.unindexArchive(url)
+### webdb.unindexArchive(url[, opts])
 
 ```js
 await webdb.unindexArchive('dat://foo.com')
 ```
 
  - `url` String or DatArchive. The site to deindex.
+ - `opts` Object.
+   - `dat`: Object. Passed through as options to DatArchive.
  - Returns Promise&lt;Void&gt;.
 
 Remove a dat:// site from the dataset.
