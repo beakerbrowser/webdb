@@ -1,4 +1,6 @@
 const test = require('ava')
+const path = require('path')
+const fs = require('fs')
 const {newDB, reopenDB, ts} = require('./lib/util')
 const DatArchive = require('node-dat-archive')
 const tempy = require('tempy')
@@ -90,6 +92,45 @@ test('index an archive', async t => {
   await testDB.indexArchive(aliceArchive)
 
   // test the indexed values
+  await testAliceIndex(t, testDB)
+
+  await testDB.close()
+})
+
+test('handle indexing failures', async t => {
+  t.plan(8)
+
+  // index the archive
+  var testDB = await setupNewDB()
+
+  // test the put event
+  testDB.profile.on('put-record', ({url, origin, record}) => {
+    t.deepEqual(url, `${aliceArchive.url}/profile.json`)
+    t.deepEqual(origin, aliceArchive.url)
+    t.deepEqual(record, {
+      name: 'alice',
+      bio: 'Cool computer girl',
+      avatarUrl: 'alice.png'
+    })
+  })
+
+  // setup reads to fail
+  let readFile = aliceArchive.readFile
+  aliceArchive.readFile = () => { throw new Error('Failed to read') }
+
+  // try indexing (should fail)
+  await testDB.indexArchive(aliceArchive)
+
+  // no data
+  await t.throws(testDB.profile.level.get(aliceArchive.url + '/profile.json'))
+
+  // restore reads
+  aliceArchive.readFile = readFile
+
+  // // try indexing (should succeed)
+  await testDB.indexArchive(aliceArchive)
+
+  // // test the indexed values
   await testAliceIndex(t, testDB)
 
   await testDB.close()

@@ -159,11 +159,13 @@ class WebDB extends EventEmitter {
 
     // create our own new DatArchive instance
     archive = typeof archive === 'string' ? new (this.DatArchive)(archive) : archive
+    debug('WebDB.indexArchive', archive.url)
     if (!(archive.url in this._archives)) {
       // store and process
-      debug('WebDB.indexArchive', archive.url)
       this._archives[archive.url] = archive
       await Indexer.addArchive(this, archive, opts)
+    } else {
+      await Indexer.indexArchive(this, archive)
     }
   }
 
