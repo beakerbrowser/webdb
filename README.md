@@ -1672,7 +1672,7 @@ The `dat://` protocol doesn't support partial updates at the file-level, which m
 Putting each record in an individual file also makes each record linkable! This isn't as important as performance, but it's a nice feature to have. See Dog Legs McBoot's status update as an example:
 
 ```
-dat://232ac2ce8ad4ed80bd1b6de4cbea7d7b0cad1441fa62312c57a6088394717e41/posts/0jbdviucy.json`
+dat://232ac2ce8ad4ed80bd1b6de4cbea7d7b0cad1441fa62312c57a6088394717e41/posts/0jbdviucy.json
 ```
 
 ## Changelog
