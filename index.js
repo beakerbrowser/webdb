@@ -17,6 +17,7 @@ class WebDB extends EventEmitter {
     if (typeof window === 'undefined' && !opts.DatArchive) {
       throw new Error('Must provide {DatArchive} opt when using WebDB outside the browser.')
     }
+    this.parser = opts.parser || JSON
     this.level = false
     this.name = name
     this.isBeingOpened = false
@@ -72,11 +73,11 @@ class WebDB extends EventEmitter {
 
         // load the saved checksum
         let lastChecksum
-        try { 
+        try {
           let tableMeta = await this._tableSchemaLevel.get(tableName)
           lastChecksum = tableMeta.checksum
         } catch (e) {}
-        
+
         // compare
         if (lastChecksum !== tableChecksum) {
           neededRebuilds.push(tableName)
