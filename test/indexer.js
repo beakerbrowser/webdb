@@ -286,7 +286,7 @@ test('catch errors when validating records', async t => {
   var testDB = await setupNewDB()
 
   // when 'source-error' triggers, assert the error we are looking for
-  testDB.on('source-error', (url, e) => {
+  testDB.on('validation-failed', (url, e) => {
       t.true(e.message.indexOf('undefinedFunc is not defined') > -1)
   })
 
