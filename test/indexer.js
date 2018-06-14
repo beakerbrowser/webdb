@@ -73,10 +73,17 @@ test.before('setup archives', async () => {
 })
 
 test('index an archive', async t => {
-  t.plan(7)
+  t.plan(12)
 
   // index the archive
   var testDB = await setupNewDB()
+
+  // test the source-indexing event
+  testDB.on('source-indexing', (url, startVersion, targetVersion) => {
+    t.is(url, aliceArchive.url)
+    t.is(startVersion, 0)
+    t.is(targetVersion, 7)
+  })
 
   // test the put event
   testDB.profile.on('put-record', ({url, origin, record}) => {
@@ -87,6 +94,12 @@ test('index an archive', async t => {
       bio: 'Cool computer girl',
       avatarUrl: 'alice.png'
     })
+  })
+
+  // test the source-indexed event
+  testDB.on('source-indexed', (url, targetVersion) => {
+    t.is(url, aliceArchive.url)
+    t.is(targetVersion, 7)
   })
 
   await testDB.indexArchive(aliceArchive)
@@ -242,6 +255,17 @@ test('index two archives, then make changes', async t => {
   // test the indexed values
   await testAliceIndex(t, testDB)
   await testBobIndex(t, testDB)
+
+  testDB.on('source-indexing', (url, startVersion, targetVersion) => {
+    t.is(url, aliceArchive.url)
+    t.is(typeof startVersion, 'number')
+    t.is(typeof targetVersion, 'number')
+    t.truthy(startVersion <= targetVersion)
+  })
+  testDB.on('source-indexed', (url, targetVersion) => {
+    t.is(url, aliceArchive.url)
+    t.is(typeof targetVersion, 'number')
+  })
 
   // write changes to alice's profile.json
   await aliceArchive.writeFile('/profile.json', JSON.stringify({name: 'alice', bio: '_Very_ cool computer girl'}))
