@@ -190,6 +190,7 @@ var oldestPeople = await webdb.people
   - [Event: 'indexes-reset'](#event-indexes-reset)
   - [Event: 'indexes-updated'](#event-indexes-updated)
   - [Event: 'source-indexing'](#event-source-indexing)
+  - [Event: 'source-index-progress'](#event-source-index-progress)
   - [Event: 'source-indexed'](#event-source-indexed)
   - [Event: 'source-missing'](#event-source-missing)
   - [Event: 'source-found'](#event-source-found)
@@ -871,6 +872,20 @@ webdb.on('source-indexing', (url, startVersion, targetVersion) => {
  - `targetVersion` Number. The version which is being indexed to.
 
 Emitted when the WebDB instance has started to index the given archive.
+
+### Event: 'source-index-progress'
+
+```js
+webdb.on('source-index-progress', (url, tick, total) => {
+  console.log('Update for', url, 'is', Math.round(tick / total * 100), '% complete')
+})
+```
+
+ - `url` String. The archive that was updated.
+ - `tick` Number. The current update being applied.
+ - `total` Number. The total number of updates being applied.
+
+Emitted when an update has been applied during an indexing process.
 
 ### Event: 'source-indexed'
 

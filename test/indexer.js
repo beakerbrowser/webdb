@@ -73,7 +73,7 @@ test.before('setup archives', async () => {
 })
 
 test('index an archive', async t => {
-  t.plan(12)
+  t.plan(27)
 
   // index the archive
   var testDB = await setupNewDB()
@@ -83,6 +83,12 @@ test('index an archive', async t => {
     t.is(url, aliceArchive.url)
     t.is(startVersion, 0)
     t.is(targetVersion, 7)
+  })
+
+  testDB.on('source-index-progress', (url, tick, total) => {
+    t.truthy(tick <= 5)
+    t.is(total, 5)
+    t.is(url, aliceArchive.url)
   })
 
   // test the put event
@@ -261,6 +267,11 @@ test('index two archives, then make changes', async t => {
     t.is(typeof startVersion, 'number')
     t.is(typeof targetVersion, 'number')
     t.truthy(startVersion <= targetVersion)
+  })
+  testDB.on('source-index-progress', (url, tick, total) => {
+    t.is(tick, 1)
+    t.is(total, 1)
+    t.is(url, aliceArchive.url)
   })
   testDB.on('source-indexed', (url, targetVersion) => {
     t.is(url, aliceArchive.url)
