@@ -189,6 +189,8 @@ var oldestPeople = await webdb.people
   - [Event: 'open-failed'](#event-open-failed)
   - [Event: 'indexes-reset'](#event-indexes-reset)
   - [Event: 'indexes-updated'](#event-indexes-updated)
+  - [Event: 'source-indexing'](#event-source-indexing)
+  - [Event: 'source-index-progress'](#event-source-index-progress)
   - [Event: 'source-indexed'](#event-source-indexed)
   - [Event: 'source-missing'](#event-source-missing)
   - [Event: 'source-found'](#event-source-found)
@@ -380,8 +382,8 @@ record.getIndexedAt()    // => 1511913554723
 
 Every record is emitted in a wrapper object with the following methods:
 
- - `getURL()` The URL of the record.
- - `getOrigin()` The URL of the site the record was found on.
+ - `getRecordURL()` The URL of the record.
+ - `getRecordOrigin()` The URL of the site the record was found on.
  - `getIndexedAt()` The timestamp of when the record was indexed.
 
 These attributes can be used in indexes with the following IDs:
@@ -856,6 +858,34 @@ webdb.on('indexes-updated', (url, version) => {
  - `version` Number. The version which was updated to.
 
 Emitted when the WebDB instance has updated the stored data for a archive.
+
+### Event: 'source-indexing'
+
+```js
+webdb.on('source-indexing', (url, startVersion, targetVersion) => {
+  console.log('Tables are updating for', url, 'from version', startVersion, 'to', targetVersion)
+})
+```
+
+ - `url` String. The archive that was updated.
+ - `startVersion` Number. The version which is being indexed from.
+ - `targetVersion` Number. The version which is being indexed to.
+
+Emitted when the WebDB instance has started to index the given archive.
+
+### Event: 'source-index-progress'
+
+```js
+webdb.on('source-index-progress', (url, tick, total) => {
+  console.log('Update for', url, 'is', Math.round(tick / total * 100), '% complete')
+})
+```
+
+ - `url` String. The archive that was updated.
+ - `tick` Number. The current update being applied.
+ - `total` Number. The total number of updates being applied.
+
+Emitted when an update has been applied during an indexing process.
 
 ### Event: 'source-indexed'
 
