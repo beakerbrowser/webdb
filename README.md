@@ -193,7 +193,6 @@ var oldestPeople = await webdb.people
   - [Event: 'source-missing'](#event-source-missing)
   - [Event: 'source-found'](#event-source-found)
   - [Event: 'source-error'](#event-source-error)
-  - [Event: 'validation-failed'](#event-validation-failed)
 - [Instance: WebDBTable](#instance-webdbtable)
   - [table.count()](#tablecount)
   - [table.delete(url)](#tabledeleteurl)
@@ -353,7 +352,7 @@ Once your query has been defined, you can execute and *modify* the results using
   - [put(record)](#queryputrecord)
   - [update(updates)](#queryupdateupdates)
   - [update(fn)](#queryupdatefn)
-
+  
 If you try to modify rows in archives that are not writable, WebDB will throw an error.
 
 ### Table helper methods
@@ -904,16 +903,6 @@ webdb.on('source-error', (url, err) => {
 
 Emitted when a source fails to load.
 
-### Event: 'validation-failed'
-
-```js
-webdb.on('validation-failed', (url, err) => {
-  console.log('WebDB failed to validate', url, err)
-})
-```
-
-Emitted when validation for a source fails.
-
 ## Instance: WebDBTable
 
 ### table.count()
@@ -986,7 +975,7 @@ var record = await webdb.mytable.get('foo', 'bar')
  - `key` String. The keyname to search against.
  - `value` Any. The value to match against.
  - Promise&lt;Object&gt;.
-
+ 
 Get the record first record to match the given key/value query.
 
 ### table.isRecordFile(url)
@@ -1434,7 +1423,7 @@ Returns the value of the primary key for each matching record, with duplicates f
 The `key` is determined by the index being used.
 By default, this is the `url` attribute, but it can be changed by using `where()` or `orderBy()`.
 
-Example:
+Example: 
 
 ```js
 var ages = await webdb.mytable.orderBy('age').uniqueKeys()
@@ -1683,7 +1672,7 @@ The `dat://` protocol doesn't support partial updates at the file-level, which m
 Putting each record in an individual file also makes each record linkable! This isn't as important as performance, but it's a nice feature to have. See Dog Legs McBoot's status update as an example:
 
 ```
-dat://232ac2ce8ad4ed80bd1b6de4cbea7d7b0cad1441fa62312c57a6088394717e41/posts/0jbdviucy.json`
+dat://232ac2ce8ad4ed80bd1b6de4cbea7d7b0cad1441fa62312c57a6088394717e41/posts/0jbdviucy.json
 ```
 
 ## Changelog

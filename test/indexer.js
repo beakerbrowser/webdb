@@ -161,7 +161,7 @@ test('index, delete db, then reindex', async t => {
   // delete db
   await testDB.delete()
   await testDB.open()
-
+  
   // index the archive
   await testDB.indexArchive(aliceArchive)
   await testAliceIndex(t, testDB)
@@ -276,25 +276,6 @@ test('index two archives, then make changes', async t => {
   } catch (e) {
     t.truthy(e)
   }
-
-  await testDB.close()
-})
-
-test('catch errors when validating records', async t => {
-  // fail if assertion is not made
-  t.plan(1)
-  var testDB = await setupNewDB()
-
-  // when 'source-error' triggers, assert the error we are looking for
-  testDB.on('validation-failed', (url, e) => {
-      t.true(e.message.indexOf('undefinedFunc is not defined') > -1)
-  })
-
-  // set validate to something that will fail
-  testDB.profile.schema.validate = function() { undefinedFunc() }
-
-  // index archive, which should trigger faulty validator
-  await testDB.indexArchive(aliceArchive)
 
   await testDB.close()
 })
