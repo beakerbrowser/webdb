@@ -1115,7 +1115,7 @@ The schema definition for the table.
 var records = await webdb.mytable.toArray()
 ```
 
- - Returns Promise&lt;Array&gt;.
+ - Returns Promise&lt;Array&lt;Object&gt;&gt;.
 
 Returns an array of all records in the table.
 
